@@ -153,8 +153,11 @@ ok "Systemd-Dienst aktiviert"
 # ------------------------------------------------------------
 # 🎉 Abschluss
 # ------------------------------------------------------------
+systemctl start brunnen.service
+
 section "✅ Installation abgeschlossen!"
-echo -e "${GREEN}${BOLD}Starte Service:${RESET} sudo systemctl start brunnen.service"
-echo -e "${GREEN}${BOLD}Prüfe Status:${RESET} sudo systemctl status brunnen.service"
+echo -e "${GREEN}${BOLD}Starte Service:${RESET} systemctl start brunnen.service"
+echo -e "${GREEN}${BOLD}Stoppe Service:${RESET} systemctl stop brunnen.service"
+echo -e "${GREEN}${BOLD}Prüfe Status:${RESET} systemctl status brunnen.service"
 echo -e "${GREEN}${BOLD}Logs anzeigen:${RESET} tail -f $LOG_DIR/brunnen.service.log"
 echo -e "\n${BOLD}Viel Erfolg mit deinem Brunnen-Websystem! 💧${RESET}"
