@@ -1,4 +1,3 @@
 *.log
 config/config.json
 data/
-.gitignore
