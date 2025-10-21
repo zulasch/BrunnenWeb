@@ -1,6 +1,4 @@
 *.log
 config/*.json
-data/*.json
-data/*.db
-data/*.pid
-scripts/*.sh
+data/
+scripts/
