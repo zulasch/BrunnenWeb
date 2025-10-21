@@ -7,7 +7,7 @@
 
 set -e  # Bei Fehlern abbrechen
 
-BASE_DIR="/opt/brunnenweb"
+BASE_DIR="/opt/brunnen_web"
 USER="brunnen"
 VENV_DIR="$BASE_DIR/venv"
 CONFIG_DIR="$BASE_DIR/config"
@@ -31,10 +31,11 @@ apt install -y python3 python3-venv python3-pip git i2c-tools sqlite3 git
 # ============================================================
 # 2️⃣ Projektverzeichnis erstellen
 # ============================================================
-echo "📁 Erstelle Verzeichnisstruktur unter $BASE_DIR ..."
+echo "📁 Erstelle Verzeichnisstruktur unter $BASE_DIR und klone Repository..."
 mkdir -p "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR" "$SCRIPT_DIR" "$TEMPLATE_DIR"
 useradd -r -s /bin/false $USER || true
 chown -R $USER:$USER $BASE_DIR
+git clone https://github.com/zulasch/BrunnenWeb $BASE_DIR
 
 # ============================================================
 # 3️⃣ Virtuelle Umgebung
