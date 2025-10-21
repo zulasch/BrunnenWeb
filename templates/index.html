@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">📊 Messsystem-Konfiguration</h2>
+<form id="configForm" class="space-y-4">
+  {% for key, value in config.items() %}
+    <div>
+      <label class="font-semibold">{{ key }}</label>
+      <small class="block text-gray-500 mb-1">{{ descriptions.get(key, '') }}</small>
+      <input type="text" name="{{ key }}" value="{{ value }}"
+             class="border p-2 rounded w-full"
+             title="{{ descriptions.get(key, '') }}">
+    </div>
+  {% endfor %}
+  <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full">
+    💾 Speichern
+  </button>
+</form>
+<p id="msg" class="text-center text-green-600 mt-4 hidden">Gespeichert!</p>
+
+<script>
+document.getElementById('configForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const response = await fetch('{{ url_for("update") }}', { method: 'POST', body: formData });
+  const result = await response.json();
+  const msg = document.getElementById('msg');
+  msg.innerText = result.message;
+  msg.classList.remove('hidden');
+  setTimeout(() => msg.classList.add('hidden'), 3000);
+});
+</script>
+{% endblock %}

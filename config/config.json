@@ -1,0 +1,14 @@
+{
+  "WERT_4mA": 0,
+  "WERT_20mA": 3.0,
+  "STARTABSTICH": 11.0,
+  "MESSWERT_NN": 50,
+  "INITIAL_WASSERTIEFE": 0.02,
+  "MESSINTERVAL": 5.0,
+  "INFLUX_URL": "http://influxdb.local:8086",
+  "INFLUX_TOKEN": "qmbQBiTiWSofhS-gyJHehpYJWNuULiwJ7ToiClngK-8WBIKBEUa9iNIYmHLS47mDrXsHrkWhRs-goWzj7eYApw==",
+  "INFLUX_ORG": "8bd6d1a46878c938",
+  "INFLUX_BUCKET": "SOAP-TEST",
+  "SHUNT_OHMS": 150.0,
+  "ADMIN_PIN": 1234
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ title or "Brunnen Webinterface" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <nav class="bg-blue-600 text-white p-4 flex justify-between">
+    <div class="font-bold">💧 Brunnensteuerung</div>
+    <div class="space-x-4">
+      <a href="{{ url_for('index') }}" class="hover:underline">📊 Messsystem</a>
+	  <a href="{{ url_for('measurements_page') }}" class="hover:underline">📈 Messwerte</a>
+	  <a href="{{ url_for('systemstatus_page') }}" class="hover:underline">🧠 Systemstatus</a>
+      <a href="{{ url_for('service_page') }}" class="hover:underline">⚙️ Service</a>
+      <a href="{{ url_for('logs_page') }}" class="hover:underline">🪵 Logs</a>
+      <a href="{{ url_for('logout') }}" class="hover:underline">🚪 Logout</a>
+    </div>
+  </nav>
+  <main class="p-6 max-w-5xl mx-auto">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="space-y-2 mb-4">
+          {% for category, msg in messages %}
+            <div class="p-3 rounded {{ 'bg-green-100' if category=='success' else 'bg-yellow-100' if category=='info' else 'bg-red-100' }}">
+              {{ msg }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

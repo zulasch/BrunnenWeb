@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">🧠 Systemstatus</h2>
+
+<!-- SYSTEMINFOS -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+  <div class="bg-white rounded-xl p-4 shadow">
+    <h3 class="font-semibold mb-2">💻 System</h3>
+    <p><b>Hostname:</b> {{ sys.hostname }}</p>
+    <p><b>OS:</b> {{ sys.os }}</p>
+    <p><b>Uptime:</b> {{ sys.uptime }}</p>
+  </div>
+
+  <div class="bg-white rounded-xl p-4 shadow">
+    <h3 class="font-semibold mb-2">🌐 Netzwerk</h3>
+    <p><b>IP-Adresse:</b> {{ sys.ip }}</p>
+    <p><b>WLAN:</b> {{ sys.wifi }}</p>
+  </div>
+
+  <div class="bg-white rounded-xl p-4 shadow">
+    <h3 class="font-semibold mb-2">🔥 CPU</h3>
+    <p><b>Last:</b> {{ sys.cpu }} %</p>
+    <p><b>Temperatur:</b> {{ sys.temp }} °C</p>
+  </div>
+
+  <div class="bg-white rounded-xl p-4 shadow">
+    <h3 class="font-semibold mb-2">🧠 RAM</h3>
+    <p>{{ sys.ram_used }} / {{ sys.ram_total }} MB</p>
+  </div>
+
+  <div class="bg-white rounded-xl p-4 shadow md:col-span-2">
+    <h3 class="font-semibold mb-2">💾 Speicher</h3>
+    <p>{{ sys.disk_used }} / {{ sys.disk_total }} GB ({{ sys.disk_percent }}%)</p>
+    <div class="w-full bg-gray-200 rounded h-3 mt-2">
+      <div style="width: {{ sys.disk_percent }}%;" class="bg-blue-600 h-3 rounded"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WLAN KONFIG -->
+<div class="bg-white rounded-xl p-4 shadow mb-6">
+  <h3 class="font-semibold mb-2">📶 WLAN-Konfiguration</h3>
+  <form id="wifiForm" class="space-y-4">
+    <div>
+      <label class="font-semibold">SSID auswählen</label>
+      <select name="ssid" class="border p-2 rounded w-full">
+        {% for net in sys.networks %}
+          <option value="{{ net.ssid }}">{{ net.ssid }} (Signal: {{ net.signal }}%)</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="font-semibold">Kennwort</label>
+      <input type="password" name="psk" class="border p-2 rounded w-full">
+    </div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">💾 Verbinden</button>
+  </form>
+  <p id="msg" class="text-center mt-4 hidden text-green-600"></p>
+</div>
+
+<script>
+document.getElementById('wifiForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const res = await fetch('/wifi/configure', { method: 'POST', body: formData });
+  const data = await res.json();
+  const msg = document.getElementById('msg');
+  msg.innerText = data.message;
+  msg.classList.remove('hidden');
+  if(data.status === 'ok') msg.classList.add('text-green-600');
+  else msg.classList.add('text-red-600');
+});
+</script>
+
+{% endblock %}

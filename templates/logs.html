@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">🪵 Logs</h2>
+
+<form class="mb-4">
+  <label class="mr-2">Datei:</label>
+  <select name="file" onchange="this.form.submit()" class="border p-2 rounded">
+    {% for name in files %}
+      <option value="{{ name }}" {% if name == chosen %}selected{% endif %}>{{ name }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<pre class="bg-black text-green-400 p-4 rounded overflow-auto" style="max-height: 70vh;">{{ content }}</pre>
+{% endblock %}
