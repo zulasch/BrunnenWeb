@@ -10,7 +10,7 @@ set -e  # Bei Fehlern abbrechen
 # ------------------------------------------------------------
 # 🧩 Konfiguration
 # ------------------------------------------------------------
-BASE_DIR="/opt/brunnen"
+BASE_DIR="/opt/brunnen_web"
 USER="brunnen"
 VENV_DIR="$BASE_DIR/venv"
 CONFIG_DIR="$BASE_DIR/config"
