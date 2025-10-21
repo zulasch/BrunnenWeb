@@ -1,60 +1,84 @@
 #!/bin/bash
 # ============================================================
-#  Brunnen-Web Installationsskript
-#  Erstellt alle benötigten Verzeichnisse, venv, Abhängigkeiten
-#  und Systemd-Dienste.
+# 💧 Brunnen-Web Installationsskript
+# Erstellt Verzeichnisse, virtuelle Umgebung, Abhängigkeiten
+# und richtet den Systemd-Dienst ein.
 # ============================================================
 
 set -e  # Bei Fehlern abbrechen
 
-BASE_DIR="/opt/brunnen_web"
+# ------------------------------------------------------------
+# 🧩 Konfiguration
+# ------------------------------------------------------------
+BASE_DIR="/opt/brunnen"
 USER="brunnen"
 VENV_DIR="$BASE_DIR/venv"
 CONFIG_DIR="$BASE_DIR/config"
 DATA_DIR="$BASE_DIR/data"
 LOG_DIR="$BASE_DIR/logs"
 SCRIPT_DIR="$BASE_DIR/scripts"
-TEMPLATE_DIR="$BASE_DIR/templates"
-
 SERVICE_FILE="/etc/systemd/system/brunnen.service"
 
-echo "🔧 Starte Installation des Brunnen-Systems ..."
+# ------------------------------------------------------------
+# 🎨 Farben & Formatierung
+# ------------------------------------------------------------
+GREEN="\e[32m"
+YELLOW="\e[33m"
+RED="\e[31m"
+BLUE="\e[36m"
+BOLD="\e[1m"
+RESET="\e[0m"
 
-# ============================================================
-# 1️⃣ Grundlegende Pakete installieren
-# ============================================================
-echo "📦 Aktualisiere Systempakete..."
-apt update -y
-apt install -y python3 python3-venv python3-pip git i2c-tools sqlite3 git
+# ------------------------------------------------------------
+# 🧭 Hilfsfunktion
+# ------------------------------------------------------------
+section() {
+  echo -e "\n${BLUE}${BOLD}=== $1 ===${RESET}"
+}
 
+ok() {
+  echo -e "  ${GREEN}✔${RESET} $1"
+}
 
-# ============================================================
-# 2️⃣ Projektverzeichnis erstellen
-# ============================================================
-echo "📁 Erstelle Verzeichnisstruktur unter $BASE_DIR und klone Repository..."
+warn() {
+  echo -e "  ${YELLOW}⚠${RESET} $1"
+}
+
+err() {
+  echo -e "  ${RED}✖${RESET} $1"
+}
+
+# ------------------------------------------------------------
+# 🚀 Installation
+# ------------------------------------------------------------
+section "Starte Installation des Brunnen-Systems"
+
+section "1️⃣  Systempakete installieren"
+apt update -y && apt install -y python3 python3-venv python3-pip git i2c-tools sqlite3
+ok "Systempakete aktualisiert"
+
+section "2️⃣  Verzeichnisse & Benutzer anlegen"
 git clone https://github.com/zulasch/BrunnenWeb $BASE_DIR
-mkdir -p "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR" "$SCRIPT_DIR" "$TEMPLATE_DIR"
-useradd -r -s /bin/false $USER || true
-chown -R $USER:$USER $BASE_DIR
+mkdir -p "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR" "$SCRIPT_DIR"
+id "$USER" &>/dev/null || useradd -r -s /bin/false "$USER"
+chown -R "$USER:$USER" "$BASE_DIR"
+ok "Verzeichnisstruktur erstellt unter $BASE_DIR"
 
-
-# ============================================================
-# 3️⃣ Virtuelle Umgebung
-# ============================================================
+section "3️⃣  Virtuelle Python-Umgebung einrichten"
 if [ ! -d "$VENV_DIR" ]; then
-    echo "🐍 Erstelle virtuelle Python-Umgebung..."
-    python3 -m venv "$VENV_DIR"
+  python3 -m venv "$VENV_DIR"
+  ok "Virtuelle Umgebung erstellt"
+else
+  warn "Virtuelle Umgebung bereits vorhanden"
 fi
 
-echo "📦 Installiere Python-Abhängigkeiten..."
 source "$VENV_DIR/bin/activate"
 pip install --upgrade pip
-pip install adafruit-circuitpython-ads1x15 influxdb-client flask board
+pip install flask psutil influxdb-client adafruit-circuitpython-ads1x15 board
 deactivate
+ok "Python-Abhängigkeiten installiert"
 
-# ============================================================
-# 4️⃣ Beispielkonfiguration anlegen (falls nicht vorhanden)
-# ============================================================
+section "4️⃣  Beispielkonfiguration anlegen"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 if [ ! -f "$CONFIG_FILE" ]; then
 cat <<EOF > "$CONFIG_FILE"
@@ -72,25 +96,26 @@ cat <<EOF > "$CONFIG_FILE"
   "INFLUX_BUCKET": ""
 }
 EOF
+ok "Beispielkonfiguration erstellt unter $CONFIG_FILE"
+else
+  warn "Konfiguration bereits vorhanden"
 fi
 
-# ============================================================
-# 5️⃣ Systemd-Service anlegen
-# ============================================================
-echo "⚙️  Erstelle systemd-Service $SERVICE_FILE ..."
-cat <<EOF | tee "$SERVICE_FILE" > /dev/null
+section "5️⃣  Systemd-Service konfigurieren"
+cat <<EOF > "$SERVICE_FILE"
 [Unit]
 Description=Brunnen Messsystem (Logger + Webinterface)
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
-Type=forking
-User=root
+Type=simple
+User=$USER
+Group=$USER
 WorkingDirectory=$BASE_DIR
 ExecStart=$SCRIPT_DIR/start_brunnen.sh
-ExecStop=$SCRIPT_DIR/stop_brunnen.sh
 Restart=always
-RestartSec=10
+RestartSec=5
 StandardOutput=append:$LOG_DIR/brunnen.service.log
 StandardError=append:$LOG_DIR/brunnen.service.log
 Environment=PYTHONUNBUFFERED=1
@@ -98,62 +123,38 @@ Environment=PYTHONUNBUFFERED=1
 [Install]
 WantedBy=multi-user.target
 EOF
+ok "Systemd-Service-Datei erstellt: $SERVICE_FILE"
 
-# ============================================================
-# 6️⃣ Beispiel-Start-/Stop-Skripte erzeugen
-# ============================================================
-echo "🚀 Erstelle Start- und Stop-Skripte..."
-
+section "6️⃣  Start- und Stop-Skripte anlegen"
 cat <<EOF > "$SCRIPT_DIR/start_brunnen.sh"
 #!/bin/bash
-BASE_DIR="$BASE_DIR"
-VENV_DIR="$VENV_DIR"
-LOG_DIR="$LOG_DIR"
-
-cd "\$BASE_DIR"
-
+cd "$BASE_DIR"
 echo "🚀 Starte Brunnen-System ..."
-"\$VENV_DIR/bin/python" wasserstand_logger.py >> "\$LOG_DIR/wasserstand_logger.log" 2>&1 &
-"\$VENV_DIR/bin/python" webapp.py >> "\$LOG_DIR/webapp.log" 2>&1 &
-
-echo \$! > "\$DATA_DIR/webapp.pid"
-pgrep -f wasserstand_logger.py > "\$DATA_DIR/logger.pid"
+source "$VENV_DIR/bin/activate"
+nohup python3 wasserstand_logger.py >> "$LOG_DIR/wasserstand_logger.log" 2>&1 &
+nohup python3 webapp.py >> "$LOG_DIR/webapp.log" 2>&1 &
 EOF
 
 cat <<EOF > "$SCRIPT_DIR/stop_brunnen.sh"
 #!/bin/bash
-BASE_DIR="$BASE_DIR"
-DATA_DIR="$DATA_DIR"
-
-if [ -f "\$DATA_DIR/webapp.pid" ]; then
-  kill \$(cat "\$DATA_DIR/webapp.pid") 2>/dev/null && rm "\$DATA_DIR/webapp.pid"
-fi
-if [ -f "\$DATA_DIR/logger.pid" ]; then
-  kill \$(cat "\$DATA_DIR/logger.pid") 2>/dev/null && rm "\$DATA_DIR/logger.pid"
-fi
-
 pkill -f wasserstand_logger.py 2>/dev/null
 pkill -f webapp.py 2>/dev/null
-
 echo "🛑 Brunnen-System gestoppt."
 EOF
 
-chmod +x "$SCRIPT_DIR/start_brunnen.sh" "$SCRIPT_DIR/stop_brunnen.sh"
+chmod +x "$SCRIPT_DIR/"*.sh
+ok "Start-/Stop-Skripte bereitgestellt"
 
-# ============================================================
-# 7️⃣ Dienste aktivieren
-# ============================================================
-echo "🔄 Aktiviere Brunnen-Service..."
+section "7️⃣  Dienst aktivieren"
 systemctl daemon-reload
 systemctl enable brunnen.service
+ok "Systemd-Dienst aktiviert"
 
-# ============================================================
-# 8️⃣ Abschluss
-# ============================================================
-echo "✅ Installation abgeschlossen!"
-echo "Starte Dienst mit:  sudo systemctl start brunnen.service"
-echo "Prüfe Status mit:  sudo systemctl status brunnen.service"
-echo "Logs:              tail -f $LOG_DIR/brunnen.service.log"
-
-
-
+# ------------------------------------------------------------
+# 🎉 Abschluss
+# ------------------------------------------------------------
+section "✅ Installation abgeschlossen!"
+echo -e "${GREEN}${BOLD}Starte Service:${RESET} sudo systemctl start brunnen.service"
+echo -e "${GREEN}${BOLD}Prüfe Status:${RESET} sudo systemctl status brunnen.service"
+echo -e "${GREEN}${BOLD}Logs anzeigen:${RESET} tail -f $LOG_DIR/brunnen.service.log"
+echo -e "\n${BOLD}Viel Erfolg mit deinem Brunnen-Websystem! 💧${RESET}"
