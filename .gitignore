@@ -1,5 +1,5 @@
 *.log
-config/config.json
+config/*.json
 data/*.json
 data/*.db
 data/*.pid
