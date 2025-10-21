@@ -1,0 +1,2604 @@
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 11: /root/brunnen_web/venv/bin/python: No such file or directory
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 1, in <module>
+    from flask import Flask, render_template, request, jsonify
+ModuleNotFoundError: No module named 'flask'
+ * Serving Flask app 'webapp'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 112-649-138
+ * Serving Flask app 'webapp'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 112-649-138
+192.168.178.13 - - [20/Oct/2025 16:03:55] "[35m[1mGET / HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 35, in index
+    return render_template("index.html", config=config, descriptions=descriptions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: index.html
+192.168.178.13 - - [20/Oct/2025 16:03:55] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:03:55] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:03:55] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:03:56] "[35m[1mGET / HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 35, in index
+    return render_template("index.html", config=config, descriptions=descriptions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: index.html
+192.168.178.13 - - [20/Oct/2025 16:03:56] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:03:56] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:03:57] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+ * Serving Flask app 'webapp'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 112-649-138
+192.168.178.13 - - [20/Oct/2025 16:05:56] "[35m[1mGET / HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 35, in index
+    return render_template("index.html", config=config, descriptions=descriptions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: index.html
+192.168.178.13 - - [20/Oct/2025 16:05:56] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:05:56] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:05:56] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:05:57] "[35m[1mGET / HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 35, in index
+    return render_template("index.html", config=config, descriptions=descriptions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: index.html
+192.168.178.13 - - [20/Oct/2025 16:05:57] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:05:57] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+192.168.178.13 - - [20/Oct/2025 16:05:57] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+ * Detected change in '/root/brunnen_web/webapp.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 112-649-138
+ * Serving Flask app 'webapp'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 112-649-138
+192.168.178.13 - - [20/Oct/2025 16:06:28] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 18:20:59] "GET / HTTP/1.1" 200 -
+ * Detected change in '/root/brunnen_web/webapp.py', reloading
+ * Restarting with stat
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+[2025-10-20 18:32:34,018] ERROR in app: Exception on /login [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 72, in login
+    return render_template("login.html")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: login.html
+192.168.178.13 - - [20/Oct/2025 18:32:34] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+[2025-10-20 18:32:34,810] ERROR in app: Exception on /login [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 72, in login
+    return render_template("login.html")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: login.html
+192.168.178.13 - - [20/Oct/2025 18:32:34] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+[2025-10-20 18:32:49,533] ERROR in app: Exception on /login [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 72, in login
+    return render_template("login.html")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: login.html
+192.168.178.13 - - [20/Oct/2025 18:32:49] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+[2025-10-20 18:33:11,051] ERROR in app: Exception on /login [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 78, in login
+    return render_template("login.html", title="Login")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: login.html
+192.168.178.13 - - [20/Oct/2025 18:33:11] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+[2025-10-20 18:33:11,708] ERROR in app: Exception on /login [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 78, in login
+    return render_template("login.html", title="Login")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: login.html
+192.168.178.13 - - [20/Oct/2025 18:33:11] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+[2025-10-20 18:33:18,385] ERROR in app: Exception on /login [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 78, in login
+    return render_template("login.html", title="Login")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: login.html
+192.168.178.13 - - [20/Oct/2025 18:33:18] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 18:35:43] "GET /login?next=/ HTTP/1.1" 200 -
+[2025-10-20 18:35:51,881] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 18:35:51] "[35m[1mPOST /login?next=/ HTTP/1.1[0m" 500 -
+192.168.178.13 - - [20/Oct/2025 18:35:56] "GET /login?next=/ HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 18:35:58] "[32mGET /system HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 18:35:58] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 18:35:59] "[32mGET /service HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 18:35:59] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 18:35:59] "[32mGET /logs HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 18:35:59] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 18:36:00] "[32mGET /logout HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 18:36:00] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 18:36:01] "[32mGET / HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 18:36:01] "GET /login HTTP/1.1" 200 -
+[2025-10-20 18:36:04,778] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 18:36:04] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+[2025-10-20 18:36:13,066] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 18:36:13] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+[2025-10-20 18:37:24,341] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 18:37:24] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+[2025-10-20 18:37:25,111] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 18:37:25] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+[2025-10-20 18:40:43,737] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 18:40:43] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+[2025-10-20 18:40:45,916] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 18:40:45] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+[2025-10-20 20:18:39,339] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 20:18:39] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+[2025-10-20 20:18:54,298] ERROR in app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 73, in login
+    if pin == get_admin_pin():
+              ^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in get_admin_pin
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 20:18:54] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 20:20:12] "[32mGET / HTTP/1.1[0m" 302 -
+[2025-10-20 20:20:12,492] ERROR in app: Exception on /login [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 63, in login
+    cfg = load_config()
+          ^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 19, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+192.168.178.13 - - [20/Oct/2025 20:20:12] "[35m[1mGET /login?next=/ HTTP/1.1[0m" 500 -
+192.168.178.13 - - [20/Oct/2025 20:20:45] "GET /login?next=/ HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:20:51] "[32mPOST /login?next=/ HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:20:51] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:20:58] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:21:13] "GET /service HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+[2025-10-20 20:21:41,449] ERROR in app: Exception on /logs [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 199, in logs_page
+    return render_template("logs.html", files=list(files.keys()), chosen=chosen, content=content, title="Logs")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/logs.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 32, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/templates/logs.html", line 6, in block 'content'
+    {% for name, text in contents.items() %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'contents' is undefined
+192.168.178.13 - - [20/Oct/2025 20:21:41] "[35m[1mGET /logs HTTP/1.1[0m" 500 -
+[2025-10-20 20:21:50,980] ERROR in app: Exception on /logs [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 199, in logs_page
+    return render_template("logs.html", files=list(files.keys()), chosen=chosen, content=content, title="Logs")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/logs.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 32, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/templates/logs.html", line 6, in block 'content'
+    {% for name, text in contents.items() %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'contents' is undefined
+192.168.178.13 - - [20/Oct/2025 20:21:50] "[35m[1mGET /logs HTTP/1.1[0m" 500 -
+[2025-10-20 20:22:54,112] ERROR in app: Exception on /logs [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 199, in logs_page
+    return render_template("logs.html", files=list(files.keys()), chosen=chosen, content=content, title="Logs")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/logs.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 32, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/templates/logs.html", line 6, in block 'content'
+    <label class="mr-2">Datei:</label>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'contents' is undefined
+192.168.178.13 - - [20/Oct/2025 20:22:54] "[35m[1mGET /logs HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 20:23:17] "GET /logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:23] "GET /logs?file=Logger HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:28] "GET /logs?file=Webapp HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:34] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:36] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:48] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:54] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:56] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:57] "GET /logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:58] "[32mGET /logout HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:23:58] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:23:59] "[32mGET / HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:23:59] "GET /login?next=/ HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:24:04] "[32mGET / HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:24:04] "GET /login?next=/ HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:24:09] "POST /login?next=/ HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:24:20] "[32mPOST /login?next=/ HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:24:20] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:24:22] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:24:23] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:24:25] "GET /logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:24:26] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:24:41] "POST /update HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:25:15] "POST /update HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 20:26:20] "POST /update HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:27:08] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:27:16] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:27:19] "GET /logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:27:24] "GET /logs?file=Webapp HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:01] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:02] "[32mGET /logout HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:02] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:05] "POST /login HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 20:29:13] "POST /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:17] "POST /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:23] "[32mPOST /login HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:23] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:40] "[32mGET /logout HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:40] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:42] "[32mGET /logs HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:42] "GET /login?next=/logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:42] "[32mGET /service HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:42] "GET /login?next=/service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:43] "[32mGET /system HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:43] "GET /login?next=/system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:43] "[32mGET / HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:43] "GET /login?next=/ HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:46] "[32mGET /system HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:46] "GET /login?next=/system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:46] "[32mGET /service HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:46] "GET /login?next=/service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:47] "[32mGET /logs HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:47] "GET /login?next=/logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:47] "[32mGET /logout HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:47] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:48] "[32mGET /service HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:48] "GET /login?next=/service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:48] "[32mGET /system HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:48] "GET /login?next=/system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:49] "[32mGET / HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:49] "GET /login?next=/ HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:50] "[32mGET /system HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:50] "GET /login?next=/system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:50] "[32mGET /service HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:50] "GET /login?next=/service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:51] "[32mGET /logs HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:51] "GET /login?next=/logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:51] "[32mGET /logout HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:51] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:52] "[32mGET /service HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:52] "GET /login?next=/service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:52] "[32mGET /system HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:52] "GET /login?next=/system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:53] "[32mGET / HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:53] "GET /login?next=/ HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:53] "[32mGET /system HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:53] "GET /login?next=/system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:55] "[32mGET /logs HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:55] "GET /login?next=/logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:29:57] "[32mPOST /login?next=/logs HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 20:29:57] "GET /logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:30:03] "GET /logs?file=Logger HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 20:30:06] "GET /logs?file=Webapp HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:30:53] "[32mGET / HTTP/1.1[0m" 302 -
+192.168.178.107 - - [20/Oct/2025 20:30:53] "GET /login?next=/ HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:03] "[32mPOST /login?next=/ HTTP/1.1[0m" 302 -
+192.168.178.107 - - [20/Oct/2025 20:31:03] "GET / HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:06] "GET /system HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:07] "GET / HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:12] "GET /system HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:16] "GET /service HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:18] "GET /logs HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:21] "GET /logs?file=Webapp HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:28] "GET /logs HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:29] "GET /system HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:32] "POST /system/control HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://127.0.0.1:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.107 - - [20/Oct/2025 20:31:40] "GET /system HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:44] "GET /service HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:45] "GET /logs HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:47] "GET /logs?file=Webapp HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:31:56] "GET / HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:32:27] "GET /system HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:32:38] "GET /service HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:32:41] "GET /logs HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:32:45] "GET /logs?file=Webapp HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 20:32:51] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:40:12] "GET /logs?file=Webapp HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:40:29] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:40:31] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:42:20] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:42:54] "POST /update HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:44:36] "GET /service HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 21:44:43] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:44:47] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:44:50] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:44:52] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:44:54] "POST /system/control HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://127.0.0.1:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 21:45:07] "POST /system/control HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://127.0.0.1:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 21:45:18] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 21:55:46] "POST /update HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:06:54] "GET /service HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:07:10] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:11] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:16] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:21] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:22] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:22] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:23] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:24] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:26] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:32] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:37] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:42] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:47] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:52] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:07:57] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:02] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:07] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:12] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:17] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:22] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:27] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:32] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:37] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:42] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:49] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:50] "GET /service HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:08:54] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:56] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:08:56] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:01] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:09:06] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:11] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:16] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:21] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:26] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:31] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:36] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:41] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:46] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:51] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:09:56] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:01] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:06] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:11] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:17] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:22] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:27] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:32] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:37] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:42] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:47] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:52] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:10:57] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:11:02] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:11:07] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:11:12] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:12:00] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:13:00] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:14:00] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:15:00] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:16:00] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:17:00] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:18:00] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:19:00] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:20:00] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:21:00] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:21:23] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:24] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:25] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:26] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:31] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:35] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:36] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:38] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:39] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:39] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:42] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:47] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:47] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:48] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:53] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:21:58] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:03] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:08] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:13] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:18] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:23] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:28] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:33] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:38] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:43] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:22:46] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:48] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:49] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:54] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:22:59] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:04] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:09] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:14] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:19] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:24] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:28] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:30] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:30] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:32] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:37] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:43] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:48] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:53] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:23:58] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:03] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:08] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:13] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:16] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:17] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:22] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:24:28] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:29] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:30] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:30] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:35] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:40] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:45] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:50] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:51] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:52] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:24:57] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:02] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:07] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:12] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:13] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:14] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:15] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:20] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:25] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:30] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:32] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:33] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:33] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:25:33] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:33] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:25:33] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:33] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:25:33] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:33] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:25:38] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:41] "[32mGET /measurements HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 22:25:41] "GET /login?next=/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:41] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:25:43] "[32mPOST /login?next=/measurements HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 22:25:43] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:43] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:48] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:53] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:25:58] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:03] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:03] "GET /measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:26:08] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:09] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:14] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:19] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:21] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:24] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:24] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:29] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:29] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:34] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:34] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:39] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:39] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:44] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:44] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:49] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:49] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:54] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:54] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:26:59] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:26:59] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:02] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:03] "GET /measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:27:04] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:04] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:04] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:04] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:04] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:05] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:05] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:10] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:27:10] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:14] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:14] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:19] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:24] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:25] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:30] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:32] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:33] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:33] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:34] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:34] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:34] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:34] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:34] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:34] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:39] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:42] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:43] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:43] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:44] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:44] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:45] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:45] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:45] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:27:50] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:52] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:53] "GET /measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:27:54] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:55] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:27:57] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:03] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:08] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:13] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:18] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:23] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:28:23] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:28] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:33] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:38] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:43] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:48] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:53] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:28:58] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:30:00] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:30:05] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:31:00] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:31:26] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:32:00] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:32:18] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:32:19] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:32:22] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:32:23] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:32:28] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:32:33] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:32:34] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:32:38] "GET /wifi HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:32:42] "GET /api/measurements HTTP/1.1" 200 -
+Failed to restart dhcpcd.service: Unit dhcpcd.service not found.
+192.168.178.13 - - [20/Oct/2025 22:33:04] "POST /wifi/configure HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:33:29] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:33:29] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:33:31] "GET /wifi HTTP/1.1" 200 -
+Failed to restart dhcpcd.service: Unit dhcpcd.service not found.
+192.168.178.13 - - [20/Oct/2025 22:33:38] "POST /wifi/configure HTTP/1.1" 200 -
+Failed to restart dhcpcd.service: Unit dhcpcd.service not found.
+192.168.178.13 - - [20/Oct/2025 22:33:45] "POST /wifi/configure HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:34:19] "GET /api/measurements HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:35:47] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:35:48] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:35:48] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:35:58] "POST /wifi/configure HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:04] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:04] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:05] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:06] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:07] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:07] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:08] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:08] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:09] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:36:10] "GET /wifi HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:36:17] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:37:07] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:38:25] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:38:51] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:38:52] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:38:53] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:38:55] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:39:58] "POST /wifi/configure HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:40:20] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:42:46] "GET /wifi HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:42:51] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:43:00] "GET /wifi HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:43:01] "GET /wifi HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:43:08] "[33mGET /wifi HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:43:12] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:43:13] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:43:14] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:43:15] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:43:16] "GET /system HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:46:03] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:26] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:29] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:32] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:32] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:36] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:36] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:49:37] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:37] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:49:42] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:43] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:49:44] "GET /chart HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:44] "GET /api/chartdata HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:47] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:48] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:48] "GET /chart HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:49:49] "GET /api/chartdata HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:50:49] "GET /api/chartdata HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 22:50:51] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:51:49] "GET /api/chartdata HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:52:49] "[33mGET /api/chartdata HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:52:57] "[33mGET /chart HTTP/1.1[0m" 404 -
+192.168.178.13 - - [20/Oct/2025 22:52:57] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+[2025-10-20 22:53:00,083] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 16, in top-level template code
+    <a href="{{ url_for('status_page') }}" class="hover:underline">⚡ Systemstatus</a>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'status_page'. Did you mean 'system_page' instead?
+192.168.178.13 - - [20/Oct/2025 22:53:00] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 22:53:00,220] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 16, in top-level template code
+    <a href="{{ url_for('status_page') }}" class="hover:underline">⚡ Systemstatus</a>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'status_page'. Did you mean 'system_page' instead?
+192.168.178.13 - - [20/Oct/2025 22:53:00] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 22:53:02,671] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 16, in top-level template code
+    <a href="{{ url_for('status_page') }}" class="hover:underline">⚡ Systemstatus</a>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'status_page'. Did you mean 'system_page' instead?
+192.168.178.13 - - [20/Oct/2025 22:53:02] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 22:53:09,100] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 16, in top-level template code
+    <a href="{{ url_for('status_page') }}" class="hover:underline">⚡ Systemstatus</a>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'status_page'. Did you mean 'system_page' instead?
+192.168.178.13 - - [20/Oct/2025 22:53:09] "[35m[1mGET / HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:53:45] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:53:47] "GET /status HTTP/1.1" 200 -
+[2025-10-20 22:53:47,548] ERROR in app: Exception on /api/status [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 248, in api_status
+    import psutil
+ModuleNotFoundError: No module named 'psutil'
+192.168.178.13 - - [20/Oct/2025 22:53:47] "[35m[1mGET /api/status HTTP/1.1[0m" 500 -
+192.168.178.13 - - [20/Oct/2025 22:53:49] "GET /status HTTP/1.1" 200 -
+[2025-10-20 22:53:49,795] ERROR in app: Exception on /api/status [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 248, in api_status
+    import psutil
+ModuleNotFoundError: No module named 'psutil'
+192.168.178.13 - - [20/Oct/2025 22:53:49] "[35m[1mGET /api/status HTTP/1.1[0m" 500 -
+[2025-10-20 22:53:59,790] ERROR in app: Exception on /api/status [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 248, in api_status
+    import psutil
+ModuleNotFoundError: No module named 'psutil'
+192.168.178.13 - - [20/Oct/2025 22:53:59] "[35m[1mGET /api/status HTTP/1.1[0m" 500 -
+[2025-10-20 22:54:09,797] ERROR in app: Exception on /api/status [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 248, in api_status
+    import psutil
+ModuleNotFoundError: No module named 'psutil'
+192.168.178.13 - - [20/Oct/2025 22:54:09] "[35m[1mGET /api/status HTTP/1.1[0m" 500 -
+[2025-10-20 22:54:19,795] ERROR in app: Exception on /api/status [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 248, in api_status
+    import psutil
+ModuleNotFoundError: No module named 'psutil'
+192.168.178.13 - - [20/Oct/2025 22:54:19] "[35m[1mGET /api/status HTTP/1.1[0m" 500 -
+[2025-10-20 22:54:29,790] ERROR in app: Exception on /api/status [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 248, in api_status
+    import psutil
+ModuleNotFoundError: No module named 'psutil'
+192.168.178.13 - - [20/Oct/2025 22:54:29] "[35m[1mGET /api/status HTTP/1.1[0m" 500 -
+[2025-10-20 22:54:39,788] ERROR in app: Exception on /api/status [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 248, in api_status
+    import psutil
+ModuleNotFoundError: No module named 'psutil'
+192.168.178.13 - - [20/Oct/2025 22:54:39] "[35m[1mGET /api/status HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 4, in <module>
+    import os, json, socket, subprocess, functools, time, psutil
+ModuleNotFoundError: No module named 'psutil'
+Traceback (most recent call last):
+  File "/root/brunnen_web/webapp.py", line 4, in <module>
+    import os, json, socket, subprocess, functools, time, psutil
+ModuleNotFoundError: No module named 'psutil'
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 22:56:29] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:56:31] "GET /status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:56:32] "GET /api/status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:56:41] "GET /api/status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:56:51] "GET /api/status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:56:54] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:56:57] "GET /status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:56:58] "GET /api/status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:56:58] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:57:01] "GET /status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:57:02] "GET /api/status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 22:57:02] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:01:01] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:01:03] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:01:03] "GET /status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:01:04] "GET /api/status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:01:05] "GET /system HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:01:07] "GET /status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:01:08] "GET /api/status HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:01:11] "GET /system HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 23:04:59] "[33mGET /system HTTP/1.1[0m" 404 -
+[2025-10-20 23:05:01,801] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 15, in top-level template code
+    <a href="{{ url_for('system_page') }}" class="hover:underline">🧠 Raspberry</a>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'system_page'. Did you mean 'systemstatus_page' instead?
+192.168.178.13 - - [20/Oct/2025 23:05:01] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 23:05:02,541] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 15, in top-level template code
+    <a href="{{ url_for('system_page') }}" class="hover:underline">🧠 Raspberry</a>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'system_page'. Did you mean 'systemstatus_page' instead?
+192.168.178.13 - - [20/Oct/2025 23:05:02] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 23:06:37,474] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 15, in top-level template code
+    <!-- <a href="{{ url_for('system_page') }}" class="hover:underline">🧠 Raspberry</a> -->
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'system_page'. Did you mean 'systemstatus_page' instead?
+192.168.178.13 - - [20/Oct/2025 23:06:37] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 23:06:39,439] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 15, in top-level template code
+    <!-- <a href="{{ url_for('system_page') }}" class="hover:underline">🧠 Raspberry</a> -->
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'system_page'. Did you mean 'systemstatus_page' instead?
+192.168.178.13 - - [20/Oct/2025 23:06:39] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 23:07:13,578] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 15, in top-level template code
+    <!-- <a href="{{ url_for('system_page') }}" class="hover:underline">🧠 Raspberry</a> -->
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'system_page'. Did you mean 'systemstatus_page' instead?
+192.168.178.13 - - [20/Oct/2025 23:07:13] "[35m[1mGET / HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+[2025-10-20 23:08:58,045] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 15, in top-level template code
+    <!-- <a href="{{ url_for('system_page') }}" class="hover:underline">🧠 Raspberry</a> -->
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'system_page'. Did you mean 'systemstatus_page' instead?
+192.168.178.13 - - [20/Oct/2025 23:08:58] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 23:09:08,538] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 15, in top-level template code
+    <a href="{{ url_for('systemstatus_page') }}" class="hover:underline">🧠 Systemstatus</a>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'system_page'. Did you mean 'systemstatus_page' instead?
+192.168.178.13 - - [20/Oct/2025 23:09:08] "[35m[1mGET / HTTP/1.1[0m" 500 -
+[2025-10-20 23:09:09,650] ERROR in app: Exception on / [GET]
+Traceback (most recent call last):
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 57, in wrapped
+    return view(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/webapp.py", line 98, in index
+    return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/root/brunnen_web/templates/index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/root/brunnen_web/templates/base.html", line 15, in top-level template code
+    <a href="{{ url_for('systemstatus_page') }}" class="hover:underline">🧠 Systemstatus</a>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/brunnen_web/venv/lib/python3.11/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'system_page'. Did you mean 'systemstatus_page' instead?
+192.168.178.13 - - [20/Oct/2025 23:09:09] "[35m[1mGET / HTTP/1.1[0m" 500 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 23:09:15] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:09:20] "GET /systemstatus HTTP/1.1" 200 -
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.178.109:8080
+[33mPress CTRL+C to quit[0m
+192.168.178.13 - - [20/Oct/2025 23:10:48] "GET /systemstatus HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:10:48] "GET /systemstatus HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:10:50] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:10:51] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:10:53] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:10:55] "GET /logs HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:10:58] "GET /systemstatus HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:26] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:27] "GET /measurements HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:28] "GET /service HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:29] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:30] "GET /systemstatus HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:30] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:31] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:31] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:31] "GET / HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:40] "[32mGET /logout HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 23:11:40] "GET /login HTTP/1.1" 200 -
+192.168.178.13 - - [20/Oct/2025 23:11:42] "[32mPOST /login HTTP/1.1[0m" 302 -
+192.168.178.13 - - [20/Oct/2025 23:11:42] "GET / HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:19:49] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:19:50] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:19:52] "GET /measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:19:57] "GET /api/measurements HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:19:57] "GET /systemstatus HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:23:45] "GET /logs HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:23:48] "GET /logs?file=Logger HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:24:00] "GET /logs?file=Service HTTP/1.1" 200 -
+192.168.178.107 - - [20/Oct/2025 23:24:06] "GET /logs?file=Webapp HTTP/1.1" 200 -

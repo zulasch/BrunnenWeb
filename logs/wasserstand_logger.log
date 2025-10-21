@@ -1,0 +1,250 @@
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+/root/brunnen_web/scripts/start_brunnen.sh: line 10: /root/brunnen_web/venv/bin/python: No such file or directory
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 7, in <module>
+    import board
+ModuleNotFoundError: No module named 'board'
+2025-10-20 18:35:22,014 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:35:27,076 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:35:32,132 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:35:37,203 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 43, in <module>
+    config = load_config()
+             ^^^^^^^^^^^^^
+  File "/root/brunnen_web/wasserstand_logger.py", line 41, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 43, in <module>
+    config = load_config()
+             ^^^^^^^^^^^^^
+  File "/root/brunnen_web/wasserstand_logger.py", line 41, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:37:23,421 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:37:28,923 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:37:34,414 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:37:39,910 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:37:45,399 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:37:50,467 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:37:55,529 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:38:00,587 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:38:05,967 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 18:38:11,394 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 3 (char 396)
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 43, in <module>
+    config = load_config()
+             ^^^^^^^^^^^^^
+  File "/root/brunnen_web/wasserstand_logger.py", line 41, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 43, in <module>
+    config = load_config()
+             ^^^^^^^^^^^^^
+  File "/root/brunnen_web/wasserstand_logger.py", line 41, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 43, in <module>
+    config = load_config()
+             ^^^^^^^^^^^^^
+  File "/root/brunnen_web/wasserstand_logger.py", line 41, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 43, in <module>
+    config = load_config()
+             ^^^^^^^^^^^^^
+  File "/root/brunnen_web/wasserstand_logger.py", line 41, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 43, in <module>
+    config = load_config()
+             ^^^^^^^^^^^^^
+  File "/root/brunnen_web/wasserstand_logger.py", line 41, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+Traceback (most recent call last):
+  File "/root/brunnen_web/wasserstand_logger.py", line 43, in <module>
+    config = load_config()
+             ^^^^^^^^^^^^^
+  File "/root/brunnen_web/wasserstand_logger.py", line 41, in load_config
+    return json.load(f)
+           ^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 3 (char 396)
+2025-10-20 20:28:19,246 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 17 (char 408)
+2025-10-20 20:28:24,344 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 17 (char 408)
+2025-10-20 20:28:29,403 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 17 (char 408)
+2025-10-20 20:28:34,468 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 17 (char 408)
+2025-10-20 20:28:39,527 [ERROR] Fehler beim Neuladen der Config: Expecting ',' delimiter: line 13 column 17 (char 408)
+2025-10-20 20:31:38,969 [WARNING] ⚠️ InfluxDB nicht erreichbar — speichere lokal.
+2025-10-20 21:45:01,832 [WARNING] ⚠️ InfluxDB nicht erreichbar — speichere lokal.
+2025-10-20 21:45:13,924 [WARNING] ⚠️ InfluxDB nicht erreichbar — speichere lokal.
+2025-10-20 22:06:58,557 [ERROR] ❌ Unerwarteter Fehler: name 'voltage' is not defined
+2025-10-20 22:08:53,831 [ERROR] ❌ Unerwarteter Fehler: name 'wassertiefe' is not defined
+2025-10-20 22:09:06,528 [ERROR] ❌ Unerwarteter Fehler: name 'wassertiefe' is not defined
+2025-10-20 22:11:31,093 [ERROR] ❌ Unerwarteter Fehler: name 'voltage' is not defined
+2025-10-20 22:12:39,118 [ERROR] ❌ Unerwarteter Fehler: '<' not supported between instances of 'tuple' and 'int'
+2025-10-20 22:13:34,649 [ERROR] ❌ Unerwarteter Fehler: '<' not supported between instances of 'tuple' and 'int'
+2025-10-20 22:14:26,484 [ERROR] ❌ Unerwarteter Fehler: '<' not supported between instances of 'tuple' and 'int'
+2025-10-20 22:17:05,813 [ERROR] ❌ Unerwarteter Fehler: name 'wassertiefe' is not defined
+2025-10-20 22:18:17,220 [ERROR] ❌ Unerwarteter Fehler: name 'wasser_oberflaeche' is not defined
+2025-10-20 22:18:59,892 [ERROR] ❌ Unerwarteter Fehler: name 'wassertiefe' is not defined
+2025-10-20 22:19:06,864 [ERROR] ❌ Unerwarteter Fehler: name 'wassertiefe' is not defined
+2025-10-20 22:19:41,360 [ERROR] ❌ Unerwarteter Fehler: name 'wassertiefe' is not defined
+2025-10-20 22:19:56,163 [ERROR] ❌ Unerwarteter Fehler: name 'wasser_oberflaeche' is not defined
+2025-10-20 22:20:50,119 [ERROR] ❌ Unerwarteter Fehler: name 'messwert_nn' is not defined
+2025-10-20 22:21:06,011 [ERROR] ❌ Unerwarteter Fehler: name 'delta' is not defined
+2025-10-20 23:59:07,299 [WARNING] ⚠️ InfluxDB nicht erreichbar — speichere lokal.
+2025-10-20 23:59:22,354 [WARNING] ⚠️ InfluxDB nicht erreichbar — speichere lokal.
+2025-10-20 23:59:27,421 [WARNING] ⚠️ InfluxDB nicht erreichbar — speichere lokal.
+2025-10-20 23:59:32,754 [WARNING] ⚠️ InfluxDB nicht erreichbar — speichere lokal.
+2025-10-20 23:59:37,794 [WARNING] ⚠️ InfluxDB nicht erreichbar — speichere lokal.
