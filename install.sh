@@ -25,7 +25,7 @@ echo "🔧 Starte Installation des Brunnen-Systems ..."
 # ============================================================
 echo "📦 Aktualisiere Systempakete..."
 apt update -y
-apt install -y python3 python3-venv python3-pip git i2c-tools sqlite3
+apt install -y python3 python3-venv python3-pip git i2c-tools sqlite3 git
 
 
 # ============================================================
