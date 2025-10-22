@@ -186,25 +186,6 @@ logging.info("🌊 Starte Messung...")
 try:
     while True:
         reload_config_if_changed()
-
-        from pathlib import Path
-
-        # Live-Check integration
-        CONFIG_FILE = "/opt/brunnen_web/config/config.json"
-        CONFIG_UPDATE_FLAG = "/opt/brunnen_web/data/config_update.flag"
-        LAST_CONFIG_UPDATE_FILE = "/opt/brunnen_web/data/last_config_update"
-        
-        # Prüfen, ob neue Konfiguration vorliegt
-        if Path(CONFIG_UPDATE_FLAG).exists():
-            try:
-                with open(CONFIG_FILE, "r") as f:
-                    cfg = json.load(f)
-                Path(LAST_CONFIG_UPDATE_FILE).write_text(str(time.time()))
-                Path(CONFIG_UPDATE_FLAG).unlink()
-                logger.info("🔄 Neue Konfiguration geladen und aktiv.")
-            except Exception as e:
-                logger.error(f"⚠️ Fehler beim Neuladen der Konfiguration: {e}")
-        # Live-Check integration Ende
         
         voltage, current_mA = read_current_mA()
         level_m = current_to_level(current_mA)
