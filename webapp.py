@@ -124,9 +124,6 @@ def update_config():
         Path(BASE_DATA_DIR).mkdir(exist_ok=True)
         Path(FLAG_FILE).touch()
 
-        # ⏳ 2 Sekunden warten, damit Logger reagieren kann
-        time.sleep(2)
-
         # 🔍 Prüfen, ob Logger wirklich reagiert hat
         if Path(LAST_UPDATE_FILE).exists():
                     return jsonify({"success": True, "message": "✅ Änderungen gespeichert und aktiv im Messsystem."})
