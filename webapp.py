@@ -145,18 +145,37 @@ def service_page():
 @login_required
 def service_action():
     action = request.form.get("action")
-    if action not in ("start","stop","restart","status"):
-        abort(400)
+    if action != "restart":
+        abort(400)  # Nur Restart erlaubt
+
     try:
-        if action == "status":
-            st = service_status("brunnen.service")
-            return jsonify({"status":"ok","message":st})
-        subprocess.check_call(["sudo", "systemctl", action, "brunnen.service"])
-        time.sleep(0.8)
+        # Neustart ausführen
+        subprocess.check_call(["sudo", "systemctl", "restart", "brunnen.service"])
+        time.sleep(1.5)  # kurz warten, damit systemd den Dienst wieder hochfährt
+
+        # Status prüfen
         st = service_status("brunnen.service")
-        return jsonify({"status":"ok","message":f"Service {action}: {st}"})
+        if st == "active":
+            return jsonify({
+                "status": "ok",
+                "message": "✅ Dienst erfolgreich neu gestartet und läuft wieder."
+            })
+        else:
+            return jsonify({
+                "status": "warning",
+                "message": f"⚠️ Dienst wurde neu gestartet, aktueller Status: {st}"
+            })
     except subprocess.CalledProcessError as e:
-        return jsonify({"status":"error","message":f"systemctl {action} fehlgeschlagen: {e}"}), 500
+        return jsonify({
+            "status": "error",
+            "message": f"❌ Neustart fehlgeschlagen: {e}"
+        }), 500
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"❌ Unerwarteter Fehler: {e}"
+        }), 500
+
 
 
 @app.route("/update-system", methods=["POST"])
