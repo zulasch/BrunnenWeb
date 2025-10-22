@@ -163,7 +163,7 @@ section "6️⃣  Start- und Stop-Skripte anlegen"
 section "7️⃣  Dienst aktivieren"
 systemctl daemon-reload
 systemctl enable brunnen_web.service 
-systemctl brunnen_logger.service
+systemctl enable brunnen_logger.service
 ok "Systemd-Dienst aktiviert"
 
 section "8️⃣  I²C aktivieren"
