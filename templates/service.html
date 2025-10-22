@@ -41,28 +41,47 @@
 <script>
 async function restartService(service) {
   const btn = document.getElementById(`restart-${service}`);
+  const resultBox = document.getElementById("service-result");
   btn.disabled = true;
   btn.textContent = "⏳ Neustart läuft...";
-  document.getElementById("service-result").innerHTML = "";
+  resultBox.innerHTML = "";
 
   try {
     const formData = new FormData();
     formData.append("service", service);
     formData.append("action", "restart");
 
-    const response = await fetch("/service/action", { method: "POST", body: formData });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // ⏱️ 5 Sek Timeout
+
+    const response = await fetch("/service/action", {
+      method: "POST",
+      body: formData,
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
     const data = await response.json();
 
     if (response.ok && data.status === "ok") {
-      document.getElementById("service-result").innerHTML =
-        `<div class='bg-green-100 text-green-800 p-3 rounded'>${data.message}</div>`;
+      resultBox.innerHTML = `<div class='bg-green-100 text-green-800 p-3 rounded'>${data.message}</div>`;
     } else {
-      document.getElementById("service-result").innerHTML =
-        `<div class='bg-red-100 text-red-800 p-3 rounded'>${data.message}</div>`;
+      resultBox.innerHTML = `<div class='bg-red-100 text-red-800 p-3 rounded'>${data.message}</div>`;
     }
+
   } catch (err) {
-    document.getElementById("service-result").innerHTML =
-      `<div class='bg-red-100 text-red-800 p-3 rounded'>Netzwerkfehler: ${err}</div>`;
+    // ⚠️ Fehlerbehandlung mit Timeout-Fall
+    if (service === "web") {
+      resultBox.innerHTML = `
+        <div class='bg-yellow-100 text-yellow-800 p-3 rounded'>
+          🔄 Die WebApp wird neu gestartet.<br>
+          Bitte lade die Seite in 5 Sekunden neu.
+        </div>`;
+      setTimeout(() => location.reload(), 6000); // ⏳ Reload nach 6 Sekunden
+    } else {
+      resultBox.innerHTML =
+        `<div class='bg-red-100 text-red-800 p-3 rounded'>Netzwerkfehler: ${err}</div>`;
+    }
   } finally {
     btn.disabled = false;
     btn.textContent = service === "logger"
