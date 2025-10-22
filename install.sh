@@ -16,7 +16,8 @@ VENV_DIR="$BASE_DIR/venv"
 CONFIG_DIR="$BASE_DIR/config"
 DATA_DIR="$BASE_DIR/data"
 LOG_DIR="$BASE_DIR/logs"
-SERVICE_FILE="/etc/systemd/system/brunnen.service"
+WEB_SERVICE_FILE="/etc/systemd/system/brunnen_web.service"
+LOGGER_SERVICE_FILE="/etc/systemd/system/brunnen_logger.service"
 
 # ------------------------------------------------------------
 # 🎨 Farben & Formatierung
@@ -119,34 +120,50 @@ else
 fi
 
 section "5️⃣  Systemd-Service konfigurieren"
-cat <<EOF > "$SERVICE_FILE"
+cat <<EOF > "$WEB_SERVICE_FILE"
 [Unit]
-Description=Brunnen Messsystem (Logger + Webinterface)
-After=network-online.target
-Wants=network-online.target
+Description=Brunnen Webinterface (Flask via Gunicorn)
+After=network.target
 
 [Service]
-Type=simple
 User=brunnen
 Group=brunnen
 WorkingDirectory=$BASE_DIR
-ExecStart=/bin/bash -c "source $VENV_DIR/bin/activate && $VENV_DIR/bin/python3 $BASE_DIR/wasserstand_logger.py & $VENV_DIR/bin/python3 $BASE_DIR/webapp.py"
+ExecStart=$BASE_DIR/venv/bin/gunicorn -w 2 -b 0.0.0.0:8080 webapp:app
 Restart=always
-RestartSec=5
-StandardOutput=append:$LOG_DIR/brunnen.service.log
-StandardError=append:$LOG_DIR/brunnen.service.log
-Environment=PYTHONUNBUFFERED=1
+Environment="PATH=$BASE_DIR/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+StandardError=append:$BASE_DIR/logs/webapp.err.log
 
 [Install]
 WantedBy=multi-user.target
 EOF
-ok "Systemd-Service-Datei erstellt: $SERVICE_FILE"
+
+cat <<EOF > "$LOGGER_SERVICE_FILE"
+[Unit]
+Description=Brunnen Messsystem (Sensorlogger)
+After=network.target
+
+[Service]
+User=brunnen
+Group=brunnen
+WorkingDirectory=$BASE_DIR
+ExecStart=$BASE_DIR/venv/bin/python $BASE_DIR/wasserstand_logger.py
+Restart=always
+Environment="PATH=$BASE_DIR/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+StandardError=append:$BASE_DIR/logs/logger.err.log
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+ok "Systemd-Service-Datei erstellt: $WEB_SERVICE_FILE"
 
 section "6️⃣  Start- und Stop-Skripte anlegen"
 
 section "7️⃣  Dienst aktivieren"
 systemctl daemon-reload
-systemctl enable brunnen.service
+systemctl enable brunnen_web.service 
+systemctl brunnen_logger.service
 ok "Systemd-Dienst aktiviert"
 
 section "8️⃣  I²C aktivieren"
@@ -164,12 +181,13 @@ chown -R "$USER:$USER" "$BASE_DIR"
 # ------------------------------------------------------------
 section "9️⃣  Starte Dienste"
 
-systemctl start brunnen.service
-systemctl status brunnen.service
+systemctl start brunnen_web.service brunnen_logger.service
+systemctl status brunnen_web.service brunnen_logger.service
 
 section "✅ Installation abgeschlossen!"
-echo -e "${GREEN}${BOLD}Starte Service:${RESET} systemctl start brunnen.service"
-echo -e "${GREEN}${BOLD}Stoppe Service:${RESET} systemctl stop brunnen.service"
-echo -e "${GREEN}${BOLD}Prüfe Status:${RESET} systemctl status brunnen.service"
-echo -e "${GREEN}${BOLD}Logs anzeigen:${RESET} tail -f $LOG_DIR/brunnen.service.log"
+echo -e "${GREEN}${BOLD}Starte Service:${RESET} systemctl start brunnen_web.service brunnen_logger.service"
+echo -e "${GREEN}${BOLD}Stoppe Service:${RESET} systemctl brunnen_web.service brunnen_logger.service"
+echo -e "${GREEN}${BOLD}Prüfe Status:${RESET} systemctl status brunnen_web.service brunnen_logger.service"
+echo -e "${GREEN}${BOLD}Logs für die Webapp anzeigen:${RESET} tail -f $BASE_DIR/logs/webapp.err.log"
+echo -e "${GREEN}${BOLD}Logs für den Logger anzeigen:${RESET} tail -f $BASE_DIR/logs/logger.err.log"
 echo -e "\n${BOLD}Viel Erfolg mit deinem Brunnen-Websystem! 💧${RESET}"
