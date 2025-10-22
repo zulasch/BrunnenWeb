@@ -123,7 +123,34 @@ def update():
     save_config(cfg)
     return jsonify({"status":"ok","message":"✅ Konfiguration gespeichert."})
 
+@app.route("/update_config", methods=["POST"])
+@login_required
+def update_config():
+    try:
+        data = request.form.to_dict()
+        cfg = load_config()
 
+        # Aktualisiere nur bekannte Parameter
+        for key, value in data.items():
+            if key in cfg:
+                try:
+                    cfg[key] = float(value)
+                except ValueError:
+                    cfg[key] = value  # Strings (z. B. URLs)
+        
+        save_config(cfg)
+
+        # 🔄 Validierung: Nach Speichern erneut laden und prüfen
+        new_cfg = load_config()
+        if new_cfg != cfg:
+            return jsonify({"success": False, "message": "⚠️ Speichern fehlgeschlagen — Werte stimmen nicht überein."}), 500
+
+        return jsonify({"success": True, "message": "✅ Änderungen gespeichert und aktiv."})
+    
+    except Exception as e:
+        app.logger.exception("Fehler beim Speichern der Konfiguration:")
+        return jsonify({"success": False, "message": f"❌ Fehler: {e}"}), 500
+        
 @app.route("/service")
 @login_required
 def service_page():
