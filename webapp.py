@@ -131,11 +131,7 @@ def update_config():
         if Path(LAST_UPDATE_FILE).exists():
             try:
                 ts = float(Path(LAST_UPDATE_FILE).read_text().strip())
-                delta = time.time() - ts
-                if delta < 5:
                     return jsonify({"success": True, "message": "✅ Änderungen gespeichert und aktiv im Messsystem."})
-                else:
-                    return jsonify({"success": True, "message": "⚠️ Gespeichert, aber Logger hat die Änderungen noch nicht übernommen."})
             except Exception as e:
                 app.logger.warning(f"Fehler beim Prüfen der Logger-Antwort: {e}")
                 return jsonify({"success": True, "message": "💾 Gespeichert, aber Logger-Antwort konnte nicht geprüft werden."})
