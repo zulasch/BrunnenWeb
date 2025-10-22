@@ -158,6 +158,29 @@ def service_action():
     except subprocess.CalledProcessError as e:
         return jsonify({"status":"error","message":f"systemctl {action} fehlgeschlagen: {e}"}), 500
 
+
+@app.route("/update-system", methods=["POST"])
+@login_required
+def update_system():
+    """Startet das GitHub-Update-Skript."""
+    script_path = "/opt/brunnen_web/scripts/update_repo.sh"
+    if not os.path.exists(script_path):
+        return jsonify({"success": False, "message": f"Skript nicht gefunden: {script_path}"}), 404
+
+    try:
+        result = subprocess.check_output(
+            ["sudo", script_path],
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=180
+        )
+        return jsonify({"success": True, "message": result})
+    except subprocess.CalledProcessError as e:
+        return jsonify({"success": False, "message": e.output}), 500
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
 @app.route("/logs")
 @login_required
 def logs_page():
