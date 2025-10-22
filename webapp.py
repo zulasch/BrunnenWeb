@@ -97,6 +97,8 @@ def index():
     }
     return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
 
+from pathlib import Path
+
 @app.route("/update", methods=["POST"])
 @login_required
 def update_config():
@@ -104,26 +106,46 @@ def update_config():
         data = request.form.to_dict()
         cfg = load_config()
 
-        # Aktualisiere nur bekannte Parameter
+        # Nur bekannte Parameter aktualisieren
         for key, value in data.items():
             if key in cfg:
                 try:
                     cfg[key] = float(value)
                 except ValueError:
                     cfg[key] = value  # Strings (z. B. URLs)
-        
+
         save_config(cfg)
 
-        # 🔄 Validierung: Nach Speichern erneut laden und prüfen
-        new_cfg = load_config()
-        if new_cfg != cfg:
-            return jsonify({"success": False, "message": "⚠️ Speichern fehlgeschlagen — Werte stimmen nicht überein."}), 500
+        # 🔔 Signal an Logger: neue Konfiguration liegt vor
+        BASE_DATA_DIR = os.path.join(BASE_DIR, "data")
+        FLAG_FILE = os.path.join(BASE_DATA_DIR, "config_update.flag")
+        LAST_UPDATE_FILE = os.path.join(BASE_DATA_DIR, "last_config_update")
 
-        return jsonify({"success": True, "message": "✅ Änderungen gespeichert und aktiv."})
-    
+        Path(BASE_DATA_DIR).mkdir(exist_ok=True)
+        Path(FLAG_FILE).touch()
+
+        # ⏳ 2 Sekunden warten, damit Logger reagieren kann
+        time.sleep(2)
+
+        # 🔍 Prüfen, ob Logger wirklich reagiert hat
+        if Path(LAST_UPDATE_FILE).exists():
+            try:
+                ts = float(Path(LAST_UPDATE_FILE).read_text().strip())
+                delta = time.time() - ts
+                if delta < 5:
+                    return jsonify({"success": True, "message": "✅ Änderungen gespeichert und aktiv im Messsystem."})
+                else:
+                    return jsonify({"success": True, "message": "⚠️ Gespeichert, aber Logger hat die Änderungen noch nicht übernommen."})
+            except Exception as e:
+                app.logger.warning(f"Fehler beim Prüfen der Logger-Antwort: {e}")
+                return jsonify({"success": True, "message": "💾 Gespeichert, aber Logger-Antwort konnte nicht geprüft werden."})
+        else:
+            return jsonify({"success": True, "message": "💾 Gespeichert, aber keine Rückmeldung vom Logger erhalten."})
+
     except Exception as e:
         app.logger.exception("Fehler beim Speichern der Konfiguration:")
         return jsonify({"success": False, "message": f"❌ Fehler: {e}"}), 500
+
         
 @app.route("/service")
 @login_required
