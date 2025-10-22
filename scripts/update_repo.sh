@@ -40,8 +40,10 @@ if [ -d "$BASE_DIR/venv" ]; then
 fi
 
 # Service neu starten
-echo "🔄 Starte Dienst neu..." | tee -a "$LOG"
-sudo systemctl restart "$SERVICE"
+# Service-Neustart verzögern (3 Sekunden nach Abschluss)
+echo "🕒 Plane Neustart in 3 Sekunden..." | tee -a "$LOG"
+(sleep 3 && sudo systemctl restart "$SERVICE") >/dev/null 2>&1 &
+echo "✅ Update abgeschlossen – Server wird automatisch neu gestartet." | tee -a "$LOG"
 
 if [ $? -eq 0 ]; then
   echo "✅ Dienst erfolgreich neu gestartet." | tee -a "$LOG"
