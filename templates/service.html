@@ -2,23 +2,41 @@
 {% block content %}
 <h1 class="text-2xl font-bold mb-4">⚙️ Dienstverwaltung</h1>
 
-<div class="space-y-4">
-  <div class="bg-white p-4 shadow rounded">
-    <h2 class="font-semibold mb-2">Logger-Dienst</h2>
-    <button id="restart-logger" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+  <!-- Logger-Dienst -->
+  <div class="bg-white p-5 shadow rounded">
+    <h2 class="font-semibold text-lg mb-2">📘 Logger-Dienst</h2>
+    <p class="text-gray-600 mb-3">Erfasst und speichert aktuelle Messwerte.</p>
+    <button id="restart-logger" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">
       🔁 Logger neu starten
     </button>
   </div>
 
-  <div class="bg-white p-4 shadow rounded">
-    <h2 class="font-semibold mb-2">WebApp-Dienst</h2>
-    <button id="restart-web" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+  <!-- WebApp-Dienst -->
+  <div class="bg-white p-5 shadow rounded">
+    <h2 class="font-semibold text-lg mb-2">💻 WebApp-Dienst</h2>
+    <p class="text-gray-600 mb-3">Steuert das Webinterface und die Benutzeroberfläche.</p>
+    <button id="restart-web" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full">
       🔄 WebApp neu starten
     </button>
   </div>
+
+  <!-- GitHub Update -->
+  <div class="bg-white p-5 shadow rounded md:col-span-2">
+    <h2 class="font-semibold text-lg mb-2">🌀 GitHub-Update</h2>
+    <p class="text-gray-600 mb-3">
+      Lade automatisch die neuesten Änderungen deines Messsystems aus GitHub herunter und aktualisiere die Umgebung.
+    </p>
+    <button id="updateBtn" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 w-full">
+      ⬆️ Update starten
+    </button>
+  </div>
+
 </div>
 
 <div id="service-result" class="mt-6 text-center"></div>
+<div id="updateStatus" class="mt-4 p-3 rounded hidden"></div>
 
 <script>
 async function restartService(service) {
@@ -47,35 +65,15 @@ async function restartService(service) {
       `<div class='bg-red-100 text-red-800 p-3 rounded'>Netzwerkfehler: ${err}</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = service === "logger" ? "🔁 Logger neu starten" : "🔄 WebApp neu starten";
+    btn.textContent = service === "logger"
+      ? "🔁 Logger neu starten"
+      : "🔄 WebApp neu starten";
   }
 }
 
 document.getElementById("restart-logger").addEventListener("click", () => restartService("logger"));
 document.getElementById("restart-web").addEventListener("click", () => restartService("web"));
-</script>
-{% endblock %}
 
-
-
-
-
-<hr class="my-6">
-
-<h2 class="text-lg font-semibold mb-2">🌀 GitHub-Update</h2>
-<p class="text-gray-700 mb-4">Hier kannst du dein Messsystem direkt aus deinem GitHub-Repository aktualisieren.</p>
-
-<form id="updateForm" onsubmit="return false;">
-  <button id="updateBtn"
-          type="submit"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-    🔄 Update starten
-  </button>
-</form>
-
-<div id="updateStatus" class="mt-4 p-3 rounded hidden"></div>
-
-<script>
 document.getElementById("updateBtn").addEventListener("click", async () => {
   const statusBox = document.getElementById("updateStatus");
   const btn = document.getElementById("updateBtn");
@@ -105,9 +103,7 @@ document.getElementById("updateBtn").addEventListener("click", async () => {
   }
 
   btn.disabled = false;
-  btn.innerText = "🔄 Update starten";
+  btn.innerText = "⬆️ Update starten";
 });
 </script>
 {% endblock %}
-
-
