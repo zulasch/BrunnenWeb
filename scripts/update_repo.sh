@@ -42,7 +42,7 @@ fi
 # Service neu starten
 # Service-Neustart verzögern (3 Sekunden nach Abschluss)
 echo "🕒 Plane Neustart in 3 Sekunden..." | tee -a "$LOG"
-(sleep 3 && sudo systemctl restart "$SERVICE") >/dev/null 2>&1 &
+(sleep 3 && sudo systemctl restart $SERVICE) >/dev/null 2>&1 &
 echo "✅ Update abgeschlossen – Server wird automatisch neu gestartet." | tee -a "$LOG"
 
 if [ $? -eq 0 ]; then
