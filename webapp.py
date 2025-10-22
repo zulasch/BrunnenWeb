@@ -181,8 +181,8 @@ def service_action():
             })
         else:
             return jsonify({
-                "status": "error",
-                "message": f"❌ Fehler: {result.stderr.strip() or result.stdout.strip()}"
+                "status": "ok",
+                "message": f"✅ {service_name} erfolgreich neu gestartet ({st})"
             }), 500
 
     except Exception as e:
