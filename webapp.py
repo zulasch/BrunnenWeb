@@ -153,7 +153,7 @@ def logs_page():
     # wählbare Logs
     files = {
         "Service": os.path.join(LOG_DIR, "brunnen.service.log"),
-        "Logger": os.path.join(LOG_DIR, "wasserstand_logger.log"),
+        "Logger": os.path.join(LOG_DIR, "wasserstand.log"),
         "Webapp": os.path.join(LOG_DIR, "webapp.log")
     }
     chosen = request.args.get("file","Service")
