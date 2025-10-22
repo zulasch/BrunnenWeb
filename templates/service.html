@@ -1,57 +1,61 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-lg font-semibold mb-2">⚙️ Dienststeuerung</h2>
-<p class="text-gray-700 mb-4">Hier kannst du den Messsystem-Dienst neu starten, falls er hängt oder Änderungen aktiv werden sollen.</p>
+<h1 class="text-2xl font-bold mb-4">⚙️ Dienstverwaltung</h1>
 
-<form id="restartForm" onsubmit="return false;">
-  <button id="restartBtn"
-          type="submit"
-          class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">
-    🔄 Dienst neu starten
-  </button>
-</form>
+<div class="space-y-4">
+  <div class="bg-white p-4 shadow rounded">
+    <h2 class="font-semibold mb-2">Logger-Dienst</h2>
+    <button id="restart-logger" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      🔁 Logger neu starten
+    </button>
+  </div>
 
-<div id="restartStatus" class="mt-4 p-3 rounded hidden"></div>
+  <div class="bg-white p-4 shadow rounded">
+    <h2 class="font-semibold mb-2">WebApp-Dienst</h2>
+    <button id="restart-web" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+      🔄 WebApp neu starten
+    </button>
+  </div>
+</div>
+
+<div id="service-result" class="mt-6 text-center"></div>
 
 <script>
-document.getElementById("restartBtn").addEventListener("click", async () => {
-  const statusBox = document.getElementById("restartStatus");
-  const btn = document.getElementById("restartBtn");
-
-  if (!confirm("⚙️ Möchtest du den Dienst wirklich neu starten?")) return;
-
+async function restartService(service) {
+  const btn = document.getElementById(`restart-${service}`);
   btn.disabled = true;
-  btn.innerText = "⏳ Neustart läuft...";
-  statusBox.className = "mt-4 p-3 rounded bg-yellow-100 text-gray-800";
-  statusBox.innerText = "Dienst wird neu gestartet...";
-  statusBox.classList.remove("hidden");
+  btn.textContent = "⏳ Neustart läuft...";
+  document.getElementById("service-result").innerHTML = "";
 
   try {
-    const res = await fetch("/service/action", {
-      method: "POST",
-      body: new URLSearchParams({ action: "restart" })
-    });
-    const data = await res.json();
+    const formData = new FormData();
+    formData.append("service", service);
+    formData.append("action", "restart");
 
-    if (data.status === "ok") {
-      statusBox.className = "mt-4 p-3 rounded bg-green-100 text-green-800";
-      statusBox.innerText = data.message;
-    } else if (data.status === "warning") {
-      statusBox.className = "mt-4 p-3 rounded bg-yellow-100 text-yellow-800";
-      statusBox.innerText = data.message;
+    const response = await fetch("/service/action", { method: "POST", body: formData });
+    const data = await response.json();
+
+    if (response.ok && data.status === "ok") {
+      document.getElementById("service-result").innerHTML =
+        `<div class='bg-green-100 text-green-800 p-3 rounded'>${data.message}</div>`;
     } else {
-      statusBox.className = "mt-4 p-3 rounded bg-red-100 text-red-800";
-      statusBox.innerText = data.message;
+      document.getElementById("service-result").innerHTML =
+        `<div class='bg-red-100 text-red-800 p-3 rounded'>${data.message}</div>`;
     }
   } catch (err) {
-    statusBox.className = "mt-4 p-3 rounded bg-red-100 text-red-800";
-    statusBox.innerText = "⚠️ Netzwerkfehler oder Serverproblem: " + err;
+    document.getElementById("service-result").innerHTML =
+      `<div class='bg-red-100 text-red-800 p-3 rounded'>Netzwerkfehler: ${err}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = service === "logger" ? "🔁 Logger neu starten" : "🔄 WebApp neu starten";
   }
+}
 
-  btn.disabled = false;
-  btn.innerText = "🔄 Dienst neu starten";
-});
+document.getElementById("restart-logger").addEventListener("click", () => restartService("logger"));
+document.getElementById("restart-web").addEventListener("click", () => restartService("web"));
 </script>
+{% endblock %}
+
 
 
 

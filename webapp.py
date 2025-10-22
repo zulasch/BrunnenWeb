@@ -144,23 +144,49 @@ def service_page():
 @app.route("/service/action", methods=["POST"])
 @login_required
 def service_action():
+    """Startet oder prüft definierte Systemd-Dienste (Logger/WebApp)."""
+    service = request.form.get("service")
     action = request.form.get("action")
-    if action not in ("start","stop","restart","status"):
+
+    valid_services = {
+        "logger": "brunnen_logger.service",
+        "web": "brunnen_web.service"
+    }
+
+    if service not in valid_services or action not in ("status", "restart"):
         abort(400)
+
+    service_name = valid_services[service]
+
     try:
         if action == "status":
-            st = service_status("brunnen_logger.service")
-            return jsonify({"status":"ok","message":st})
-        subprocess.check_call(["sudo", "systemctl", action, "brunnen_logger.service"])
-        time.sleep(0.8)
-        st = service_status("brunnen_logger.service")
-        return jsonify({"status":"ok","message":f"Service {action}: {st}"})
-    except subprocess.CalledProcessError as e:
-        return jsonify({"status":"error","message":f"systemctl {action} fehlgeschlagen: {e}"}), 500
+            st = service_status(service_name)
+            return jsonify({"status": "ok", "message": st})
 
+        # 🔄 Neustart ausführen
+        result = subprocess.run(
+            ["sudo", "/bin/systemctl", "restart", service_name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=False
+        )
+        time.sleep(1)
+        st = service_status(service_name)
 
+        if result.returncode == 0:
+            return jsonify({
+                "status": "ok",
+                "message": f"✅ {service_name} erfolgreich neu gestartet ({st})"
+            })
+        else:
+            return jsonify({
+                "status": "error",
+                "message": f"❌ Fehler: {result.stderr.strip() or result.stdout.strip()}"
+            }), 500
 
-
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"❌ Unerwarteter Fehler: {e}"}), 500
 
 @app.route("/update-system", methods=["POST"])
 @login_required
