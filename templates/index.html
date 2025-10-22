@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <h2 class="text-xl font-bold mb-4">📊 Messsystem-Konfiguration</h2>
+
+<div id="messageBox" class="hidden"></div>
+
+<form id="configForm" onsubmit="saveConfig(event)">
+  <!-- deine Eingabefelder -->
+  <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+    💾 Speichern
+  </button>
+</form>
+
 <form id="configForm" class="space-y-4">
   {% for key, value in config.items() %}
     <div>
@@ -50,4 +60,5 @@ async function saveConfig(event) {
 }
 </script>
 {% endblock %}
+
 
