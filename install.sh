@@ -64,6 +64,23 @@ chown -R "$USER:$USER" "$BASE_DIR"
 ok "Verzeichnisstruktur erstellt unter $BASE_DIR"
 usermod -aG i2c $USER
 
+
+SUDOERS_FILE="/etc/sudoers.d/$USER"
+cat <<EOF > "$SUDOERS_FILE"
+# Erlaubt dem Benutzer '$USER' kontrollierte Service-Kommandos ohne Passwort
+brunnen ALL=NOPASSWD: /bin/systemctl start brunnen.service, /bin/systemctl stop brunnen.service, /bin/systemctl restart brunnen.service, /bin/systemctl status brunnen.service
+EOF
+
+chmod 440 "$SUDOERS_FILE"
+
+# Test, ob Datei gültig ist
+if visudo -c -f "$SUDOERS_FILE" >/dev/null 2>&1; then
+  ok "Sudo-Regel erfolgreich erstellt und validiert: $SUDOERS_FILE"
+else
+  err "Fehler in der sudoers-Datei – bitte prüfen: $SUDOERS_FILE"
+fi
+
+
 section "3️⃣  Virtuelle Python-Umgebung einrichten"
 if [ ! -d "$VENV_DIR" ]; then
   python3 -m venv "$VENV_DIR"
