@@ -192,7 +192,9 @@ try:
         wasser_oberflaeche_m = STARTABSTICH + (INITIAL_WASSERTIEFE - level_m)
         messwert_NN = MESSWERT_NN - wasser_oberflaeche_m
         pegel_diff = STARTABSTICH - wasser_oberflaeche_m
-        timestamp = datetime.utcnow().isoformat()
+        from datetime import datetime, UTC
+        timestamp = datetime.now(UTC).isoformat()
+
 
         logging.info(
             f"🕒 {timestamp} | {current_mA:.2f} mA | "
