@@ -58,7 +58,7 @@ ok "Systempakete aktualisiert"
 
 section "2️⃣  Verzeichnisse & Benutzer anlegen"
 git clone https://github.com/zulasch/BrunnenWeb $BASE_DIR
-mkdir -p "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR" "$SCRIPT_DIR"
+mkdir -p "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR"
 id "$USER" &>/dev/null || useradd -r -s /bin/false "$USER"
 chown -R "$USER:$USER" "$BASE_DIR"
 ok "Verzeichnisstruktur erstellt unter $BASE_DIR"
