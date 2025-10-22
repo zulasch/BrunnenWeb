@@ -146,35 +146,27 @@ def service_page():
 def service_action():
     action = request.form.get("action")
     if action != "restart":
-        abort(400)  # Nur Restart erlaubt
+        abort(400)
 
     try:
-        # Neustart ausführen
-        subprocess.check_call(["sudo", "systemctl", "restart", "brunnen.service"])
-        time.sleep(1.5)  # kurz warten, damit systemd den Dienst wieder hochfährt
+        # 🔄 Asynchroner Neustart in Hintergrundprozess
+        subprocess.Popen(
+            ["bash", "-c", "(sleep 2 && sudo systemctl restart brunnen.service) &"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
 
-        # Status prüfen
-        st = service_status("brunnen.service")
-        if st == "active":
-            return jsonify({
-                "status": "ok",
-                "message": "✅ Dienst erfolgreich neu gestartet und läuft wieder."
-            })
-        else:
-            return jsonify({
-                "status": "warning",
-                "message": f"⚠️ Dienst wurde neu gestartet, aktueller Status: {st}"
-            })
-    except subprocess.CalledProcessError as e:
+        # ✅ Sofortige Rückmeldung an Browser, bevor Flask beendet wird
         return jsonify({
-            "status": "error",
-            "message": f"❌ Neustart fehlgeschlagen: {e}"
-        }), 500
+            "status": "ok",
+            "message": "✅ Neustart wird ausgeführt – Dienst startet in wenigen Sekunden neu."
+        })
     except Exception as e:
         return jsonify({
             "status": "error",
-            "message": f"❌ Unerwarteter Fehler: {e}"
+            "message": f"❌ Fehler beim Starten des Neustarts: {e}"
         }), 500
+
 
 
 
