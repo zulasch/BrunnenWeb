@@ -145,9 +145,8 @@ def service_page():
 @login_required
 def service_action():
     action = request.form.get("action")
-    if action != "restart":
+    if action not in ("start","stop","restart","status"):
         abort(400)
-
     try:
         if action == "status":
             st = service_status("brunnen_logger.service")
@@ -158,6 +157,7 @@ def service_action():
         return jsonify({"status":"ok","message":f"Service {action}: {st}"})
     except subprocess.CalledProcessError as e:
         return jsonify({"status":"error","message":f"systemctl {action} fehlgeschlagen: {e}"}), 500
+
 
 
 
