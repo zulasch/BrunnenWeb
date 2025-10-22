@@ -49,7 +49,7 @@ err() {
 }
 
 # ------------------------------------------------------------
-# 🚀 Installation
+# 🚀 Installation 
 # ------------------------------------------------------------
 section "Starte Installation des Brunnen-Systems"
 
@@ -63,6 +63,7 @@ mkdir -p "$CONFIG_DIR" "$DATA_DIR" "$LOG_DIR" "$SCRIPT_DIR"
 id "$USER" &>/dev/null || useradd -r -s /bin/false "$USER"
 chown -R "$USER:$USER" "$BASE_DIR"
 ok "Verzeichnisstruktur erstellt unter $BASE_DIR"
+usermod -aG i2c $USER
 
 section "3️⃣  Virtuelle Python-Umgebung einrichten"
 if [ ! -d "$VENV_DIR" ]; then
@@ -74,7 +75,7 @@ fi
 
 source "$VENV_DIR/bin/activate"
 pip install --upgrade pip
-pip install flask psutil influxdb-client adafruit-circuitpython-ads1x15 board
+pip install flask psutil influxdb-client adafruit-circuitpython-ads1x15 board RPi.GPIO
 deactivate
 ok "Python-Abhängigkeiten installiert"
 
@@ -110,10 +111,10 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=$USER
-Group=$USER
+User=brunnen
+Group=brunnen
 WorkingDirectory=$BASE_DIR
-ExecStart=$SCRIPT_DIR/start_brunnen.sh
+ExecStart=/bin/bash -c "source $VENV_DIR/bin/activate && $VENV_DIR/bin/python3 $BASE_DIR/wasserstand_logger.py & $VENV_DIR/bin/python3 $BASE_DIR/webapp.py"
 Restart=always
 RestartSec=5
 StandardOutput=append:$LOG_DIR/brunnen.service.log
@@ -128,17 +129,37 @@ ok "Systemd-Service-Datei erstellt: $SERVICE_FILE"
 section "6️⃣  Start- und Stop-Skripte anlegen"
 cat <<EOF > "$SCRIPT_DIR/start_brunnen.sh"
 #!/bin/bash
+
 cd "$BASE_DIR"
-echo "🚀 Starte Brunnen-System ..."
+
+echo "🚀 Starte Brunnen-System..."
+
 source "$VENV_DIR/bin/activate"
 nohup python3 wasserstand_logger.py >> "$LOG_DIR/wasserstand_logger.log" 2>&1 &
 nohup python3 webapp.py >> "$LOG_DIR/webapp.log" 2>&1 &
+
+pgrep -f webapp.py > "$BASE_DIR/data/webapp.pid"
+pgrep -f wasserstand_logger.py > "$BASE_DIR/data/logger.pid"
+
+echo "✅ Brunnen-System gestartet."
 EOF
 
 cat <<EOF > "$SCRIPT_DIR/stop_brunnen.sh"
 #!/bin/bash
+
+if [ -f "$BASE_DIR/data/webapp.pid" ]; then
+  kill 2802 2>/dev/null
+  rm "$BASE_DIR/data/webapp.pid"
+fi
+
+if [ -f "$BASE_DIR/data/logger.pid" ]; then
+  kill 3508 2>/dev/null
+  rm "$BASE_DIR/data/logger.pid"
+fi
+
 pkill -f wasserstand_logger.py 2>/dev/null
 pkill -f webapp.py 2>/dev/null
+
 echo "🛑 Brunnen-System gestoppt."
 EOF
 
@@ -150,10 +171,22 @@ systemctl daemon-reload
 systemctl enable brunnen.service
 ok "Systemd-Dienst aktiviert"
 
+section "8️⃣  I²C aktivieren"
+if command -v raspi-config &>/dev/null; then
+    raspi-config nonint do_i2c 0
+    ok "I²C-Schnittstelle aktiviert"
+else
+    warn "raspi-config nicht gefunden – aktiviere I²C manuell"
+fi
+
+
 # ------------------------------------------------------------
 # 🎉 Abschluss
 # ------------------------------------------------------------
+section "9️⃣  Starte Dienste"
+
 systemctl start brunnen.service
+systemctl status brunnen.service
 
 section "✅ Installation abgeschlossen!"
 echo -e "${GREEN}${BOLD}Starte Service:${RESET} systemctl start brunnen.service"
