@@ -151,7 +151,7 @@ def service_action():
         if action == "status":
             st = service_status("brunnen.service")
             return jsonify({"status":"ok","message":st})
-        subprocess.check_call(["systemctl", action, "brunnen.service"])
+        subprocess.check_call(["sudo", "systemctl", action, "brunnen.service"])
         time.sleep(0.8)
         st = service_status("brunnen.service")
         return jsonify({"status":"ok","message":f"Service {action}: {st}"})
