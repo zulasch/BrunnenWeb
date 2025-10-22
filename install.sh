@@ -140,6 +140,7 @@ else
     warn "raspi-config nicht gefunden – aktiviere I²C manuell"
 fi
 
+chown -R "$USER:$USER" "$BASE_DIR"
 
 # ------------------------------------------------------------
 # 🎉 Abschluss
