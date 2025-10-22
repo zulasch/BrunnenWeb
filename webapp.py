@@ -151,8 +151,7 @@ def service_action():
     try:
         # 🔄 Asynchroner Neustart in Hintergrundprozess
         subprocess.Popen(
-            ["bash", "-c", "(sleep 2 && sudo systemctl restart brunnen_web.service) &"],
-            ["bash", "-c", "(sleep 2 && sudo systemctl restart brunnen_logger.service) &"],
+            ["bash", "-c", "(sleep 2 && sudo systemctl restart brunnen_web.service brunnen_logger.service) &"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
