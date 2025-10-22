@@ -149,23 +149,15 @@ def service_action():
         abort(400)
 
     try:
-        # 🔄 Asynchroner Neustart in Hintergrundprozess
-        subprocess.Popen(
-            ["bash", "-c", "(sleep 2 && sudo systemctl restart brunnen_web.service brunnen_logger.service) &"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
-
-        # ✅ Sofortige Rückmeldung an Browser, bevor Flask beendet wird
-        return jsonify({
-            "status": "ok",
-            "message": "✅ Neustart wird ausgeführt – Dienst startet in wenigen Sekunden neu."
-        })
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": f"❌ Fehler beim Starten des Neustarts: {e}"
-        }), 500
+        if action == "status":
+            st = service_status("brunnen_logger.service")
+            return jsonify({"status":"ok","message":st})
+        subprocess.check_call(["sudo", "systemctl", action, "brunnen_logger.service"])
+        time.sleep(0.8)
+        st = service_status("brunnen_logger.service")
+        return jsonify({"status":"ok","message":f"Service {action}: {st}"})
+    except subprocess.CalledProcessError as e:
+        return jsonify({"status":"error","message":f"systemctl {action} fehlgeschlagen: {e}"}), 500
 
 
 
