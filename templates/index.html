@@ -18,15 +18,36 @@
 <p id="msg" class="text-center text-green-600 mt-4 hidden">Gespeichert!</p>
 
 <script>
-document.getElementById('configForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const response = await fetch('{{ url_for("update") }}', { method: 'POST', body: formData });
-  const result = await response.json();
-  const msg = document.getElementById('msg');
-  msg.innerText = result.message;
-  msg.classList.remove('hidden');
-  setTimeout(() => msg.classList.add('hidden'), 3000);
-});
+async function saveConfig(event) {
+  event.preventDefault();
+  const form = document.getElementById('configForm');
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch('{{ url_for("update_config") }}', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await response.json();
+
+    // Ergebnis anzeigen
+    const msgBox = document.getElementById("messageBox");
+    msgBox.classList.remove("hidden");
+    msgBox.textContent = result.message;
+
+    if (result.success) {
+      msgBox.className = "p-3 mb-4 rounded bg-green-200 text-green-800";
+    } else {
+      msgBox.className = "p-3 mb-4 rounded bg-red-200 text-red-800";
+    }
+
+  } catch (error) {
+    const msgBox = document.getElementById("messageBox");
+    msgBox.classList.remove("hidden");
+    msgBox.textContent = "❌ Netzwerkfehler beim Speichern!";
+    msgBox.className = "p-3 mb-4 rounded bg-red-200 text-red-800";
+  }
+}
 </script>
 {% endblock %}
+
