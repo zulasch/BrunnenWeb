@@ -68,7 +68,7 @@ usermod -aG i2c $USER
 SUDOERS_FILE="/etc/sudoers.d/$USER"
 cat <<EOF > "$SUDOERS_FILE"
 # Erlaubt dem Benutzer '$USER' kontrollierte Service-Kommandos ohne Passwort
-brunnen ALL=NOPASSWD: /bin/systemctl start brunnen.service, /bin/systemctl stop brunnen.service, /bin/systemctl restart brunnen.service, /bin/systemctl status brunnen.service
+brunnen ALL=NOPASSWD: /bin/systemctl start brunnen.service, /bin/systemctl stop brunnen.service, /bin/systemctl restart brunnen.service, /bin/systemctl status brunnen.service, $BASE_DIR/scripts/update_repo.sh
 EOF
 
 chmod 440 "$SUDOERS_FILE"
