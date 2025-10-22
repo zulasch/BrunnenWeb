@@ -52,7 +52,7 @@ async function restartService(service) {
     formData.append("action", "restart");
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5s Timeout
+    const timeout = setTimeout(() => controller.abort(), 5000); // ⏱️ 5 Sek Timeout
 
     const response = await fetch("/service/action", {
       method: "POST",
@@ -61,36 +61,68 @@ async function restartService(service) {
     });
     clearTimeout(timeout);
 
-    // Versuch, JSON zu parsen (wenn WebApp sich noch nicht beendet hat)
-    const data = await response.json().catch(() => null);
+    const data = await response.json();
 
-    if (response.ok && data && data.status === "ok") {
+    if (response.ok && data.status === "ok") {
       resultBox.innerHTML = `<div class='bg-green-100 text-green-800 p-3 rounded'>${data.message}</div>`;
     } else {
-      // Fallback wenn kein JSON oder Response abbricht
-      throw new Error("Keine Antwort erhalten.");
+      resultBox.innerHTML = `<div class='bg-red-100 text-red-800 p-3 rounded'>${data.message}</div>`;
     }
 
   } catch (err) {
-    // 💡 Wenn WebApp neu gestartet wird, bricht fetch ab → simuliertes "Erfolg"
+    // ⚠️ Fehlerbehandlung mit Timeout-Fall
     if (service === "web") {
       resultBox.innerHTML = `
         <div class='bg-yellow-100 text-yellow-800 p-3 rounded'>
-          🔄 Die WebApp wird jetzt neu gestartet.<br>
-          Bitte warte 5–10 Sekunden, dann <b>lade die Seite neu</b>.
+          🔄 Die WebApp wird neu gestartet.<br>
+          Bitte lade die Seite in 5 Sekunden neu.
         </div>`;
-      // optionaler Auto-Reload nach 8s
-      setTimeout(() => location.reload(), 8000);
+      setTimeout(() => location.reload(), 6000); // ⏳ Reload nach 6 Sekunden
     } else {
       resultBox.innerHTML =
-        `<div class='bg-red-100 text-red-800 p-3 rounded'>❌ Fehler: ${err.message || err}</div>`;
+        `<div class='bg-red-100 text-red-800 p-3 rounded'>Netzwerkfehler: ${err}</div>`;
     }
   } finally {
     btn.disabled = false;
-    btn.textContent =
-      service === "logger" ? "🔁 Logger neu starten" : "🔄 WebApp neu starten";
+    btn.textContent = service === "logger"
+      ? "🔁 Logger neu starten"
+      : "🔄 WebApp neu starten";
   }
 }
-</script>
 
+document.getElementById("restart-logger").addEventListener("click", () => restartService("logger"));
+document.getElementById("restart-web").addEventListener("click", () => restartService("web"));
+
+document.getElementById("updateBtn").addEventListener("click", async () => {
+  const statusBox = document.getElementById("updateStatus");
+  const btn = document.getElementById("updateBtn");
+
+  if (!confirm("⚙️ Möchtest du wirklich ein GitHub-Update ausführen?")) return;
+
+  btn.disabled = true;
+  btn.innerText = "⏳ Aktualisiere...";
+  statusBox.className = "mt-4 p-3 rounded bg-yellow-100 text-gray-800";
+  statusBox.innerText = "Update läuft... bitte warten.";
+  statusBox.classList.remove("hidden");
+
+  try {
+    const response = await fetch("/update-system", { method: "POST" });
+    const data = await response.json();
+
+    if (data.success) {
+      statusBox.className = "mt-4 p-3 rounded bg-green-100 text-green-800 whitespace-pre-wrap";
+      statusBox.innerText = "✅ Update erfolgreich abgeschlossen:\n\n" + data.message;
+    } else {
+      statusBox.className = "mt-4 p-3 rounded bg-red-100 text-red-800 whitespace-pre-wrap";
+      statusBox.innerText = "❌ Fehler beim Update:\n\n" + (data.message || "Unbekannter Fehler");
+    }
+  } catch (err) {
+    statusBox.className = "mt-4 p-3 rounded bg-red-100 text-red-800";
+    statusBox.innerText = "⚠️ Netzwerkfehler oder Serverproblem: " + err;
+  }
+
+  btn.disabled = false;
+  btn.innerText = "⬆️ Update starten";
+});
+</script>
 {% endblock %}
