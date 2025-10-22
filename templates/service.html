@@ -27,4 +27,56 @@ async function svc(action) {
   document.getElementById('svcmsg').innerText = j.message + " (Status: " + j.svc_status + ")";
 }
 </script>
+
+
+
+<hr class="my-6">
+
+<h2 class="text-lg font-semibold mb-2">🌀 GitHub-Update</h2>
+<p class="text-gray-700 mb-4">Hier kannst du dein Messsystem direkt aus deinem GitHub-Repository aktualisieren.</p>
+
+<form id="updateForm" onsubmit="return false;">
+  <button id="updateBtn"
+          type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+    🔄 Update starten
+  </button>
+</form>
+
+<div id="updateStatus" class="mt-4 p-3 rounded hidden"></div>
+
+<script>
+document.getElementById("updateBtn").addEventListener("click", async () => {
+  const statusBox = document.getElementById("updateStatus");
+  const btn = document.getElementById("updateBtn");
+
+  if (!confirm("⚙️ Möchtest du wirklich ein GitHub-Update ausführen?")) return;
+
+  btn.disabled = true;
+  btn.innerText = "⏳ Aktualisiere...";
+  statusBox.className = "mt-4 p-3 rounded bg-yellow-100 text-gray-800";
+  statusBox.innerText = "Update läuft... bitte warten.";
+  statusBox.classList.remove("hidden");
+
+  try {
+    const response = await fetch("/update-system", { method: "POST" });
+    const data = await response.json();
+
+    if (data.success) {
+      statusBox.className = "mt-4 p-3 rounded bg-green-100 text-green-800 whitespace-pre-wrap";
+      statusBox.innerText = "✅ Update erfolgreich abgeschlossen:\n\n" + data.message;
+    } else {
+      statusBox.className = "mt-4 p-3 rounded bg-red-100 text-red-800 whitespace-pre-wrap";
+      statusBox.innerText = "❌ Fehler beim Update:\n\n" + (data.message || "Unbekannter Fehler");
+    }
+  } catch (err) {
+    statusBox.className = "mt-4 p-3 rounded bg-red-100 text-red-800";
+    statusBox.innerText = "⚠️ Netzwerkfehler oder Serverproblem: " + err;
+  }
+
+  btn.disabled = false;
+  btn.innerText = "🔄 Update starten";
+});
+</script>
 {% endblock %}
+
