@@ -16,7 +16,6 @@ VENV_DIR="$BASE_DIR/venv"
 CONFIG_DIR="$BASE_DIR/config"
 DATA_DIR="$BASE_DIR/data"
 LOG_DIR="$BASE_DIR/logs"
-SCRIPT_DIR="$BASE_DIR/scripts"
 SERVICE_FILE="/etc/systemd/system/brunnen.service"
 
 # ------------------------------------------------------------
@@ -127,44 +126,6 @@ EOF
 ok "Systemd-Service-Datei erstellt: $SERVICE_FILE"
 
 section "6️⃣  Start- und Stop-Skripte anlegen"
-cat <<EOF > "$SCRIPT_DIR/start_brunnen.sh"
-#!/bin/bash
-
-cd "$BASE_DIR"
-
-echo "🚀 Starte Brunnen-System..."
-
-source "$VENV_DIR/bin/activate"
-nohup python3 wasserstand_logger.py >> "$LOG_DIR/wasserstand_logger.log" 2>&1 &
-nohup python3 webapp.py >> "$LOG_DIR/webapp.log" 2>&1 &
-
-pgrep -f webapp.py > "$BASE_DIR/data/webapp.pid"
-pgrep -f wasserstand_logger.py > "$BASE_DIR/data/logger.pid"
-
-echo "✅ Brunnen-System gestartet."
-EOF
-
-cat <<EOF > "$SCRIPT_DIR/stop_brunnen.sh"
-#!/bin/bash
-
-if [ -f "$BASE_DIR/data/webapp.pid" ]; then
-  kill 2802 2>/dev/null
-  rm "$BASE_DIR/data/webapp.pid"
-fi
-
-if [ -f "$BASE_DIR/data/logger.pid" ]; then
-  kill 3508 2>/dev/null
-  rm "$BASE_DIR/data/logger.pid"
-fi
-
-pkill -f wasserstand_logger.py 2>/dev/null
-pkill -f webapp.py 2>/dev/null
-
-echo "🛑 Brunnen-System gestoppt."
-EOF
-
-chmod +x "$SCRIPT_DIR/"*.sh
-ok "Start-/Stop-Skripte bereitgestellt"
 
 section "7️⃣  Dienst aktivieren"
 systemctl daemon-reload
