@@ -171,7 +171,7 @@ def service_action():
             text=True,
             check=False
         )
-        time.sleep(1)
+        time.sleep(3)
         st = service_status(service_name)
 
         if result.returncode == 0:
@@ -181,8 +181,8 @@ def service_action():
             })
         else:
             return jsonify({
-                "status": "ok",
-                "message": f"✅ {service_name} erfolgreich neu gestartet ({st})"
+                "status": "error",
+                "message": f"❌ Fehler: {result.stderr.strip() or result.stdout.strip()}"
             }), 500
 
     except Exception as e:
