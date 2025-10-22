@@ -99,32 +99,6 @@ def index():
 
 @app.route("/update", methods=["POST"])
 @login_required
-def update():
-    # Strings/Float/Int heuristisch casten
-    def cast(v):
-        try:
-            if v.strip() == "":
-                return ""
-            if v.lower() in ("true", "false"):
-                return v.lower() == "true"
-        except Exception:
-            pass
-        # float/int
-        try:
-            if v.isdigit():  # int
-                return int(v)
-            return float(v)
-        except Exception:
-            return v  # string
-
-    cfg = load_config()
-    for k, v in request.form.items():
-        cfg[k] = cast(v)
-    save_config(cfg)
-    return jsonify({"status":"ok","message":"✅ Konfiguration gespeichert."})
-
-@app.route("/update_config", methods=["POST"])
-@login_required
 def update_config():
     try:
         data = request.form.to_dict()
