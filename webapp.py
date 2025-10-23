@@ -231,13 +231,13 @@ def update_system():
 def logs_page():
     # wählbare Logs
     files = {
-        "Service": os.path.join(LOG_DIR, "brunnen.service.log"),
-        "Logger": os.path.join(LOG_DIR, "wasserstand.log")
+        "Service": os.path.join(LOG_DIR, "webapp.err.log"),
+        "Logger": os.path.join(LOG_DIR, "logger.err.log")
         #"Webapp": os.path.join(LOG_DIR, "webapp.log")
     }
     chosen = request.args.get("file","Service")
     path = files.get(chosen, list(files.values())[0])
-    content = tail_file(path, lines=300)
+    content = tail_file(path, lines=30)
     return render_template("logs.html", files=list(files.keys()), chosen=chosen, content=content, title="Logs")
 
 # ===== Aktuelle Messwerte =====
