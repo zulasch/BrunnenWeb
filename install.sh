@@ -54,7 +54,7 @@ err() {
 section "Starte Installation des Brunnen-Systems"
 
 section "1️⃣  Systempakete installieren"
-apt update -y && apt install -y python3 python3-venv python3-pip git i2c-tools sqlite3
+apt update -y && apt install -y swig python3 python3-venv python3-pip git i2c-tools sqlite3
 ok "Systempakete aktualisiert"
 
 section "2️⃣  Verzeichnisse & Benutzer anlegen"
