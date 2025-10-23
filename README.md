@@ -4,6 +4,7 @@ Ein vollständiges Messsystem zur **Überwachung des Wasserstands eines Brunnens
 mit einem **4–20 mA-Sensor**, **ADS1115 ADC** und **Raspberry Pi**.  
 Die Anwendung umfasst:
 
+
 - 🌊 Kontinuierliche Messung der Wassertiefe  
 - 💾 Lokale Datenspeicherung in SQLite (Offline-Puffer)  
 - ☁️ Automatische Übertragung an InfluxDB (wenn verfügbar)  
