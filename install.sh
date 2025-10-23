@@ -92,7 +92,7 @@ fi
 
 source "$VENV_DIR/bin/activate"
 pip install --upgrade pip
-pip install flask psutil influxdb-client adafruit-circuitpython-ads1x15 board RPi.GPIO gunicorn
+pip install flask psutil influxdb-client adafruit-circuitpython-ads1x15 board RPi.GPIO gunicorn lgpio
 deactivate
 ok "Python-Abhängigkeiten installiert"
 
