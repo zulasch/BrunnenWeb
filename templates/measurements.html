@@ -2,7 +2,7 @@
 {% block content %}
 <h2 class="text-xl font-bold mb-4">📈 Aktuelle Messwerte</h2>
 
-<div id="data" class="bg-white rounded-xl p-4 shadow text-lg">
+<div id="data" class="bg-white rounded-xl p-4 shadow text-lg space-y-2">
   <p><b>🕒 Zeit:</b> <span id="ts">{{ data.timestamp }}</span></p> 
   <p><b>🔌 Strom:</b> <span id="current">{{ data.current_mA }}</span> mA</p>
   <p><b>🌊 Wassertiefe:</b> <span id="depth">{{ data.depth_m }}</span> m</p>
