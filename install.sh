@@ -54,7 +54,7 @@ err() {
 section "Starte Installation des Brunnen-Systems"
 
 section "1️⃣  Systempakete installieren"
-apt update -y && apt install -y swig python3 python3-venv python3-pip git i2c-tools sqlite3
+apt update -y && apt install -y python3 swig liblgpio-dev python3-lgpio python3-dev python3-setuptools python3-wheel build-essential python3-venv python3-pip git i2c-tools sqlite3
 ok "Systempakete aktualisiert"
 
 section "2️⃣  Verzeichnisse & Benutzer anlegen"
@@ -186,7 +186,7 @@ systemctl status brunnen_web.service brunnen_logger.service
 
 section "✅ Installation abgeschlossen!"
 echo -e "${GREEN}${BOLD}Starte Service:${RESET} systemctl start brunnen_web.service brunnen_logger.service"
-echo -e "${GREEN}${BOLD}Stoppe Service:${RESET} systemctl brunnen_web.service brunnen_logger.service"
+echo -e "${GREEN}${BOLD}Stoppe Service:${RESET} systemctl stop brunnen_web.service brunnen_logger.service"
 echo -e "${GREEN}${BOLD}Prüfe Status:${RESET} systemctl status brunnen_web.service brunnen_logger.service"
 echo -e "${GREEN}${BOLD}Logs für die Webapp anzeigen:${RESET} tail -f $BASE_DIR/logs/webapp.err.log"
 echo -e "${GREEN}${BOLD}Logs für den Logger anzeigen:${RESET} tail -f $BASE_DIR/logs/logger.err.log"
