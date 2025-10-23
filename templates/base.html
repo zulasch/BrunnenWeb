@@ -3,8 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <title>{{ title or "Brunnen Webinterface" }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  /* Mobile Optimierungen */
+  body {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+  input, select, button {
+    font-size: 1.1rem;
+    padding: 0.75rem;
+  }
+  .container {
+    max-width: 100%;
+    padding: 0.5rem;
+  }
+  @media (max-width: 640px) {
+    h1, h2, h3 { font-size: 1.25rem; }
+    .grid { grid-template-columns: 1fr !important; }
+    .p-5, .p-4 { padding: 1rem; }
+  }
+</style>
+
 </head>
 <body class="bg-gray-100 text-gray-800">
   <nav class="bg-blue-600 text-white p-4 flex justify-between">
