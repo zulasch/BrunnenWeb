@@ -1,38 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">⚙️ Dienstverwaltung</h1>
+<h2 class="text-xl font-bold mb-4">⚙️ Dienstverwaltung</h2>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-  <!-- Logger-Dienst -->
-  <div class="bg-white p-5 shadow rounded">
-    <h2 class="font-semibold text-lg mb-2">📘 Logger-Dienst</h2>
+  <div class="bg-white p-5 shadow rounded-xl">
+    <h3 class="font-semibold text-lg mb-2">📘 Logger-Dienst</h3>
     <p class="text-gray-600 mb-3">Erfasst und speichert aktuelle Messwerte.</p>
-    <button id="restart-logger" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">
-      🔁 Logger neu starten
-    </button>
+    <button id="restart-logger" class="bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700 w-full">🔁 Logger neu starten</button>
   </div>
 
-  <!-- WebApp-Dienst -->
-  <div class="bg-white p-5 shadow rounded">
-    <h2 class="font-semibold text-lg mb-2">💻 WebApp-Dienst</h2>
+  <div class="bg-white p-5 shadow rounded-xl">
+    <h3 class="font-semibold text-lg mb-2">💻 WebApp-Dienst</h3>
     <p class="text-gray-600 mb-3">Steuert das Webinterface und die Benutzeroberfläche.</p>
-    <button id="restart-web" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full">
-      🔄 WebApp neu starten
-    </button>
+    <button id="restart-web" class="bg-green-600 text-white px-4 py-3 rounded-xl hover:bg-green-700 w-full">🔄 WebApp neu starten</button>
   </div>
 
-  <!-- GitHub Update -->
-  <div class="bg-white p-5 shadow rounded md:col-span-2">
-    <h2 class="font-semibold text-lg mb-2">🌀 GitHub-Update</h2>
-    <p class="text-gray-600 mb-3">
-      Lade automatisch die neuesten Änderungen deines Messsystems aus GitHub herunter und aktualisiere die Umgebung.
-    </p>
-    <button id="updateBtn" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 w-full">
-      ⬆️ Update starten
-    </button>
+  <div class="bg-white p-5 shadow rounded-xl md:col-span-2">
+    <h3 class="font-semibold text-lg mb-2">🌀 GitHub-Update</h3>
+    <p class="text-gray-600 mb-3">Hole die neuesten Änderungen aus GitHub und aktualisiere automatisch.</p>
+    <button id="updateBtn" class="bg-purple-600 text-white px-4 py-3 rounded-xl hover:bg-purple-700 w-full">⬆️ Update starten</button>
   </div>
-
 </div>
 
 <div id="service-result" class="mt-6 text-center"></div>
@@ -50,79 +37,18 @@ async function restartService(service) {
     const formData = new FormData();
     formData.append("service", service);
     formData.append("action", "restart");
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // ⏱️ 5 Sek Timeout
-
-    const response = await fetch("/service/action", {
-      method: "POST",
-      body: formData,
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-
+    const response = await fetch("/service/action", { method: "POST", body: formData });
     const data = await response.json();
-
-    if (response.ok && data.status === "ok") {
-      resultBox.innerHTML = `<div class='bg-green-100 text-green-800 p-3 rounded'>${data.message}</div>`;
-    } else {
-      resultBox.innerHTML = `<div class='bg-red-100 text-red-800 p-3 rounded'>${data.message}</div>`;
-    }
-
+    resultBox.innerHTML = `<div class='${data.status === "ok" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"} p-3 rounded'>${data.message}</div>`;
   } catch (err) {
-    // ⚠️ Fehlerbehandlung mit Timeout-Fall
-    if (service === "web") {
-      resultBox.innerHTML = `
-        <div class='bg-yellow-100 text-yellow-800 p-3 rounded'>
-          🔄 Die WebApp wird neu gestartet.<br>
-          Bitte lade die Seite in 5 Sekunden neu.
-        </div>`;
-      setTimeout(() => location.reload(), 6000); // ⏳ Reload nach 6 Sekunden
-    } else {
-      resultBox.innerHTML =
-        `<div class='bg-red-100 text-red-800 p-3 rounded'>Netzwerkfehler: ${err}</div>`;
-    }
+    resultBox.innerHTML = `<div class='bg-yellow-100 text-yellow-800 p-3 rounded'>⚠️ ${err}</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = service === "logger"
-      ? "🔁 Logger neu starten"
-      : "🔄 WebApp neu starten";
+    btn.textContent = service === "logger" ? "🔁 Logger neu starten" : "🔄 WebApp neu starten";
   }
 }
 
 document.getElementById("restart-logger").addEventListener("click", () => restartService("logger"));
 document.getElementById("restart-web").addEventListener("click", () => restartService("web"));
-
-document.getElementById("updateBtn").addEventListener("click", async () => {
-  const statusBox = document.getElementById("updateStatus");
-  const btn = document.getElementById("updateBtn");
-
-  if (!confirm("⚙️ Möchtest du wirklich ein GitHub-Update ausführen?")) return;
-
-  btn.disabled = true;
-  btn.innerText = "⏳ Aktualisiere...";
-  statusBox.className = "mt-4 p-3 rounded bg-yellow-100 text-gray-800";
-  statusBox.innerText = "Update läuft... bitte warten.";
-  statusBox.classList.remove("hidden");
-
-  try {
-    const response = await fetch("/update-system", { method: "POST" });
-    const data = await response.json();
-
-    if (data.success) {
-      statusBox.className = "mt-4 p-3 rounded bg-green-100 text-green-800 whitespace-pre-wrap";
-      statusBox.innerText = "✅ Update erfolgreich abgeschlossen:\n\n" + data.message;
-    } else {
-      statusBox.className = "mt-4 p-3 rounded bg-red-100 text-red-800 whitespace-pre-wrap";
-      statusBox.innerText = "❌ Fehler beim Update:\n\n" + (data.message || "Unbekannter Fehler");
-    }
-  } catch (err) {
-    statusBox.className = "mt-4 p-3 rounded bg-red-100 text-red-800";
-    statusBox.innerText = "⚠️ Netzwerkfehler oder Serverproblem: " + err;
-  }
-
-  btn.disabled = false;
-  btn.innerText = "⬆️ Update starten";
-});
 </script>
 {% endblock %}
