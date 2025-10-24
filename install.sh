@@ -101,13 +101,40 @@ CONFIG_FILE="$CONFIG_DIR/config.json"
 if [ ! -f "$CONFIG_FILE" ]; then
 cat <<EOF > "$CONFIG_FILE"
 {
-  "STARTABSTICH": 10.0,
-  "INITIAL_WASSERTIEFE": 2.5,
-  "SHUNT_OHMS": 150.0,
-  "WERT_4mA": 0.0,
-  "WERT_20mA": 3.0,
-  "MESSWERT_NN": 530.0,
-  "MESSINTERVAL": 5,
+  "NAME_A0": "Nordbrunnen ABC",
+  "WERT_4mA_A0": 0.0,
+  "WERT_20mA_A0": 3.0,
+  "SHUNT_OHMS_A0": 150.0,
+  "STARTABSTICH_A0": 100.0,
+  "INITIAL_WASSERTIEFE_A0": 25.0,
+  "MESSWERT_NN_A0": 100.0,
+
+  "NAME_A1": "S\u00fcdbrunnen",
+  "WERT_4mA_A1": 0.0,
+  "WERT_20mA_A1": 2.5,
+  "SHUNT_OHMS_A1": 150.0,
+  "STARTABSTICH_A1": 11.0,
+  "INITIAL_WASSERTIEFE_A1": 3.0,
+  "MESSWERT_NN_A1": 528.5,
+
+  "NAME_A2": "Ostbrunnen",
+  "WERT_4mA_A2": 0.0,
+  "WERT_20mA_A2": 3.0,
+  "SHUNT_OHMS_A2": 150.0,
+  "STARTABSTICH_A2": 10.0,
+  "INITIAL_WASSERTIEFE_A2": 2.5,
+  "MESSWERT_NN_A2": 529.0,
+
+  "NAME_A3": "Westbrunnen",
+  "WERT_4mA_A3": 0.0,
+  "WERT_20mA_A3": 3.0,
+  "SHUNT_OHMS_A3": 150.0,
+  "STARTABSTICH_A3": 10.0,
+  "INITIAL_WASSERTIEFE_A3": 2.5,
+  "MESSWERT_NN_A3": 530.0,
+
+  "MESSINTERVAL": 5.0,
+  "ADMIN_PIN": 1234,
   "INFLUX_URL": "",
   "INFLUX_TOKEN": "",
   "INFLUX_ORG": "",
@@ -130,7 +157,7 @@ User=brunnen
 Group=brunnen
 SupplementaryGroups=gpio
 WorkingDirectory=$BASE_DIR
-ExecStart=$BASE_DIR/venv/bin/gunicorn -w 2 -b 0.0.0.0:8080 webapp:app
+ExecStart=$BASE_DIR/venv/bin/gunicorn -w 1 --threads 2 -t 180 -b 0.0.0.0:8080 webapp:app
 Restart=always
 Environment="PATH=$BASE_DIR/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 StandardError=append:$BASE_DIR/logs/webapp.err.log

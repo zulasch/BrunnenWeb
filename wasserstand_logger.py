@@ -166,9 +166,11 @@ def send_to_influx(data_list):
 
             for entry in data_list:
                 try:
+                    sensor_name = cfg.get(f"NAME_{entry.get('channel', 'A0')}", entry.get("channel", "A0"))
                     p = (
                         Point("wasserstand")
                         .tag("channel", entry.get("channel", "A0"))
+                        .tag("name", sensor_name)
                         .time(entry["timestamp"], WritePrecision.S)
                         .field("Strom_in_mA", float(entry["current_mA"]))
                         .field("Wassertiefe", float(entry["level_m"]))
@@ -209,26 +211,40 @@ logging.info("🌊 Starte Mehrkanal-Messung...")
 try:
     while True:
         reload_config_if_changed()
+        cfg = load_config()
         all_data = []
 
         for ch_name, chan in channels.items():
             try:
+                # Kanalbezogene Parameter aus Config lesen
+                cfg = load_config()
+                w4 = float(cfg.get(f"WERT_4mA_{ch_name}", WERT_4mA))
+                w20 = float(cfg.get(f"WERT_20mA_{ch_name}", WERT_20mA))
+                shunt = float(cfg.get(f"SHUNT_OHMS_{ch_name}", SHUNT_OHMS))
+                startabstich = float(cfg.get(f"STARTABSTICH_{ch_name}", STARTABSTICH))
+                initial_tiefe = float(cfg.get(f"INITIAL_WASSERTIEFE_{ch_name}", INITIAL_WASSERTIEFE))
+                messwert_nn = float(cfg.get(f"MESSWERT_NN_{ch_name}", MESSWERT_NN))
+                sensor_name = cfg.get(f"NAME_{ch_name}", ch_name)
+
+                # Messung
                 voltage = chan.voltage
-                current_mA = voltage / SHUNT_OHMS * 1000.0
-                level_m = current_to_level(current_mA)
-                wasser_oberflaeche_m = STARTABSTICH + (INITIAL_WASSERTIEFE - level_m)
-                messwert_NN = MESSWERT_NN - wasser_oberflaeche_m
-                pegel_diff = STARTABSTICH - wasser_oberflaeche_m
+                current_mA = voltage / shunt * 1000.0
+                # lineare Umrechnung 4–20mA
+                if current_mA < 4: current_mA = 4
+                if current_mA > 20: current_mA = 20
+                level_m = w4 + (current_mA - 4) * (w20 - w4) / 16
+                wasser_oberflaeche_m = startabstich + (initial_tiefe - level_m)
+                messwert_NN = messwert_nn - wasser_oberflaeche_m
+                pegel_diff = startabstich - wasser_oberflaeche_m
                 from datetime import datetime, UTC
                 timestamp = datetime.now(UTC).isoformat()
 
                 logging.info(
-                    f"🕒 {timestamp} | Kanal {ch_name} | {current_mA:.2f} mA | "
-                    f"Wassertiefe: {level_m:.2f} m | "
-                    f"Wasseroberfläche: {wasser_oberflaeche_m:.2f} m u. Gelände | "
-                    f"Messwert NN: {messwert_NN:.2f} m ü. NN | Δ={pegel_diff:+.2f} m"
+                    f"🕒 {timestamp} | Kanal {ch_name} ({sensor_name}) | "
+                    f"{current_mA:.2f} mA | Tiefe: {level_m:.2f} m | Δ={pegel_diff:+.2f} m"
                 )
 
+                # Daten speichern
                 data = (timestamp, current_mA, level_m, wasser_oberflaeche_m, messwert_NN, pegel_diff)
                 save_local(data)
 
@@ -239,8 +255,10 @@ try:
                     "level_m": level_m,
                     "wasser_oberflaeche_m": wasser_oberflaeche_m,
                     "messwert_NN": messwert_NN,
-                    "pegel_diff": pegel_diff
+                    "pegel_diff": pegel_diff,
+                    "name": sensor_name
                 })
+
             except Exception as e:
                 logging.error(f"❌ Fehler bei Kanal {ch_name}: {e}")
 
@@ -258,9 +276,11 @@ try:
 
         for ch_data in all_data:
             try:
+                sensor_name = config.get(f"NAME_{ch_data.get('channel', 'A0')}", ch_data.get("channel", "A0"))
                 p = (
                     Point("wasserstand")
                     .tag("channel", ch_data.get("channel", "A0"))
+                    .tag("name", sensor_name)
                     .time(ch_data["timestamp"], WritePrecision.S)
                     .field("Strom_in_mA", ch_data["current_mA"])
                     .field("Wassertiefe", ch_data["level_m"])

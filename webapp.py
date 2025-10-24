@@ -82,6 +82,7 @@ def logout():
 def index():
     cfg = load_config()
     descriptions = {
+        "NAME": "Bezeichnung oder Standort dieses Sensors.",
         "STARTABSTICH": "Abstand Gelände → Wasseroberfläche beim Start [m].",
         "INITIAL_WASSERTIEFE": "Initiale Sonden-Wassertiefe [m] (z. B. 2.5).",
         "SHUNT_OHMS": "Shunt-Widerstand [Ω] (typ. 150 Ω).",
@@ -102,13 +103,18 @@ def update_config():
         data = request.form.to_dict()
         cfg = load_config()
 
-        # Nur bekannte Parameter aktualisieren
+        # Felder, die immer als Text behandelt werden sollen
+        string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS"]
+
         for key, value in data.items():
             if key in cfg:
-                try:
-                    cfg[key] = float(value)
-                except ValueError:
-                    cfg[key] = value  # Strings (z. B. URLs)
+                if key in string_keys:
+                    cfg[key] = value.strip()
+                else:
+                    try:
+                        cfg[key] = float(value)
+                    except ValueError:
+                        cfg[key] = value
 
         save_config(cfg)
 
