@@ -1,27 +1,68 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-xl font-bold mb-4">📈 Aktuelle Messwerte</h2>
+<h2 class="text-2xl font-bold mb-4">📈 Aktuelle Messwerte</h2>
 
-<div id="data" class="bg-white rounded-xl p-4 shadow text-lg space-y-2">
-  <p><b>🕒 Zeit:</b> <span id="ts">{{ data.timestamp }}</span></p> 
-  <p><b>🔌 Strom:</b> <span id="current">{{ data.current_mA }}</span> mA</p>
-  <p><b>🌊 Wassertiefe:</b> <span id="depth">{{ data.depth_m }}</span> m</p>
-  <p><b>🏞️ Wasseroberfläche unter Gelände:</b> <span id="surf">{{ data.water_surface_m }}</span> m</p>
-  <p><b>📏 Pegel über NN:</b> <span id="nn">{{ data.nn_level_m }}</span> m ü. NN</p>
+<!-- Statusbox -->
+<div id="messageBox" class="hidden mb-4"></div>
+
+<!-- Messwert-Tabelle -->
+<div class="overflow-x-auto bg-white p-6 rounded-xl shadow">
+  <table class="min-w-full border-collapse">
+    <thead>
+      <tr class="bg-blue-100 text-blue-800 text-left">
+        <th class="p-2">🔌 Kanal</th>
+        <th class="p-2">⏱ Zeitstempel</th>
+        <th class="p-2">⚡ Strom [mA]</th>
+        <th class="p-2">🌊 Tiefe [m]</th>
+        <th class="p-2">🪣 Wasseroberfläche [m u. Gelände]</th>
+        <th class="p-2">🏔 Messwert NN [m ü. NN]</th>
+        <th class="p-2">📉 Δ Pegel [m]</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="7" class="text-center p-4 text-gray-500">Lade aktuelle Messdaten...</td></tr>
+    </tbody>
+  </table>
 </div>
 
+<!-- Automatische Aktualisierung -->
 <script>
-async function update(){
-  const res = await fetch('/api/measurements');
-  const data = await res.json();
-  if(!data.error){
-    document.getElementById('ts').innerText = data.timestamp;
-    document.getElementById('current').innerText = data.current_mA.toFixed(2);
-    document.getElementById('depth').innerText = data.depth_m.toFixed(2);
-    document.getElementById('surf').innerText = data.water_surface_m.toFixed(2);
-    document.getElementById('nn').innerText = data.nn_level_m.toFixed(2);
+async function loadMeasurements() {
+  try {
+    const res = await fetch('{{ url_for("measurements_api") }}');
+    const data = await res.json();
+
+    const body = document.getElementById("tableBody");
+    body.innerHTML = "";
+
+    if (!Array.isArray(data)) {
+      body.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-gray-500">Keine gültigen Messdaten gefunden.</td></tr>`;
+      return;
+    }
+
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.className = "border-b hover:bg-blue-50";
+
+      tr.innerHTML = `
+        <td class="p-2 font-semibold">${row.channel}</td>
+        <td class="p-2">${new Date(row.timestamp).toLocaleString()}</td>
+        <td class="p-2">${row.current_mA?.toFixed(2) ?? "–"}</td>
+        <td class="p-2">${row.level_m?.toFixed(2) ?? "–"}</td>
+        <td class="p-2">${row.wasser_oberflaeche_m?.toFixed(2) ?? "–"}</td>
+        <td class="p-2">${row.messwert_NN?.toFixed(2) ?? "–"}</td>
+        <td class="p-2">${row.pegel_diff?.toFixed(2) ?? "–"}</td>
+      `;
+      body.appendChild(tr);
+    });
+  } catch (err) {
+    const body = document.getElementById("tableBody");
+    body.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-red-500">⚠️ Fehler beim Laden: ${err}</td></tr>`;
   }
 }
-setInterval(update, 5000);
+
+// Alle 5 Sekunden aktualisieren
+loadMeasurements();
+setInterval(loadMeasurements, 5000);
 </script>
 {% endblock %}

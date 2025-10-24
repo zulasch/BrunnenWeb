@@ -103,12 +103,18 @@ CREATE TABLE IF NOT EXISTS measurements (
 conn.commit()
 
 # ============================================================
-# 🧠 SENSOR SETUP
+# 🧠 SENSOR SETUP (mehrere Kanäle)
 # ============================================================
 i2c = busio.I2C(board.SCL, board.SDA)
 ads = ADS(i2c)
 ads.gain = 1
-chan = AnalogIn(ads, ads1x15.Pin.A0)
+
+channels = {
+    "A0": AnalogIn(ads, ads1x15.Pin.A0),
+    "A1": AnalogIn(ads, ads1x15.Pin.A1),
+    "A2": AnalogIn(ads, ads1x15.Pin.A2),
+    "A3": AnalogIn(ads, ads1x15.Pin.A3),
+}
 
 # ============================================================
 # 🔍 HELFERFUNKTIONEN
@@ -179,70 +185,75 @@ def send_to_influx(data_list):
             client.__del__()
 
 # ============================================================
-# 🧮 HAUPTSCHLEIFE
+# 🧮 HAUPTSCHLEIFE (mehrkanalig)
 # ============================================================
-logging.info("🌊 Starte Messung...")
+logging.info("🌊 Starte Mehrkanal-Messung...")
 
 try:
     while True:
         reload_config_if_changed()
-        
-        voltage, current_mA = read_current_mA()
-        level_m = current_to_level(current_mA)
-        wasser_oberflaeche_m = STARTABSTICH + (INITIAL_WASSERTIEFE - level_m)
-        messwert_NN = MESSWERT_NN - wasser_oberflaeche_m
-        pegel_diff = STARTABSTICH - wasser_oberflaeche_m
-        from datetime import datetime, UTC
-        timestamp = datetime.now(UTC).isoformat()
+        all_data = []
 
+        for ch_name, chan in channels.items():
+            try:
+                voltage = chan.voltage
+                current_mA = voltage / SHUNT_OHMS * 1000.0
+                level_m = current_to_level(current_mA)
+                wasser_oberflaeche_m = STARTABSTICH + (INITIAL_WASSERTIEFE - level_m)
+                messwert_NN = MESSWERT_NN - wasser_oberflaeche_m
+                pegel_diff = STARTABSTICH - wasser_oberflaeche_m
+                from datetime import datetime, UTC
+                timestamp = datetime.now(UTC).isoformat()
 
-        logging.info(
-            f"🕒 {timestamp} | {current_mA:.2f} mA | "
-            f"Wassertiefe: {level_m:.2f} m | "
-            f"Wasseroberfläche: {wasser_oberflaeche_m:.2f} m u. Gelände | "
-            f"Messwert NN: {messwert_NN:.2f} m ü. NN | Δ={pegel_diff:+.2f} m"
-        )
+                logging.info(
+                    f"🕒 {timestamp} | Kanal {ch_name} | {current_mA:.2f} mA | "
+                    f"Wassertiefe: {level_m:.2f} m | "
+                    f"Wasseroberfläche: {wasser_oberflaeche_m:.2f} m u. Gelände | "
+                    f"Messwert NN: {messwert_NN:.2f} m ü. NN | Δ={pegel_diff:+.2f} m"
+                )
 
-        save_local((timestamp, current_mA, level_m, wasser_oberflaeche_m, messwert_NN, pegel_diff))
-        
-        # Aktuelle Messwerte für Webinterface speichern
-        
-        latest = {
-            "timestamp": datetime.now().isoformat(),
-            #"voltage_V": voltage,
-            "current_mA": current_mA,
-            "depth_m": level_m,
-            "water_surface_m": wasser_oberflaeche_m,
-            "nn_level_m": messwert_NN,
-            #"delta_m": pegel_diff
-        }
+                data = (timestamp, current_mA, level_m, wasser_oberflaeche_m, messwert_NN, pegel_diff)
+                save_local(data)
 
-        # Pfad zur Datei im /data-Verzeichnis
+                all_data.append({
+                    "channel": ch_name,
+                    "timestamp": timestamp,
+                    "current_mA": current_mA,
+                    "level_m": level_m,
+                    "wasser_oberflaeche_m": wasser_oberflaeche_m,
+                    "messwert_NN": messwert_NN,
+                    "pegel_diff": pegel_diff
+                })
+            except Exception as e:
+                logging.error(f"❌ Fehler bei Kanal {ch_name}: {e}")
+
+        # Speichere letzte Messungen (für Webapp)
         latest_file = os.path.join(BASE_DIR, "data", "latest_measurement.json")
         try:
             with open(latest_file, "w") as f:
-                json.dump(latest, f)
+                json.dump(all_data, f, indent=2)
         except Exception as e:
             logging.warning(f"Konnte latest_measurement.json nicht schreiben: {e}")
 
-        cur.execute("SELECT * FROM measurements")
-        cached = cur.fetchall()
-        data_list = [
-            {
-                "timestamp": r[0],
-                "current_mA": r[1],
-                "level_m": r[2],
-                "wasser_oberflaeche_m": r[3],
-                "messwert_NN": r[4],
-                "pegel_diff": r[5],
+        # Sende an Influx
+        cached = cur.execute("SELECT * FROM measurements").fetchall()
+        data_list = []
+        for ch_data in all_data:
+            d = {
+                "timestamp": ch_data["timestamp"],
+                "current_mA": ch_data["current_mA"],
+                "level_m": ch_data["level_m"],
+                "wasser_oberflaeche_m": ch_data["wasser_oberflaeche_m"],
+                "messwert_NN": ch_data["messwert_NN"],
+                "pegel_diff": ch_data["pegel_diff"],
+                "channel": ch_data["channel"]
             }
-            for r in cached
-        ]
+            data_list.append(d)
 
         if send_to_influx(data_list):
             cur.execute("DELETE FROM measurements")
             conn.commit()
-            logging.info("✅ Daten an InfluxDB gesendet.")
+            logging.info("✅ Daten aller Kanäle an InfluxDB gesendet.")
         else:
             logging.info("📦 Werte lokal zwischengespeichert.")
 
