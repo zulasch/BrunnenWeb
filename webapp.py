@@ -318,21 +318,26 @@ def systemstatus_page():
         ip = subprocess.getoutput("hostname -I").split()[0]
         wifi = subprocess.getoutput("iwgetid -r") or "nicht verbunden"
         try:
-            temp_out = subprocess.check_output(["vcgencmd", "measure_temp"]).decode().strip()
-            temp = temp_out.replace("temp=", "").replace("'C", "")
+            temps = psutil.sensors_temperatures()
+            if "cpu_thermal" in temps:
+                temp = round(temps["cpu_thermal"][0].current, 1)
+            elif "coretemp" in temps:
+                temp = round(temps["coretemp"][0].current, 1)
+            else:
+                temp = "?"
         except Exception:
             temp = "?"
 
         # WLAN-Netzwerke abrufen
-        networks = []
-        try:
-            result = subprocess.check_output(["nmcli", "-t", "-f", "SSID,SIGNAL", "dev", "wifi"], stderr=subprocess.DEVNULL)
-            for line in result.decode().splitlines():
-                parts = line.split(":")
-                if len(parts) >= 2 and parts[0].strip():
-                    networks.append({"ssid": parts[0], "signal": parts[1]})
-        except Exception:
-            pass
+#        networks = []
+#        try:
+#            result = subprocess.check_output(["nmcli", "-t", "-f", "SSID,SIGNAL", "dev", "wifi"], stderr=subprocess.DEVNULL)
+#            for line in result.decode().splitlines():
+#                parts = line.split(":")
+#                if len(parts) >= 2 and parts[0].strip():
+#                    networks.append({"ssid": parts[0], "signal": parts[1]})
+#        except Exception:
+#            pass
 
         # Systemdaten zusammenstellen
         data = {

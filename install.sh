@@ -54,7 +54,7 @@ err() {
 section "Starte Installation des Brunnen-Systems"
 
 section "1️⃣  Systempakete installieren"
-apt update -y && apt install -y python3 swig liblgpio-dev python3-lgpio python3-dev python3-setuptools python3-wheel build-essential python3-venv python3-pip git i2c-tools sqlite3
+apt -y update && apt -y upgrade && apt install -y python3 swig liblgpio-dev python3-lgpio python3-dev python3-setuptools python3-wheel build-essential python3-venv python3-pip git i2c-tools sqlite3 openvpn
 ok "Systempakete aktualisiert"
 
 section "2️⃣  Verzeichnisse & Benutzer anlegen"
