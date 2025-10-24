@@ -144,19 +144,6 @@ def read_current_mA():
     current_mA = voltage / SHUNT_OHMS * 1000.0
     return voltage, current_mA
 
-def send_to_influx(data_list):
-    """Sendet mehrere Kanal-Messungen an InfluxDB"""
-    try:
-        cfg = load_config()
-        influx_url = cfg.get("INFLUX_URL")
-        influx_token = cfg.get("INFLUX_TOKEN")
-        influx_org = cfg.get("INFLUX_ORG")
-        influx_bucket = cfg.get("INFLUX_BUCKET")
-
-        if not all([influx_url, influx_token, influx_org, influx_bucket]):
-            logging.warning("⚠️ InfluxDB-Konfiguration unvollständig, Daten werden nicht gesendet.")
-            return False
-
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
