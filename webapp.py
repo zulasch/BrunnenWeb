@@ -3,6 +3,7 @@
 
 import os, json, socket, subprocess, functools, time
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash
+import mosfet_control
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
@@ -136,7 +137,19 @@ def update_config():
         app.logger.exception("Fehler beim Speichern der Konfiguration:")
         return jsonify({"success": False, "message": f"❌ Fehler: {e}"}), 500
 
-        
+
+@app.route("/outputs")
+@login_required
+def outputs_page():
+    return render_template("outputs.html", title="MOSFET-Steuerung")
+
+@app.route("/outputs/set/<int:channel>/<int:state>", methods=["POST"])
+@login_required
+def set_output(channel, state):
+    mosfet_control.set_output(channel, bool(state))
+    return jsonify({"success": True, "message": f"Kanal {channel+1} {'AN' if state else 'AUS'}"})
+
+
 @app.route("/service")
 @login_required
 def service_page():
