@@ -353,7 +353,7 @@ def systemstatus_page():
             "disk_percent": disk.percent,
             "uptime": uptime,
             "os": platform.platform(),
-            "networks": networks
+ #           "networks": networks
         }
         return render_template("systemstatus.html", title="Systemstatus", sys=data)
     except Exception as e:
