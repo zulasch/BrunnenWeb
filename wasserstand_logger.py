@@ -235,23 +235,27 @@ try:
         except Exception as e:
             logging.warning(f"Konnte latest_measurement.json nicht schreiben: {e}")
 
-        # Sende an Influx
+        # Sende an Influx (alle Kanäle)
         cached = cur.execute("SELECT * FROM measurements").fetchall()
-        data_list = []
-        for ch_data in all_data:
-            d = (
-                Point("wasserstand")
-                .tag("channel", d.get("channel", "A0"))
-                .time(d["timestamp"], WritePrecision.S)
-                .field("Strom_in_mA", d["current_mA"])
-                .field("Wassertiefe", d["level_m"])
-                .field("Startabstich", d["wasser_oberflaeche_m"])
-                .field("Messwert_NN", d["messwert_NN"])
-                .field("Pegel_Differenz", d["pegel_diff"])
-            )
-            data_list.append(d)
+        points = []
 
-        if send_to_influx(data_list):
+        for ch_data in all_data:
+            try:
+                p = (
+                    Point("wasserstand")
+                    .tag("channel", ch_data.get("channel", "A0"))
+                    .time(ch_data["timestamp"], WritePrecision.S)
+                    .field("Strom_in_mA", ch_data["current_mA"])
+                    .field("Wassertiefe", ch_data["level_m"])
+                    .field("Startabstich", ch_data["wasser_oberflaeche_m"])
+                    .field("Messwert_NN", ch_data["messwert_NN"])
+                    .field("Pegel_Differenz", ch_data["pegel_diff"])
+                )
+                points.append(p)
+            except Exception as e:
+                logging.error(f"Fehler beim Erstellen des Influx-Punkts ({ch_data.get('channel')}): {e}")
+
+        if send_to_influx(all_data):
             cur.execute("DELETE FROM measurements")
             conn.commit()
             logging.info("✅ Daten aller Kanäle an InfluxDB gesendet.")
