@@ -89,10 +89,6 @@ def index():
         "WERT_20mA": "Sondenwert [m] bei 20 mA (obere Grenze).",
         "MESSWERT_NN": "Geländehöhe über NN [m].",
         "MESSINTERVAL": "Messintervall [s].",
-        "INFLUX_URL": "URL des InfluxDB-Servers.",
-        "INFLUX_TOKEN": "InfluxDB API-Token.",
-        "INFLUX_ORG": "InfluxDB-Organisation.",
-        "INFLUX_BUCKET": "InfluxDB-Bucket.",
         "ADMIN_PIN": "PIN für Web-Login (4–8 Ziffern)."
     }
     return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
@@ -239,6 +235,32 @@ def logs_page():
     path = files.get(chosen, list(files.values())[0])
     content = tail_file(path, lines=30)
     return render_template("logs.html", files=list(files.keys()), chosen=chosen, content=content, title="Logs")
+
+@app.route("/database", methods=["GET", "POST"])
+@login_required
+def db_config_page():
+    cfg = load_config()
+    db_keys = ["INFLUX_URL", "INFLUX_TOKEN", "INFLUX_ORG", "INFLUX_BUCKET"]
+    db_config = {k: cfg.get(k, "") for k in db_keys}
+
+    descriptions = {
+        "INFLUX_URL": "URL des InfluxDB-Servers, z. B. http://192.168.1.50:8086",
+        "INFLUX_TOKEN": "API-Token der InfluxDB-Instanz.",
+        "INFLUX_ORG": "Organisation (Org-Name in InfluxDB).",
+        "INFLUX_BUCKET": "Ziel-Bucket für Messdaten."
+    }
+
+    if request.method == "POST":
+        for key in db_keys:
+            if key in request.form:
+                db_config[key] = request.form[key]
+                cfg[key] = request.form[key]
+        save_config(cfg)
+        flash("✅ InfluxDB-Konfiguration gespeichert.", "success")
+        return redirect(url_for("db_config_page"))
+
+    return render_template("database.html", config=db_config, descriptions=descriptions, title="Datenbank")
+
 
 # ===== Aktuelle Messwerte =====
 @app.route("/measurements")
