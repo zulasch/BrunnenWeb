@@ -145,34 +145,50 @@ def read_current_mA():
     return voltage, current_mA
 
 def send_to_influx(data_list):
-    if not all([INFLUX_URL, INFLUX_TOKEN, INFLUX_ORG, INFLUX_BUCKET]):
-        logging.warning("⚠️ InfluxDB nicht konfiguriert — speichere lokal.")
-        return False
-    if not check_influx_reachable():
-        logging.warning("⚠️ InfluxDB nicht erreichbar — speichere lokal.")
-        return False
-
-    client = None
-    write_api = None
+    """Sendet mehrere Kanal-Messungen an InfluxDB"""
     try:
-        client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG, timeout=5000)
-        write_api = client.write_api(write_options=SYNCHRONOUS)
+        cfg = load_config()
+        influx_url = cfg.get("INFLUX_URL")
+        influx_token = cfg.get("INFLUX_TOKEN")
+        influx_org = cfg.get("INFLUX_ORG")
+        influx_bucket = cfg.get("INFLUX_BUCKET")
 
-        for d in data_list:
-            p = (
-                Point("wasserstand")
-                .time(d["timestamp"], WritePrecision.S)
-                .field("Strom_in_mA", d["current_mA"])
-                .field("Wassertiefe", d["level_m"])
-                .field("Startabstich", d["wasser_oberflaeche_m"])
-                .field("Messwert_NN", d["messwert_NN"])
-                .field("Pegel_Differenz", d["pegel_diff"])
-            )
-            write_api.write(bucket=INFLUX_BUCKET, record=p)
-        return True
+        if not all([influx_url, influx_token, influx_org, influx_bucket]):
+            logging.warning("⚠️ InfluxDB-Konfiguration unvollständig, Daten werden nicht gesendet.")
+            return False
+
+        from influxdb_client import InfluxDBClient, Point, WritePrecision
+
+        with InfluxDBClient(url=influx_url, token=influx_token, org=influx_org) as client:
+            write_api = client.write_api(write_options=None)
+            points = []
+
+            for entry in data_list:
+                try:
+                    p = (
+                        Point("wasserstand")
+                        .tag("channel", entry.get("channel", "A0"))
+                        .time(entry["timestamp"], WritePrecision.S)
+                        .field("Strom_in_mA", float(entry["current_mA"]))
+                        .field("Wassertiefe", float(entry["level_m"]))
+                        .field("Startabstich", float(entry["wasser_oberflaeche_m"]))
+                        .field("Messwert_NN", float(entry["messwert_NN"]))
+                        .field("Pegel_Differenz", float(entry["pegel_diff"]))
+                    )
+                    points.append(p)
+                except Exception as e:
+                    logging.error(f"❌ Fehler bei Punkt-Erstellung für {entry.get('channel')}: {e}")
+
+            if not points:
+                logging.warning("Keine gültigen Datenpunkte zum Senden.")
+                return False
+
+            write_api.write(bucket=influx_bucket, org=influx_org, record=points)
+            logging.info(f"📤 {len(points)} Messpunkte erfolgreich an InfluxDB gesendet.")
+            return True
 
     except Exception as e:
-        logging.error(f"Fehler beim Schreiben in InfluxDB: {e}")
+        logging.error(f"❌ Fehler beim Senden an InfluxDB: {e}")
         return False
 
     finally:
