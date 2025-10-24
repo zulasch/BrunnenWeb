@@ -239,15 +239,16 @@ try:
         cached = cur.execute("SELECT * FROM measurements").fetchall()
         data_list = []
         for ch_data in all_data:
-            d = {
-                "timestamp": ch_data["timestamp"],
-                "current_mA": ch_data["current_mA"],
-                "level_m": ch_data["level_m"],
-                "wasser_oberflaeche_m": ch_data["wasser_oberflaeche_m"],
-                "messwert_NN": ch_data["messwert_NN"],
-                "pegel_diff": ch_data["pegel_diff"],
-                "channel": ch_data["channel"]
-            }
+            d = (
+                Point("wasserstand")
+                .tag("channel", d.get("channel", "A0"))
+                .time(d["timestamp"], WritePrecision.S)
+                .field("Strom_in_mA", d["current_mA"])
+                .field("Wassertiefe", d["level_m"])
+                .field("Startabstich", d["wasser_oberflaeche_m"])
+                .field("Messwert_NN", d["messwert_NN"])
+                .field("Pegel_Differenz", d["pegel_diff"])
+            )
             data_list.append(d)
 
         if send_to_influx(data_list):
