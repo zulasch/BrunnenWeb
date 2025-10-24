@@ -157,10 +157,24 @@ def send_to_influx(data_list):
             logging.warning("⚠️ InfluxDB-Konfiguration unvollständig, Daten werden nicht gesendet.")
             return False
 
-        from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client.client.write_api import SYNCHRONOUS
+
+def send_to_influx(data_list):
+    """Sendet mehrere Kanal-Messungen an InfluxDB"""
+    try:
+        cfg = load_config()
+        influx_url = cfg.get("INFLUX_URL")
+        influx_token = cfg.get("INFLUX_TOKEN")
+        influx_org = cfg.get("INFLUX_ORG")
+        influx_bucket = cfg.get("INFLUX_BUCKET")
+
+        if not all([influx_url, influx_token, influx_org, influx_bucket]):
+            logging.warning("⚠️ InfluxDB-Konfiguration unvollständig, Daten werden nicht gesendet.")
+            return False
 
         with InfluxDBClient(url=influx_url, token=influx_token, org=influx_org) as client:
-            write_api = client.write_api(write_options=None)
+            write_api = client.write_api(write_options=SYNCHRONOUS)
             points = []
 
             for entry in data_list:
