@@ -64,7 +64,7 @@ id "$USER" &>/dev/null || useradd -r -s /bin/false "$USER"
 chown -R "$USER:$USER" "$BASE_DIR"
 ok "Verzeichnisstruktur erstellt unter $BASE_DIR"
 usermod -aG i2c $USER
-
+usermod -aG gpio $USER
 
 SUDOERS_FILE="/etc/sudoers.d/$USER"
 cat <<EOF > "$SUDOERS_FILE"
