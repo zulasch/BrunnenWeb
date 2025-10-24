@@ -128,6 +128,7 @@ After=network.target
 [Service]
 User=brunnen
 Group=brunnen
+SupplementaryGroups=gpio
 WorkingDirectory=$BASE_DIR
 ExecStart=$BASE_DIR/venv/bin/gunicorn -w 2 -b 0.0.0.0:8080 webapp:app
 Restart=always
@@ -146,6 +147,7 @@ After=network.target
 [Service]
 User=brunnen
 Group=brunnen
+SupplementaryGroups=gpio
 WorkingDirectory=$BASE_DIR
 ExecStart=$BASE_DIR/venv/bin/python $BASE_DIR/wasserstand_logger.py
 Restart=always
