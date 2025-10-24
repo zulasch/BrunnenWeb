@@ -343,7 +343,7 @@ def systemstatus_page():
         data = {
             "hostname": hostname,
             "ip": ip,
-            "wifi": wifi,
+#            "wifi": wifi,
             "cpu": cpu,
             "temp": temp,
             "ram_used": round(ram.used/1024/1024, 1),
