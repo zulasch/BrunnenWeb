@@ -15,4 +15,21 @@
     💾 Speichern
   </button>
 </form>
+
+<script>
+async function saveConfig(event) {
+  event.preventDefault();
+  const form = document.getElementById('configForm');
+  const formData = new FormData(form);
+  const response = await fetch('{{ url_for("update_config") }}', { method: 'POST', body: formData });
+  const result = await response.json();
+
+  const box = document.getElementById("messageBox");
+  box.classList.remove("hidden");
+  box.textContent = result.message;
+  box.className = result.success
+    ? "p-3 rounded bg-green-200 text-green-800 mb-4"
+    : "p-3 rounded bg-red-200 text-red-800 mb-4";
+}
+
 {% endblock %}
