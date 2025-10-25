@@ -4,10 +4,13 @@
 import os, json, socket, subprocess, functools, time
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash
 import mosfet_control
+from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
+SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
+NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
 
 # ===== Flask =====
 app = Flask(__name__, template_folder="templates")
@@ -15,6 +18,30 @@ app = Flask(__name__, template_folder="templates")
 app.config["SECRET_KEY"] = os.environ.get("WEBAPP_SECRET", "change-me-please")
 
 # ===== Helpers =====
+def load_schedule():
+    if os.path.exists(SCHEDULE_FILE):
+        with open(SCHEDULE_FILE) as f:
+            return json.load(f)
+    return []
+
+
+def save_schedule(data):
+    with open(SCHEDULE_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+def load_names():
+    if os.path.exists(NAMES_FILE):
+        with open(NAMES_FILE) as f:
+            return json.load(f)
+    return {str(i): f"Kanal {i+1}" for i in range(8)}
+
+
+def save_names(data):
+    with open(NAMES_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+        
+
 def load_config():
     with open(CONFIG_PATH, "r") as f:
         return json.load(f)
@@ -143,11 +170,56 @@ def update_config():
 def outputs_page():
     return render_template("outputs.html", title="MOSFET-Steuerung")
 
+@app.route("/outputs/names", methods=["GET", "POST"])
+@login_required
+def outputs_names():
+    if request.method == "POST":
+        data = request.form.to_dict()
+        save_names(data)
+        return jsonify({"success": True, "message": "✅ Namen gespeichert"})
+    return jsonify(load_names())
+
 @app.route("/outputs/set/<int:channel>/<int:state>", methods=["POST"])
 @login_required
 def set_output(channel, state):
     mosfet_control.set_output(channel, bool(state))
     return jsonify({"success": True, "message": f"Kanal {channel+1} {'AN' if state else 'AUS'}"})
+
+@app.route("/outputs/state")
+@login_required
+def outputs_state():
+    state_dict = mosfet_control.get_state() or {}
+    # Sicherstellen, dass wir etwas zurückgeben
+    if not state_dict:
+        state_dict = {i: False for i in range(8)}
+    ordered = [state_dict.get(i, False) for i in sorted(state_dict.keys())]
+    return jsonify(ordered)
+
+    
+@app.route("/outputs/schedule", methods=["GET", "POST", "DELETE"])
+@login_required
+def outputs_schedule():
+    """GET = Liste aller Zeitpläne, POST = neuen hinzufügen, DELETE = löschen"""
+    if request.method == "GET":
+        return jsonify(load_schedule())
+
+    if request.method == "POST":
+        job = {
+            "channel": int(request.form["channel"]),
+            "time": request.form["time"],
+            "state": int(request.form["state"]),
+        }
+        data = load_schedule()
+        data.append(job)
+        save_schedule(data)
+        return jsonify({"success": True, "message": "✅ Zeitplan gespeichert"})
+
+    if request.method == "DELETE":
+        ch = request.args.get("channel")
+        t = request.args.get("time")
+        data = [j for j in load_schedule() if not (str(j["channel"]) == ch and j["time"] == t)]
+        save_schedule(data)
+        return jsonify({"success": True, "message": "🗑️ Zeitplan gelöscht"})
 
 
 @app.route("/service")
@@ -379,6 +451,34 @@ def systemstatus_page():
         return f"Fehler beim Laden des Systemstatus: {e}", 500
 
 
+# Ausgänge Zeitsteuerung
+
+from threading import Thread
+from datetime import datetime
+import json, time
+
+SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
+
+def load_schedule():
+    if os.path.exists(SCHEDULE_FILE):
+        with open(SCHEDULE_FILE) as f:
+            return json.load(f)
+    return []
+
+def save_schedule(data):
+    with open(SCHEDULE_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+def scheduler_loop():
+    while True:
+        now = datetime.now().strftime("%H:%M")
+        schedule = load_schedule()
+        for job in schedule:
+            if job["time"] == now:
+                mosfet_control.set_output(job["channel"], job["state"])
+        time.sleep(60)
+
+Thread(target=scheduler_loop, daemon=True).start()
 
 
 # Start

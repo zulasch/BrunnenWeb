@@ -1,21 +1,175 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">🔌 MOSFET-Steuerung</h2>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-  {% for i in range(8) %}
-  <div class="bg-white p-4 shadow rounded text-center">
-    <h3 class="font-semibold mb-2">Kanal {{ i+1 }}</h3>
-    <button onclick="toggle({{ i }}, 1)" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full">EIN</button>
-    <button onclick="toggle({{ i }}, 0)" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 w-full mt-2">AUS</button>
+<h2 class="text-3xl font-bold mb-6 text-center">⚡ MOSFET-Ausgänge</h2>
+
+<!-- 🔘 KANÄLE -->
+<div id="outputsGrid"
+     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 transition-all">
+</div>
+
+<!-- 🏷️ NAMEN -->
+<div class="bg-white p-6 rounded-2xl shadow max-w-3xl mx-auto mb-12">
+  <h3 class="text-2xl font-bold mb-4 text-blue-700">🏷️ Kanalnamen bearbeiten</h3>
+  <form id="namesForm" class="grid md:grid-cols-2 gap-4"></form>
+  <button type="submit" form="namesForm"
+          class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+    💾 Namen speichern
+  </button>
+  <p id="namesMsg" class="text-center mt-2 hidden"></p>
+</div>
+
+<!-- ⏰ ZEITPLAN -->
+<div class="bg-white p-6 rounded-2xl shadow max-w-5xl mx-auto">
+  <h3 class="text-2xl font-bold mb-6 text-blue-700">⏰ Zeitsteuerung</h3>
+
+  <!-- Formular -->
+  <form id="scheduleForm" class="grid sm:grid-cols-4 gap-3 mb-8">
+    <select name="channel" id="schedChannel" class="border p-2 rounded">
+      {% for i in range(8) %}
+        <option value="{{ i }}">Kanal {{ i+1 }}</option>
+      {% endfor %}
+    </select>
+    <input name="time" type="time" required class="border p-2 rounded" />
+    <select name="state" class="border p-2 rounded">
+      <option value="1">Einschalten</option>
+      <option value="0">Ausschalten</option>
+    </select>
+    <button type="submit"
+            class="bg-green-600 text-white rounded hover:bg-green-700 transition py-2 col-span-full sm:col-span-1">
+      ➕ Hinzufügen
+    </button>
+  </form>
+
+  <!-- Tabelle -->
+  <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+    <table class="min-w-full text-sm text-gray-700" id="scheduleTable">
+      <thead class="bg-blue-50 text-blue-800">
+        <tr>
+          <th class="p-3 text-left">Kanal</th>
+          <th class="p-3 text-left">Zeit</th>
+          <th class="p-3 text-left">Aktion</th>
+          <th class="p-3 text-left">Aktion</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-  {% endfor %}
 </div>
 
 <script>
-async function toggle(channel, state) {
-  const res = await fetch(`/outputs/set/${channel}/${state}`, { method: "POST" });
-  const data = await res.json();
-  alert(data.message);
+let channelNames = {};
+
+async function loadStates() {
+  try {
+    const [stateRes, nameRes] = await Promise.all([
+      fetch("/outputs/state"),
+      fetch("/outputs/names")
+    ]);
+    const states = await stateRes.json();
+    channelNames = await nameRes.json();
+
+    const grid = document.getElementById("outputsGrid");
+    grid.innerHTML = "";
+
+    states.forEach((on, i) => {
+      const label = channelNames[i] || `Kanal ${i + 1}`;
+      const color = on ? "bg-green-500" : "bg-gray-300";
+      const glow = on ? "shadow-[0_0_10px_#22c55e]" : "shadow-inner";
+
+      const card = document.createElement("div");
+      card.className =
+        `p-6 rounded-2xl bg-white shadow hover:shadow-lg transition relative text-center border-t-4 ${on ? 'border-green-500' : 'border-gray-300'}`;
+      card.innerHTML = `
+        <h4 class="font-bold text-lg mb-4 text-gray-800">${label}</h4>
+        <button onclick="toggle(${i}, ${on ? 0 : 1})"
+                class="w-full py-3 rounded-lg text-white font-semibold ${color} hover:opacity-90 transition ${glow}">
+          ${on ? 'AUS' : 'EIN'}
+        </button>
+        <p class="mt-3 text-sm ${on ? 'text-green-600' : 'text-gray-500'} font-medium">
+          ${on ? '🟢 Aktiv' : '⚫ Inaktiv'}
+        </p>
+      `;
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    document.getElementById("outputsGrid").innerHTML =
+      `<div class='col-span-4 text-center text-red-600'>⚠️ Fehler beim Laden: ${err}</div>`;
+  }
 }
+
+async function toggle(channel, state) {
+  await fetch(`/outputs/set/${channel}/${state}`, { method: "POST" });
+  loadStates();
+}
+
+/* === Namen bearbeiten === */
+async function loadNamesForm() {
+  const res = await fetch("/outputs/names");
+  const data = await res.json();
+  const form = document.getElementById("namesForm");
+  form.innerHTML = "";
+  Object.keys(data).forEach(k => {
+    form.innerHTML += `
+      <div>
+        <label class="font-semibold text-gray-700">Kanal ${parseInt(k)+1}</label>
+        <input name="${k}" value="${data[k]}" class="border p-2 rounded w-full focus:ring-2 focus:ring-blue-300 outline-none">
+      </div>`;
+  });
+}
+
+document.getElementById("namesForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const res = await fetch("/outputs/names", { method: "POST", body: formData });
+  const msg = document.getElementById("namesMsg");
+  msg.classList.remove("hidden");
+  msg.textContent = res.ok ? "✅ Gespeichert" : "❌ Fehler";
+  msg.className = res.ok
+    ? "block text-green-700 mt-3"
+    : "block text-red-700 mt-3";
+  setTimeout(()=>msg.classList.add("hidden"),2500);
+  loadStates();
+});
+
+/* === Zeitplan === */
+async function loadSchedule() {
+  const res = await fetch("/outputs/schedule");
+  const data = await res.json();
+  const tbody = document.querySelector("#scheduleTable tbody");
+  tbody.innerHTML = "";
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-400">Kein Zeitplan vorhanden</td></tr>`;
+    return;
+  }
+  data.forEach(j => {
+    const name = channelNames[j.channel] || `Kanal ${parseInt(j.channel)+1}`;
+    const action = j.state ? "🟢 EIN" : "⚫ AUS";
+    const row = document.createElement("tr");
+    row.className = "border-b hover:bg-blue-50 transition";
+    row.innerHTML = `
+      <td class="p-3">${name}</td>
+      <td class="p-3">${j.time}</td>
+      <td class="p-3">${action}</td>
+      <td class="p-3"><button class="text-red-600 hover:text-red-800" onclick="deleteSchedule(${j.channel},'${j.time}')">🗑️</button></td>`;
+    tbody.appendChild(row);
+  });
+}
+
+async function deleteSchedule(channel, time) {
+  await fetch(`/outputs/schedule?channel=${channel}&time=${time}`, { method: "DELETE" });
+  loadSchedule();
+}
+
+document.getElementById("scheduleForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  await fetch("/outputs/schedule", { method: "POST", body: formData });
+  loadSchedule();
+});
+
+loadStates();
+loadNamesForm();
+loadSchedule();
+setInterval(loadStates, 5000);
 </script>
 {% endblock %}

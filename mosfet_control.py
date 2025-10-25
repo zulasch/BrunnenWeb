@@ -1,46 +1,65 @@
 #!/usr/bin/env python3
 import logging
-import RPi.GPIO as GPIO
 import lgpio
+import threading
+_gpio_lock = threading.Lock()
 
-chip = lgpio.gpiochip_open(0)
-CHANNELS = [17, 18, 27, 22, 23, 24, 25, 4]
-_initialized = False
+# Alle verwendeten GPIO-Kanäle
+CHANNELS = [4, 17, 18, 27, 22, 23, 24, 25]
+
+# Globale Variablen
+chip = None
+_handles = {}
 _state = {i: False for i in range(len(CHANNELS))}
 
-def init_gpio():
-    global _initialized
-    if not _initialized:
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-        for ch in CHANNELS:
-            GPIO.setup(ch, GPIO.OUT)
-            GPIO.output(ch, GPIO.LOW)
-        _initialized = True
 
-def set_output(index, state):
-    handle = lgpio.gpiochip_open(0)
-    lgpio.gpio_claim_output(handle, CHANNELS[index])
-    lgpio.gpio_write(handle, CHANNELS[index], 1 if state else 0)
-    lgpio.gpiochip_close(handle)
+def init_gpio():
+    """Initialisiert alle GPIOs als Ausgänge."""
+    global chip
+    if chip is None:
+        chip = lgpio.gpiochip_open(0)
+
+    for i, ch in enumerate(CHANNELS):
+        try:
+            if ch not in _handles:
+                handle = lgpio.gpio_claim_output(chip, ch)
+                _handles[ch] = handle
+                lgpio.gpio_write(chip, ch, 0)
+                _state[i] = False
+        except Exception as e:
+            logging.error(f"Fehler beim Initialisieren von GPIO {ch}: {e}")
+
+
+def set_output(index: int, state: bool):
+    """Setzt den angegebenen Kanal auf HIGH oder LOW (thread-safe)."""
+    global chip
+    if chip is None:
+        chip = lgpio.gpiochip_open(0)
+
+    ch = CHANNELS[index]
+
+    with _gpio_lock:
+        if ch not in _handles:
+            try:
+                handle = lgpio.gpio_claim_output(chip, ch)
+                _handles[ch] = handle
+            except Exception as e:
+                logging.error(f"GPIO {ch} konnte nicht reserviert werden: {e}")
+                return
+
+        try:
+            lgpio.gpio_write(chip, ch, 1 if state else 0)
+            _state[index] = state
+        except Exception as e:
+            logging.error(f"Fehler beim Setzen von Ausgang {index}: {e}")
+
 
 def get_state():
-    """Gibt den aktuellen Zustand aller Kanäle zurück (auch im Simulationsmodus)."""
-    init_gpio()
-    if HARDWARE_AVAILABLE:
-        try:
-            for i, ch in enumerate(CHANNELS):
-                _state[i] = bool(GPIO.input(ch))
-        except Exception as e:
-            logging.error(f"GPIO-Abfrage fehlgeschlagen: {e}")
-            globals()["HARDWARE_AVAILABLE"] = False
-    return _state
-
-    
-def all_off():
-    init_gpio()
-    for ch in CHANNELS:
-        GPIO.output(ch, GPIO.LOW)
-
-def cleanup():
-    GPIO.cleanup()
+    """Gibt aktuellen Status aller Kanäle zurück (aus Cache)."""
+    try:
+        if not _state:
+            return {i: False for i in range(len(CHANNELS))}
+        return _state
+    except Exception as e:
+        logging.error(f"Fehler in get_state(): {e}")
+        return {i: False for i in range(len(CHANNELS))}

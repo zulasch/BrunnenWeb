@@ -66,6 +66,9 @@ ok "Verzeichnisstruktur erstellt unter $BASE_DIR"
 usermod -aG i2c $USER
 usermod -aG gpio $USER
 
+(crontab -l 2>/dev/null | grep -q 'restart-openvpn-if-ip-changed.sh') || \
+(crontab -l 2>/dev/null; echo "*/5 * * * * $BASE_DIR/scripts/restart-openvpn-if-ip-changed.sh") | crontab -
+
 SUDOERS_FILE="/etc/sudoers.d/$USER"
 cat <<EOF > "$SUDOERS_FILE"
 # Erlaubt dem Benutzer '$USER' kontrollierte Service-Kommandos ohne Passwort
