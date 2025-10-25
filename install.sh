@@ -160,7 +160,7 @@ User=brunnen
 Group=brunnen
 SupplementaryGroups=gpio
 WorkingDirectory=$BASE_DIR
-ExecStart=$BASE_DIR/venv/bin/gunicorn -w 1 --threads 2 -t 180 -b 0.0.0.0:8080 webapp:app
+ExecStart=$BASE_DIR/venv/bin/gunicorn -w 1 --threads 1 -t 180 -b 0.0.0.0:8080 webapp:app
 Restart=always
 Environment="PATH=$BASE_DIR/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 StandardError=append:$BASE_DIR/logs/webapp.err.log
