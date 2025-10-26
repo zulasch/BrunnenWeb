@@ -109,7 +109,9 @@ def logout():
 @login_required
 def index():
     cfg = load_config()
-    descriptions = {
+
+    # Basisbeschreibungen – ohne Kanalendung
+    base_descriptions = {
         "NAME": "Bezeichnung oder Standort dieses Sensors.",
         "STARTABSTICH": "Abstand Gelände → Wasseroberfläche beim Start [m].",
         "INITIAL_WASSERTIEFE": "Initiale Sonden-Wassertiefe [m] (z. B. 2.5).",
@@ -120,6 +122,19 @@ def index():
         "MESSINTERVAL": "Messintervall [s].",
         "ADMIN_PIN": "PIN für Web-Login (4–8 Ziffern)."
     }
+
+    # Automatische Erweiterung: Für alle Kanalvarianten
+    descriptions = {}
+    for key in cfg.keys():
+        # Suche, ob der Key auf einem bekannten Basisschlüssel basiert
+        for base_key, desc in base_descriptions.items():
+            if key.startswith(base_key):
+                descriptions[key] = desc
+                break
+        else:
+            # kein Treffer → leere Beschreibung
+            descriptions[key] = ""
+
     return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
 
 from pathlib import Path
