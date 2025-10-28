@@ -434,22 +434,25 @@ def systemstatus_page():
         except Exception:
             temp = "?"
 
-        # WLAN-Netzwerke abrufen
-#        networks = []
-#        try:
-#            result = subprocess.check_output(["nmcli", "-t", "-f", "SSID,SIGNAL", "dev", "wifi"], stderr=subprocess.DEVNULL)
-#            for line in result.decode().splitlines():
-#                parts = line.split(":")
-#                if len(parts) >= 2 and parts[0].strip():
-#                    networks.append({"ssid": parts[0], "signal": parts[1]})
-#        except Exception:
-#            pass
+        # 🔍 WLAN-Netzwerke abrufen
+        networks = []
+        try:
+            result = subprocess.check_output(
+                ["nmcli", "-t", "-f", "SSID,SIGNAL", "dev", "wifi"],
+                stderr=subprocess.DEVNULL
+            )
+            for line in result.decode().splitlines():
+                parts = line.split(":")
+                if len(parts) >= 2 and parts[0].strip():
+                    networks.append({"ssid": parts[0], "signal": parts[1]})
+        except Exception as e:
+            networks = [{"ssid": f"Fehler: {e}", "signal": 0}]
 
         # Systemdaten zusammenstellen
         data = {
             "hostname": hostname,
             "ip": ip,
-#            "wifi": wifi,
+            "wifi": wifi,
             "cpu": cpu,
             "temp": temp,
             "ram_used": round(ram.used/1024/1024, 1),
@@ -459,11 +462,47 @@ def systemstatus_page():
             "disk_percent": disk.percent,
             "uptime": uptime,
             "os": platform.platform(),
- #           "networks": networks
+            "networks": networks
         }
         return render_template("systemstatus.html", title="Systemstatus", sys=data)
     except Exception as e:
         return f"Fehler beim Laden des Systemstatus: {e}", 500
+
+@app.route("/wifi/configure", methods=["POST"])
+@login_required
+def wifi_configure():
+    """Konfiguriert WLAN-Verbindung (SSID + Passwort)."""
+    ssid = request.form.get("ssid", "").strip()
+    psk = request.form.get("psk", "").strip()
+
+    if not ssid:
+        return jsonify({"status": "error", "message": "❌ SSID darf nicht leer sein."})
+    if not psk:
+        return jsonify({"status": "error", "message": "❌ Passwort darf nicht leer sein."})
+
+    try:
+        wpa_conf = "/etc/wpa_supplicant/wpa_supplicant.conf"
+        backup = f"{wpa_conf}.bak"
+        # Backup anlegen
+        subprocess.run(["sudo", "cp", wpa_conf, backup], check=False)
+
+        # Neue Netzwerkkonfiguration einfügen
+        with open(wpa_conf, "a") as f:
+            f.write(f'\nnetwork={{\n  ssid="{ssid}"\n  psk="{psk}"\n}}\n')
+
+        # WLAN neu starten
+        subprocess.run(["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"], check=False)
+        subprocess.run(["sudo", "systemctl", "restart", "dhcpcd"], check=False)
+
+        return jsonify({
+            "status": "ok",
+            "message": f"✅ WLAN wird mit „{ssid}“ verbunden..."
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"❌ Fehler beim Setzen der WLAN-Konfiguration: {e}"
+        })
 
 
 # Ausgänge Zeitsteuerung
