@@ -487,8 +487,11 @@ def wifi_configure():
         subprocess.run(["sudo", "cp", wpa_conf, backup], check=False)
 
         # Neue Netzwerkkonfiguration einfügen
-        with open(wpa_conf, "a") as f:
-            f.write(f'\nnetwork={{\n  ssid="{ssid}"\n  psk="{psk}"\n}}\n')
+        subprocess.run(
+            ["sudo", "bash", "-c",
+            f'echo -e "\\nnetwork={{\\n  ssid=\\"{ssid}\\"\\n  psk=\\"{psk}\\"\\n}}" >> /etc/wpa_supplicant/wpa_supplicant.conf'],
+            check=True
+        )
 
         # WLAN neu starten
         subprocess.run(["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"], check=False)

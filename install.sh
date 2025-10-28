@@ -72,7 +72,7 @@ usermod -aG gpio $USER
 SUDOERS_FILE="/etc/sudoers.d/$USER"
 cat <<EOF > "$SUDOERS_FILE"
 # Erlaubt dem Benutzer '$USER' kontrollierte Service-Kommandos ohne Passwort
-brunnen ALL=NOPASSWD: /bin/systemctl restart brunnen_logger.service, /bin/systemctl restart brunnen_web.service, /bin/systemctl is-active brunnen_logger.service, /bin/systemctl is-active brunnen_web.service, $BASE_DIR/scripts/update_repo.sh
+brunnen ALL=NOPASSWD: /bin/bash, /usr/bin/bash, /usr/bin/wpa_cli, /bin/systemctl restart dhcpcd, /bin/systemctl restart wpa_supplicant, /bin/systemctl restart brunnen_logger.service, /bin/systemctl restart brunnen_web.service, /bin/systemctl is-active brunnen_logger.service, /bin/systemctl is-active brunnen_web.service, $BASE_DIR/scripts/update_repo.sh
 EOF
 
 chmod 440 "$SUDOERS_FILE"
@@ -207,6 +207,18 @@ else
 fi
 
 chown -R "$USER:$USER" "$BASE_DIR"
+
+# WiFi 
+
+rfkill unblock wifi
+rfkill unblock all
+ip link set wlan0 up
+
+systemctl enable wpa_supplicant
+systemctl start wpa_supplicant
+systemctl enable NetworkManager
+systemctl start NetworkManager
+
 
 # ------------------------------------------------------------
 # 🎉 Abschluss
