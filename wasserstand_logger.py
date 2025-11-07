@@ -3,34 +3,30 @@
 
 import time
 import sqlite3
-from datetime import datetime
+import json
+import os
+import logging
 import board
 import busio
+from datetime import datetime, UTC
 from adafruit_ads1x15.ads1115 import ADS1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 from adafruit_ads1x15 import ads1x15
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
-import json
-import os
-import logging
 
 # ============================================================
 # 🔧 GRUNDEINSTELLUNGEN
 # ============================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
 DB_PATH = os.path.join(BASE_DIR, "data", "offline_cache.db")
 LOGFILE = os.path.join(BASE_DIR, "logs", "wasserstand.log")
 
 logging.basicConfig(
-    level=logging.WARNING,
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(LOGFILE),
-        logging.StreamHandler()
-    ]
+    handlers=[logging.FileHandler(LOGFILE), logging.StreamHandler()]
 )
 
 # ============================================================
@@ -43,18 +39,18 @@ def load_config():
 config = load_config()
 last_config_mtime = os.path.getmtime(CONFIG_PATH)
 
-# Initiale Variablen
-STARTABSTICH = config.get("STARTABSTICH", 0.0)
+# Initiale Defaults (werden pro Kanal übersteuert)
+STARTABSTICH     = config.get("STARTABSTICH", 0.0)
 INITIAL_WASSERTIEFE = config.get("INITIAL_WASSERTIEFE", 0.0)
-SHUNT_OHMS = config.get("SHUNT_OHMS", 150.0)
-WERT_4mA = config.get("WERT_4mA", 0.0)
-WERT_20mA = config.get("WERT_20mA", 3.0)
-MESSWERT_NN = config.get("MESSWERT_NN", 500.0)
-MESSINTERVAL = config.get("MESSINTERVAL", 5)
-INFLUX_URL = config.get("INFLUX_URL", "")
-INFLUX_TOKEN = config.get("INFLUX_TOKEN", "")
-INFLUX_ORG = config.get("INFLUX_ORG", "")
-INFLUX_BUCKET = config.get("INFLUX_BUCKET", "")
+SHUNT_OHMS       = config.get("SHUNT_OHMS", 150.0)
+WERT_4mA         = config.get("WERT_4mA", 0.0)
+WERT_20mA        = config.get("WERT_20mA", 3.0)
+MESSWERT_NN      = config.get("MESSWERT_NN", 500.0)
+MESSINTERVAL     = config.get("MESSINTERVAL", 5)
+INFLUX_URL       = config.get("INFLUX_URL", "")
+INFLUX_TOKEN     = config.get("INFLUX_TOKEN", "")
+INFLUX_ORG       = config.get("INFLUX_ORG", "")
+INFLUX_BUCKET    = config.get("INFLUX_BUCKET", "")
 
 # ============================================================
 # 🔁 KONFIG NEU LADEN BEI ÄNDERUNG
@@ -70,26 +66,29 @@ def reload_config_if_changed():
         if current_mtime != last_config_mtime:
             logging.info("🔄 Neue Konfiguration erkannt — lade neu...")
             config = load_config()
-            STARTABSTICH = config.get("STARTABSTICH", STARTABSTICH)
-            INITIAL_WASSERTIEFE = config.get("INITIAL_WASSERTIEFE", INITIAL_WASSERTIEFE)
-            SHUNT_OHMS = config.get("SHUNT_OHMS", SHUNT_OHMS)
-            WERT_4mA = config.get("WERT_4mA", WERT_4mA)
-            WERT_20mA = config.get("WERT_20mA", WERT_20mA)
-            MESSWERT_NN = config.get("MESSWERT_NN", MESSWERT_NN)
-            MESSINTERVAL = config.get("MESSINTERVAL", MESSINTERVAL)
-            INFLUX_URL = config.get("INFLUX_URL", INFLUX_URL)
-            INFLUX_TOKEN = config.get("INFLUX_TOKEN", INFLUX_TOKEN)
-            INFLUX_ORG = config.get("INFLUX_ORG", INFLUX_ORG)
-            INFLUX_BUCKET = config.get("INFLUX_BUCKET", INFLUX_BUCKET)
-            last_config_mtime = current_mtime
+            STARTABSTICH       = config.get("STARTABSTICH", STARTABSTICH)
+            INITIAL_WASSERTIEFE= config.get("INITIAL_WASSERTIEFE", INITIAL_WASSERTIEFE)
+            SHUNT_OHMS         = config.get("SHUNT_OHMS", SHUNT_OHMS)
+            WERT_4mA           = config.get("WERT_4mA", WERT_4mA)
+            WERT_20mA          = config.get("WERT_20mA", WERT_20mA)
+            MESSWERT_NN        = config.get("MESSWERT_NN", MESSWERT_NN)
+            MESSINTERVAL       = config.get("MESSINTERVAL", MESSINTERVAL)
+            INFLUX_URL         = config.get("INFLUX_URL", INFLUX_URL)
+            INFLUX_TOKEN       = config.get("INFLUX_TOKEN", INFLUX_TOKEN)
+            INFLUX_ORG         = config.get("INFLUX_ORG", INFLUX_ORG)
+            INFLUX_BUCKET      = config.get("INFLUX_BUCKET", INFLUX_BUCKET)
+            last_config_mtime  = current_mtime
     except Exception as e:
         logging.error(f"Fehler beim Neuladen der Config: {e}")
 
 # ============================================================
 # 💾 SQLITE SETUP
 # ============================================================
+os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 cur = conn.cursor()
+
+# (Legacy) alte Tabelle lassen – wird nicht mehr genutzt, aber stört nicht.
 cur.execute("""
 CREATE TABLE IF NOT EXISTS measurements (
     timestamp TEXT,
@@ -98,6 +97,14 @@ CREATE TABLE IF NOT EXISTS measurements (
     wasser_oberflaeche_m REAL,
     messwert_NN REAL,
     pegel_diff REAL
+)
+""")
+
+# Neu: robuste Offline-Queue
+cur.execute("""
+CREATE TABLE IF NOT EXISTS offline_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    payload TEXT NOT NULL
 )
 """)
 conn.commit()
@@ -117,138 +124,144 @@ channels = {
 }
 
 # ============================================================
-# 🔍 HELFERFUNKTIONEN
+# 📨 OFFLINE-QUEUE HELFER
 # ============================================================
-def read_current_mA():
-    return chan.voltage / SHUNT_OHMS * 1000.0
-
-def current_to_level(current_mA):
-    """4–20 mA → physikalische Messgröße"""
-    if current_mA < 4: current_mA = 4
-    if current_mA > 20: current_mA = 20
-    return WERT_4mA + (current_mA - 4) * (WERT_20mA - WERT_4mA) / 16
-
-def check_influx_reachable():
-    try:
-        with InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG) as client:
-            return client.ping()
-    except Exception:
-        return False
-
-def save_local(data):
-    cur.execute("INSERT INTO measurements VALUES (?, ?, ?, ?, ?, ?)", data)
+def queue_insert(entry: dict):
+    cur.execute("INSERT INTO offline_queue (payload) VALUES (?)", (json.dumps(entry),))
     conn.commit()
 
-def read_current_mA():
-    voltage = chan.voltage
-    current_mA = voltage / SHUNT_OHMS * 1000.0
-    return voltage, current_mA
+def queue_fetch_batch(limit=500):
+    rows = cur.execute(
+        "SELECT id, payload FROM offline_queue ORDER BY id ASC LIMIT ?",
+        (limit,)
+    ).fetchall()
+    ids, items = [], []
+    for rid, payload in rows:
+        try:
+            items.append(json.loads(payload))
+            ids.append(rid)
+        except Exception:
+            cur.execute("DELETE FROM offline_queue WHERE id=?", (rid,))
+    if rows:
+        conn.commit()
+    return ids, items
 
-from influxdb_client import InfluxDBClient, Point, WritePrecision
-from influxdb_client.client.write_api import SYNCHRONOUS
+def queue_delete_ids(ids):
+    if not ids:
+        return
+    q = "DELETE FROM offline_queue WHERE id IN ({})".format(",".join(["?"]*len(ids)))
+    cur.execute(q, ids)
+    conn.commit()
 
+# ============================================================
+# 📤 INFLUX HELPERS
+# ============================================================
 def send_to_influx(data_list):
-    """Sendet mehrere Kanal-Messungen an InfluxDB"""
+    """
+    data_list: Liste aus Dicts mit Feldern:
+      channel, timestamp, current_mA, level_m, wasser_oberflaeche_m, messwert_NN, pegel_diff, name
+    """
     try:
         cfg = load_config()
-        influx_url = cfg.get("INFLUX_URL")
+        influx_url   = cfg.get("INFLUX_URL")
         influx_token = cfg.get("INFLUX_TOKEN")
-        influx_org = cfg.get("INFLUX_ORG")
-        influx_bucket = cfg.get("INFLUX_BUCKET")
+        influx_org   = cfg.get("INFLUX_ORG")
+        influx_bucket= cfg.get("INFLUX_BUCKET")
 
         if not all([influx_url, influx_token, influx_org, influx_bucket]):
-            logging.warning("⚠️ InfluxDB-Konfiguration unvollständig, Daten werden nicht gesendet.")
+            logging.warning("⚠️ InfluxDB-Konfiguration unvollständig – überspringe Sendung.")
             return False
 
         with InfluxDBClient(url=influx_url, token=influx_token, org=influx_org) as client:
             write_api = client.write_api(write_options=SYNCHRONOUS)
             points = []
-
             for entry in data_list:
                 try:
-                    sensor_name = cfg.get(f"NAME_{entry.get('channel', 'A0')}", entry.get("channel", "A0"))
+                    sensor_name = cfg.get(f"NAME_{entry.get('channel','A0')}", entry.get("channel","A0"))
                     p = (
                         Point("wasserstand")
-                        .tag("channel", entry.get("channel", "A0"))
-                        .tag("name", sensor_name)
+                        .tag("channel", entry.get("channel","A0"))
+                        .tag("name",   sensor_name)
                         .time(entry["timestamp"], WritePrecision.S)
-                        .field("Strom_in_mA", float(entry["current_mA"]))
-                        .field("Wassertiefe", float(entry["level_m"]))
-                        .field("Startabstich", float(entry["wasser_oberflaeche_m"]))
-                        .field("Messwert_NN", float(entry["messwert_NN"]))
-                        .field("Pegel_Differenz", float(entry["pegel_diff"]))
+                        .field("Strom_in_mA",       float(entry["current_mA"]))
+                        .field("Wassertiefe",       float(entry["level_m"]))
+                        .field("Startabstich",      float(entry["wasser_oberflaeche_m"]))
+                        .field("Messwert_NN",       float(entry["messwert_NN"]))
+                        .field("Pegel_Differenz",   float(entry["pegel_diff"]))
                     )
                     points.append(p)
                 except Exception as e:
-                    logging.error(f"❌ Fehler bei Punkt-Erstellung für {entry.get('channel')}: {e}")
+                    logging.error(f"❌ Punktfehler ({entry.get('channel')}): {e}")
 
             if not points:
-                logging.warning("Keine gültigen Datenpunkte zum Senden.")
                 return False
 
             write_api.write(bucket=influx_bucket, org=influx_org, record=points)
-            logging.info(f"📤 {len(points)} Messpunkte erfolgreich an InfluxDB gesendet.")
+            logging.info(f"📤 {len(points)} Messpunkte an InfluxDB gesendet.")
             return True
 
     except Exception as e:
         logging.error(f"❌ Fehler beim Senden an InfluxDB: {e}")
         return False
 
-    finally:
-        try:
-            if isinstance(write_api, WriteApi):
-                write_api.__del__()
-        except Exception:
-            pass
-        if client:
-            client.__del__()
+def flush_queue_to_influx(max_total=5000, batch_size=500):
+    """Älteste Queue-Daten in Batches an Influx senden."""
+    remaining = max_total
+    all_ok = True
+    while remaining > 0:
+        ids, batch = queue_fetch_batch(min(batch_size, remaining))
+        if not ids:
+            break
+        ok = send_to_influx(batch)
+        if ok:
+            queue_delete_ids(ids)
+            remaining -= len(ids)
+        else:
+            all_ok = False
+            break
+    return all_ok
 
 # ============================================================
-# 🧮 HAUPTSCHLEIFE (mehrkanalig)
+# 🧮 HAUPTSCHLEIFE
 # ============================================================
-logging.info("🌊 Starte Mehrkanal-Messung...")
+logging.info("🌊 Starte Mehrkanal-Messung mit Offline-Puffer...")
 
 try:
     while True:
         reload_config_if_changed()
-        cfg = load_config()
         all_data = []
 
         for ch_name, chan in channels.items():
             try:
-                # Kanalbezogene Parameter aus Config lesen
-                cfg = load_config()
-                w4 = float(cfg.get(f"WERT_4mA_{ch_name}", WERT_4mA))
-                w20 = float(cfg.get(f"WERT_20mA_{ch_name}", WERT_20mA))
-                shunt = float(cfg.get(f"SHUNT_OHMS_{ch_name}", SHUNT_OHMS))
-                startabstich = float(cfg.get(f"STARTABSTICH_{ch_name}", STARTABSTICH))
-                initial_tiefe = float(cfg.get(f"INITIAL_WASSERTIEFE_{ch_name}", INITIAL_WASSERTIEFE))
-                messwert_nn = float(cfg.get(f"MESSWERT_NN_{ch_name}", MESSWERT_NN))
-                sensor_name = cfg.get(f"NAME_{ch_name}", ch_name)
+                # Kanal-Parameter aus Config lesen
+                cfg            = load_config()
+                w4             = float(cfg.get(f"WERT_4mA_{ch_name}", WERT_4mA))
+                w20            = float(cfg.get(f"WERT_20mA_{ch_name}", WERT_20mA))
+                shunt          = float(cfg.get(f"SHUNT_OHMS_{ch_name}", SHUNT_OHMS))
+                startabstich   = float(cfg.get(f"STARTABSTICH_{ch_name}", STARTABSTICH))
+                initial_tiefe  = float(cfg.get(f"INITIAL_WASSERTIEFE_{ch_name}", INITIAL_WASSERTIEFE))
+                messwert_nn    = float(cfg.get(f"MESSWERT_NN_{ch_name}", MESSWERT_NN))
+                sensor_name    = cfg.get(f"NAME_{ch_name}", ch_name)
 
                 # Messung
-                voltage = chan.voltage
-                current_mA = voltage / shunt * 1000.0
-                # lineare Umrechnung 4–20mA
-                if current_mA < 4: current_mA = 4
+                voltage     = chan.voltage
+                current_mA  = voltage / shunt * 1000.0
+                # 4–20 mA begrenzen
+                if current_mA < 4:  current_mA = 4
                 if current_mA > 20: current_mA = 20
-                level_m = w4 + (current_mA - 4) * (w20 - w4) / 16
-                wasser_oberflaeche_m = startabstich + (initial_tiefe - level_m)
-                messwert_NN = messwert_nn - wasser_oberflaeche_m
-                pegel_diff = startabstich - wasser_oberflaeche_m
-                from datetime import datetime, UTC
-                timestamp = datetime.now(UTC).isoformat()
+
+                level_m               = w4 + (current_mA - 4) * (w20 - w4) / 16
+                wasser_oberflaeche_m  = startabstich + (initial_tiefe - level_m)
+                messwert_NN           = messwert_nn - wasser_oberflaeche_m
+                pegel_diff            = startabstich - wasser_oberflaeche_m
+                timestamp             = datetime.now(UTC).isoformat()
 
                 logging.info(
-                    f"🕒 {timestamp} | Kanal {ch_name} ({sensor_name}) | "
-                    f"{current_mA:.2f} mA | Tiefe: {level_m:.2f} m | Δ={pegel_diff:+.2f} m"
+                    f"🕒 {timestamp} | {ch_name} ({sensor_name}) | "
+                    f"{current_mA:.2f} mA | Tiefe {level_m:.2f} m | Δ {pegel_diff:+.2f} m"
                 )
 
-                # Daten speichern
-                data = (timestamp, current_mA, level_m, wasser_oberflaeche_m, messwert_NN, pegel_diff)
-                save_local(data)
-
-                all_data.append({
+                ch_data = {
                     "channel": ch_name,
                     "timestamp": timestamp,
                     "current_mA": current_mA,
@@ -257,12 +270,16 @@ try:
                     "messwert_NN": messwert_NN,
                     "pegel_diff": pegel_diff,
                     "name": sensor_name
-                })
+                }
+
+                # 💾 sofort in Offline-Queue (damit nichts verloren geht)
+                queue_insert(ch_data)
+                all_data.append(ch_data)
 
             except Exception as e:
                 logging.error(f"❌ Fehler bei Kanal {ch_name}: {e}")
 
-        # Speichere letzte Messungen (für Webapp)
+        # Für Web-GUI letzte Messungen sichern
         latest_file = os.path.join(BASE_DIR, "data", "latest_measurement.json")
         try:
             with open(latest_file, "w") as f:
@@ -270,36 +287,13 @@ try:
         except Exception as e:
             logging.warning(f"Konnte latest_measurement.json nicht schreiben: {e}")
 
-        # Sende an Influx (alle Kanäle)
-        cached = cur.execute("SELECT * FROM measurements").fetchall()
-        points = []
-
-        for ch_data in all_data:
-            try:
-                sensor_name = config.get(f"NAME_{ch_data.get('channel', 'A0')}", ch_data.get("channel", "A0"))
-                p = (
-                    Point("wasserstand")
-                    .tag("channel", ch_data.get("channel", "A0"))
-                    .tag("name", sensor_name)
-                    .time(ch_data["timestamp"], WritePrecision.S)
-                    .field("Strom_in_mA", ch_data["current_mA"])
-                    .field("Wassertiefe", ch_data["level_m"])
-                    .field("Startabstich", ch_data["wasser_oberflaeche_m"])
-                    .field("Messwert_NN", ch_data["messwert_NN"])
-                    .field("Pegel_Differenz", ch_data["pegel_diff"])
-                )
-                points.append(p)
-            except Exception as e:
-                logging.error(f"Fehler beim Erstellen des Influx-Punkts ({ch_data.get('channel')}): {e}")
-
-        if send_to_influx(all_data):
-            cur.execute("DELETE FROM measurements")
-            conn.commit()
-            logging.info("✅ Daten aller Kanäle an InfluxDB gesendet.")
+        # 🔄 Queue flushen (inkl. der gerade erzeugten Messungen)
+        if flush_queue_to_influx(max_total=5000, batch_size=500):
+            logging.info("✅ Alle gepufferten Messpunkte erfolgreich an InfluxDB gesendet.")
         else:
-            logging.info("📦 Werte lokal zwischengespeichert.")
+            logging.info("📦 Offline: Werte bleiben in der Queue und werden später nachgesendet.")
 
-        time.sleep(MESSINTERVAL)
+        time.sleep(float(MESSINTERVAL))
 
 except KeyboardInterrupt:
     logging.info("🛑 Messung manuell beendet.")

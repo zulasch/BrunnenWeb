@@ -471,8 +471,7 @@ def systemstatus_page():
 @app.route("/wifi/configure", methods=["POST"])
 @login_required
 def wifi_configure():
-    """Konfiguriert WLAN-Verbindung (SSID + Passwort)."""
-    ssid = request.form.get("ssid", "").strip()
+    ssid = (request.form.get("ssid", "") or request.form.get("ssid_manual", "")).strip()
     psk = request.form.get("psk", "").strip()
 
     if not ssid:
@@ -481,31 +480,36 @@ def wifi_configure():
         return jsonify({"status": "error", "message": "❌ Passwort darf nicht leer sein."})
 
     try:
-        wpa_conf = "/etc/wpa_supplicant/wpa_supplicant.conf"
-        backup = f"{wpa_conf}.bak"
-        # Backup anlegen
-        subprocess.run(["sudo", "cp", wpa_conf, backup], check=False)
+        config_block = f'\nnetwork={{\n  ssid="{ssid}"\n  psk="{psk}"\n}}\n'
 
-        # Neue Netzwerkkonfiguration einfügen
+        # 🔹 Schreibe sicher über 'tee' (läuft mit root-Rechten)
         subprocess.run(
-            ["sudo", "bash", "-c",
-            f'echo -e "\\nnetwork={{\\n  ssid=\\"{ssid}\\"\\n  psk=\\"{psk}\\"\\n}}" >> /etc/wpa_supplicant/wpa_supplicant.conf'],
-            check=True
+            ["sudo", "-n", "tee", "-a", "/etc/wpa_supplicant/wpa_supplicant.conf"],
+            input=config_block.encode(),
+            check=True,
         )
 
-        # WLAN neu starten
-        subprocess.run(["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"], check=False)
-        subprocess.run(["sudo", "systemctl", "restart", "dhcpcd"], check=False)
+        # 🔹 WLAN-Dienste neu starten
+        subprocess.run(["sudo", "-n", "wpa_cli", "-i", "wlan0", "reconfigure"], check=False)
+        subprocess.run(["sudo", "-n", "systemctl", "restart", "NetworkManager"], check=False)
 
         return jsonify({
             "status": "ok",
             "message": f"✅ WLAN wird mit „{ssid}“ verbunden..."
         })
+
+    except subprocess.CalledProcessError as e:
+        return jsonify({
+            "status": "error",
+            "message": f"❌ Fehler beim Schreiben der WLAN-Konfiguration: {e}"
+        })
     except Exception as e:
         return jsonify({
             "status": "error",
-            "message": f"❌ Fehler beim Setzen der WLAN-Konfiguration: {e}"
+            "message": f"❌ Unerwarteter Fehler: {e}"
         })
+
+
 
 
 # Ausgänge Zeitsteuerung
