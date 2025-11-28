@@ -10,5 +10,5 @@ fi
 
 if [ "$CURRENT_IP" != "$OLD_IP" ]; then
     echo "$CURRENT_IP" > "$STATE_FILE"
-    systemctl restart openvpn-client@openvpn
+    systemctl restart openvpn@client
 fi
