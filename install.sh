@@ -66,8 +66,20 @@ ok "Verzeichnisstruktur erstellt unter $BASE_DIR"
 usermod -aG i2c $USER
 usermod -aG gpio $USER
 
-(crontab -l 2>/dev/null | grep -q 'restart-openvpn-if-ip-changed.sh') || \
-(crontab -l 2>/dev/null; echo "*/5 * * * * $BASE_DIR/scripts/restart-openvpn-if-ip-changed.sh") | crontab -
+# Cronjob nur hinzufügen, wenn er nicht existiert
+if ! crontab -l 2>/dev/null | grep -q 'restart-openvpn-if-ip-changed.sh'; then
+    # Crontab neu erzeugen
+    echo "Cronjob nicht gefunden, lege an..."
+    chmod +x $BASE_DIR/scripts/restart-openvpn-if-ip-changed.sh
+    (crontab -l 2>/dev/null; echo "*/5 * * * * $BASE_DIR/scripts/restart-openvpn-if-ip-changed.sh") | crontab -
+    
+    # Prüfen, ob crontab erfolgreich war
+    if [ $? -ne 0 ]; then
+        echo "Fehler: Crontab konnte nicht angelegt werden!"
+        exit 1
+    fi
+fi
+
 
 SUDOERS_FILE="/etc/sudoers.d/$USER"
 cat <<EOF > "$SUDOERS_FILE"
