@@ -89,7 +89,7 @@ cat << 'EOF' > /etc/logrotate.d/brunnen_web
 /opt/brunnen_web/logs/webapp.err.log
 /var/log/check-vpn.log 
 {
-    dailysize 5M
+    size 5M
     rotate 7
     missingok
     notifempty
