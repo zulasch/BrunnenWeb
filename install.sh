@@ -93,6 +93,7 @@ cat << 'EOF' > /etc/logrotate.d/brunnen_web
     rotate 7
     missingok
     notifempty
+    copytruncate
     create 644 root root
 }
 EOF
