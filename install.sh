@@ -66,21 +66,6 @@ ok "Verzeichnisstruktur erstellt unter $BASE_DIR"
 usermod -aG i2c $USER
 usermod -aG gpio $USER
 
-## Cronjob nur hinzufügen, wenn er nicht existiert
-#if ! crontab -l 2>/dev/null | grep -q 'restart-openvpn-if-ip-changed.sh'; then
-#    # Crontab neu erzeugen
-#    echo "Cronjob nicht gefunden, lege an..."
-#    chmod +x $BASE_DIR/scripts/restart-openvpn-if-ip-changed.sh
-#    (crontab -l 2>/dev/null; echo "*/5 * * * * $BASE_DIR/scripts/restart-openvpn-if-ip-changed.sh") | crontab -
-#    
-#    # Prüfen, ob crontab erfolgreich war
-#    if [ $? -ne 0 ]; then
-#        echo "Fehler: Crontab konnte nicht angelegt werden!"
-#        exit 1
-#    fi
-#fi
-
-
 SUDOERS_FILE="/etc/sudoers.d/$USER"
 cat <<EOF > "$SUDOERS_FILE"
 # Erlaubt dem Benutzer '$USER' kontrollierte Service-Kommandos ohne Passwort
@@ -95,6 +80,22 @@ if visudo -c -f "$SUDOERS_FILE" >/dev/null 2>&1; then
 else
   err "Fehler in der sudoers-Datei – bitte prüfen: $SUDOERS_FILE"
 fi
+
+section "Logrotate Configuration"
+
+cat << 'EOF' > /etc/logrotate.d/brunnen_web
+/opt/brunnen_web/logs/logger.err.log
+/opt/brunnen_web/logs/wasserstand.log
+/opt/brunnen_web/logs/webapp.err.log
+/var/log/check-vpn.log 
+{
+    daily
+    rotate 7
+    missingok
+    notifempty
+    create 644 root root
+}
+EOF
 
 
 section "3️⃣  Virtuelle Python-Umgebung einrichten"
