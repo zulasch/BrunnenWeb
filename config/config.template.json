@@ -1,5 +1,11 @@
 {
   "MESSINTERVAL": 5,
+  "ADMIN_PIN": "",
+
+  "INFLUX_URL": "",
+  "INFLUX_TOKEN": "",
+  "INFLUX_ORG": "",
+  "INFLUX_BUCKET": "",
 
   "NAME_A0": "",
   "SENSOR_TYP_A0": "LEVEL",

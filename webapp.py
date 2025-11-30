@@ -78,11 +78,11 @@ def load_config():
             changed = True
 
     # 3️⃣ (Optional) Ungültige Keys aufräumen:
-    # allowed_keys = set(DEFAULT_CONFIG.keys()) | {k for k in cfg.keys() if k.startswith("NAME_")}
-    # for key in list(cfg.keys()):
-    #     if key not in allowed_keys:
-    #         cfg.pop(key)
-    #         changed = True
+    allowed_keys = set(DEFAULT_CONFIG.keys()) | {k for k in cfg.keys() if k.startswith("NAME_")}
+    for key in list(cfg.keys()):
+        if key not in allowed_keys:
+            cfg.pop(key)
+            changed = True
 
     # 4️⃣ Wenn sich was geändert hat -> wieder speichern
     if changed:
