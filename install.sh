@@ -3,6 +3,7 @@
 # 💧 Brunnen-Web Installationsskript
 # Erstellt Verzeichnisse, virtuelle Umgebung, Abhängigkeiten
 # und richtet den Systemd-Dienst ein.
+#
 # ============================================================
 
 set -e  # Bei Fehlern abbrechen
