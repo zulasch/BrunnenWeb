@@ -29,3 +29,7 @@ Optional in Web-GUI beschreiben
 
 
 Beim nächsten Neustart: config.json wird automatisch ergänzt.
+
+git pull
+sudo systemctl restart brunnen_web.service
+sudo systemctl restart brunnen_logger.service
