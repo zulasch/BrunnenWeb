@@ -177,19 +177,39 @@ def send_to_influx(data_list):
             points = []
             for entry in data_list:
                 try:
-                    sensor_name = cfg.get(f"NAME_{entry.get('channel','A0')}", entry.get("channel","A0"))
+                    sensor_type = str(entry.get("type", "LEVEL")).upper()
+                    unit        = entry.get("unit", "")
+                    sensor_name = cfg.get(f"NAME_{entry.get('channel','A0')}", entry.get("name", entry.get("channel","A0")))
+                    value       = float(entry.get("value", entry.get("level_m", 0.0)))
+
                     p = (
-                        Point("wasserstand")
+                        Point("wasserstand")   # Messname kannst du lassen
                         .tag("channel", entry.get("channel","A0"))
                         .tag("name",   sensor_name)
+                        .tag("type",   sensor_type)
+                        .tag("unit",   unit)
                         .time(entry["timestamp"], WritePrecision.S)
-                        .field("Strom_in_mA",       float(entry["current_mA"]))
-                        .field("Wassertiefe",       float(entry["level_m"]))
-                        .field("Startabstich",      float(entry["wasser_oberflaeche_m"]))
-                        .field("Messwert_NN",       float(entry["messwert_NN"]))
-                        .field("Pegel_Differenz",   float(entry["pegel_diff"]))
+                        .field("Strom_in_mA", float(entry["current_mA"]))
                     )
+
+                    if sensor_type == "LEVEL":
+                        p = (
+                            p
+                            .field("Wassertiefe",     float(entry["level_m"]))
+                            .field("Startabstich",    float(entry["wasser_oberflaeche_m"]))
+                            .field("Messwert_NN",     float(entry["messwert_NN"]))
+                            .field("Pegel_Differenz", float(entry["pegel_diff"]))
+                        )
+                    elif sensor_type == "TEMP":
+                        p = p.field("Temperatur", value)
+                    elif sensor_type == "FLOW":
+                        p = p.field("Durchfluss", value)
+                    else:
+                        # Fallback für sonstige Sensoren
+                        p = p.field("Messwert", value)
+
                     points.append(p)
+
                 except Exception as e:
                     logging.error(f"❌ Punktfehler ({entry.get('channel')}): {e}")
 
@@ -235,6 +255,9 @@ try:
             try:
                 # Kanal-Parameter aus Config lesen
                 cfg            = load_config()
+                sensor_type    = str(cfg.get(f"SENSOR_TYP_{ch_name}", "LEVEL")).upper()
+                unit           = str(cfg.get(f"SENSOR_EINHEIT_{ch_name}", "m" if sensor_type == "LEVEL" else "")).strip()
+
                 w4             = float(cfg.get(f"WERT_4mA_{ch_name}", WERT_4mA))
                 w20            = float(cfg.get(f"WERT_20mA_{ch_name}", WERT_20mA))
                 shunt          = float(cfg.get(f"SHUNT_OHMS_{ch_name}", SHUNT_OHMS))
@@ -246,30 +269,53 @@ try:
                 # Messung
                 voltage     = chan.voltage
                 current_mA  = voltage / shunt * 1000.0
-                # 4–20 mA begrenzen
-                if current_mA < 4:  current_mA = 4
-                if current_mA > 20: current_mA = 20
 
-                level_m               = w4 + (current_mA - 4) * (w20 - w4) / 16
-                wasser_oberflaeche_m  = startabstich + (initial_tiefe - level_m)
-                messwert_NN           = messwert_nn - wasser_oberflaeche_m
-                pegel_diff            = startabstich - wasser_oberflaeche_m
-                timestamp             = datetime.now(UTC).isoformat()
+                # 4–20 mA begrenzen
+                if current_mA < 4:
+                    current_mA = 4
+                if current_mA > 20:
+                    current_mA = 20
+
+                # Generische lineare Skalierung: 4–20 mA -> WERT_4mA..WERT_20mA
+                value = w4 + (current_mA - 4) * (w20 - w4) / 16.0
+
+                # Default-Werte initialisieren
+                level_m              = None
+                wasser_oberflaeche_m = 0.0
+                messwert_NN_out      = 0.0
+                pegel_diff           = 0.0
+
+                if sensor_type == "LEVEL":
+                    # Klassische Wasserstand-Berechnung
+                    level_m              = value
+                    wasser_oberflaeche_m = startabstich + (initial_tiefe - level_m)
+                    messwert_NN_out      = messwert_nn - wasser_oberflaeche_m
+                    pegel_diff           = startabstich - wasser_oberflaeche_m
+                else:
+                    # Temperatur / Durchfluss / andere: nur generischer Messwert
+                    level_m = value
+
+                timestamp = datetime.now(UTC).isoformat()
 
                 logging.info(
-                    f"🕒 {timestamp} | {ch_name} ({sensor_name}) | "
-                    f"{current_mA:.2f} mA | Tiefe {level_m:.2f} m | Δ {pegel_diff:+.2f} m"
+                    f"🕒 {timestamp} | {ch_name} ({sensor_name}, {sensor_type}) | "
+                    f"{current_mA:.2f} mA | Wert {value:.2f} {unit or ''}"
                 )
 
                 ch_data = {
                     "channel": ch_name,
                     "timestamp": timestamp,
                     "current_mA": current_mA,
-                    "level_m": level_m,
+                    # Für Kompatibilität behalten wir die bekannten Felder bei:
+                    "level_m": level_m if level_m is not None else 0.0,
                     "wasser_oberflaeche_m": wasser_oberflaeche_m,
-                    "messwert_NN": messwert_NN,
+                    "messwert_NN": messwert_NN_out,
                     "pegel_diff": pegel_diff,
-                    "name": sensor_name
+                    "name": sensor_name,
+                    # Neu:
+                    "type": sensor_type,
+                    "unit": unit,
+                    "value": level_m if level_m is not None else value
                 }
 
                 # 💾 sofort in Offline-Queue (damit nichts verloren geht)
@@ -278,6 +324,7 @@ try:
 
             except Exception as e:
                 logging.error(f"❌ Fehler bei Kanal {ch_name}: {e}")
+
 
         # Für Web-GUI letzte Messungen sichern
         latest_file = os.path.join(BASE_DIR, "data", "latest_measurement.json")
