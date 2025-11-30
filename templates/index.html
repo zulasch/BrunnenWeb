@@ -30,7 +30,38 @@
       {% if key.endswith("_" + channel) and not key.startswith("SHUNT_OHMS") %}
         <div class="mb-4">
           <label class="block font-semibold text-gray-700 mb-1">{{ key }}</label>
-          <input name="{{ key }}" value="{{ val }}" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none" />
+          {% if "SENSOR_TYP" in key %}
+              <select name="{{ key }}" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none">
+                <option value="LEVEL" {% if val == "LEVEL" %}selected{% endif %}>LEVEL</option>
+                <option value="TEMP" {% if val == "TEMP" %}selected{% endif %}>TEMP</option>
+                <option value="FLOW" {% if val == "FLOW" %}selected{% endif %}>FLOW</option>
+                <option value="ANALOG" {% if val == "ANALOG" %}selected{% endif %}>ANALOG</option>
+              </select>
+
+            {% elif "SENSOR_EINHEIT" in key %}
+              <select name="{{ key }}" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none">
+                <option value="m" {% if val == "m" %}selected{% endif %}>m</option>
+                <option value="cm" {% if val == "cm" %}selected{% endif %}>cm</option>
+                <option value="mm" {% if val == "mm" %}selected{% endif %}>mm</option>
+
+                <option value="°C" {% if val == "°C" %}selected{% endif %}>°C</option>
+                <option value="K" {% if val == "K" %}selected{% endif %}>K</option>
+
+                <option value="m3/h" {% if val == "m3/h" %}selected{% endif %}>m³/h</option>
+                <option value="l/min" {% if val == "l/min" %}selected{% endif %}>l/min</option>
+                <option value="l/s" {% if val == "l/s" %}selected{% endif %}>l/s</option>
+
+                <option value="" {% if val == "" %}selected{% endif %}>(keine)</option>
+              </select>
+
+            {% else %}
+              <input 
+                name="{{ key }}" 
+                value="{{ val }}" 
+                class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none" 
+              />
+            {% endif %}
+
           {% if descriptions.get(key) %}
             <p class="text-gray-500 text-sm mt-1">{{ descriptions.get(key) }}</p>
           {% endif %}
