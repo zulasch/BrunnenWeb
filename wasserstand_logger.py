@@ -163,18 +163,6 @@ os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 cur = conn.cursor()
 
-# (Legacy) alte Tabelle lassen – wird nicht mehr genutzt, aber stört nicht.
-cur.execute("""
-CREATE TABLE IF NOT EXISTS measurements (
-    timestamp TEXT,
-    current_mA REAL,
-    level_m REAL,
-    wasser_oberflaeche_m REAL,
-    messwert_NN REAL,
-    pegel_diff REAL
-)
-""")
-
 # Neu: robuste Offline-Queue
 cur.execute("""
 CREATE TABLE IF NOT EXISTS offline_queue (
