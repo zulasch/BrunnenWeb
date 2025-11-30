@@ -8,17 +8,21 @@
 <!-- Messwert-Tabelle -->
 <div class="overflow-x-auto bg-white p-6 rounded-xl shadow">
   <table class="min-w-full border-collapse">
-    <thead>
-      <tr class="bg-blue-100 text-blue-800 text-left">
-        <th class="p-2">🔌 Kanal</th>
-        <th class="p-2">⏱ Zeitstempel</th>
-        <th class="p-2">⚡ Strom [mA]</th>
-        <th class="p-2">🌊 Tiefe [m]</th>
-        <th class="p-2">🪣 Wasseroberfläche [m u. Gelände]</th>
-        <th class="p-2">🏔 Messwert NN [m ü. NN]</th>
-        <th class="p-2">📉 Δ Pegel [m]</th>
-      </tr>
-    </thead>
+<thead>
+  <tr class="bg-blue-100 text-blue-800 text-left">
+    <th class="p-2">🔌 Kanal</th>
+    <th class="p-2">🏷 Name</th>
+    <th class="p-2">⏱ Zeitstempel</th>
+    <th class="p-2">⚡ Strom [mA]</th>
+    <th class="p-2">📏 Messwert</th>
+    <th class="p-2">📐 Einheit</th>
+    <th class="p-2">🌊 Tiefe [m] (LEVEL)</th>
+    <th class="p-2">🪣 Wasseroberfläche [m u. Gelände]</th>
+    <th class="p-2">🏔 Messwert NN [m ü. NN]</th>
+    <th class="p-2">📉 Δ Pegel [m]</th>
+  </tr>
+</thead>
+
     <tbody id="tableBody">
       <tr><td colspan="7" class="text-center p-4 text-gray-500">Lade aktuelle Messdaten...</td></tr>
     </tbody>
@@ -44,17 +48,25 @@ async function loadMeasurements() {
       const tr = document.createElement("tr");
       tr.className = "border-b hover:bg-blue-50";
 
+      const type = (row.type || "LEVEL").toUpperCase();
+      const value = (row.value ?? row.level_m);
+      const unit = row.unit || (type === "LEVEL" ? "m" : "");
+
       tr.innerHTML = `
         <td class="p-2 font-semibold">${row.channel}</td>
+        <td class="p-2">${row.name ?? "–"}</td>
         <td class="p-2">${new Date(row.timestamp).toLocaleString()}</td>
-        <td class="p-2">${row.current_mA?.toFixed(2) ?? "–"}</td>
-        <td class="p-2">${row.level_m?.toFixed(2) ?? "–"}</td>
-        <td class="p-2">${row.wasser_oberflaeche_m?.toFixed(2) ?? "–"}</td>
-        <td class="p-2">${row.messwert_NN?.toFixed(2) ?? "–"}</td>
-        <td class="p-2">${row.pegel_diff?.toFixed(2) ?? "–"}</td>
+        <td class="p-2">${row.current_mA != null ? row.current_mA.toFixed(2) : "–"}</td>
+        <td class="p-2">${value != null ? value.toFixed(2) : "–"}</td>
+        <td class="p-2">${unit || "–"}</td>
+        <td class="p-2">${type === "LEVEL" && row.level_m != null ? row.level_m.toFixed(2) : "–"}</td>
+        <td class="p-2">${type === "LEVEL" && row.wasser_oberflaeche_m != null ? row.wasser_oberflaeche_m.toFixed(2) : "–"}</td>
+        <td class="p-2">${type === "LEVEL" && row.messwert_NN != null ? row.messwert_NN.toFixed(2) : "–"}</td>
+        <td class="p-2">${type === "LEVEL" && row.pegel_diff != null ? row.pegel_diff.toFixed(2) : "–"}</td>
       `;
       body.appendChild(tr);
     });
+
   } catch (err) {
     const body = document.getElementById("tableBody");
     body.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-red-500">⚠️ Fehler beim Laden: ${err}</td></tr>`;

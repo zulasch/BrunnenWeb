@@ -113,15 +113,18 @@ def index():
     # Basisbeschreibungen – ohne Kanalendung
     base_descriptions = {
         "NAME": "Bezeichnung oder Standort dieses Sensors.",
+        "SENSOR_TYP": "Art des Sensors (z. B. LEVEL, TEMP, FLOW).",
+        "SENSOR_EINHEIT": "Einheit des Messwerts (z. B. m, °C, m3/h).",
         "STARTABSTICH": "Abstand Gelände → Wasseroberfläche beim Start [m].",
-        "INITIAL_WASSERTIEFE": "Initiale Sonden-Wassertiefe [m] (z. B. 2.5).",
+        "INITIAL_WASSERTIEFE": "Initiale Wassertiefe [m] (z. B. 2.5).",
         "SHUNT_OHMS": "Shunt-Widerstand [Ω] (typ. 150 Ω).",
-        "WERT_4mA": "Sondenwert [m] bei 4 mA (untere Grenze).",
-        "WERT_20mA": "Sondenwert [m] bei 20 mA (obere Grenze).",
+        "WERT_4mA": "Messwert bei 4 mA (untere Grenze).",
+        "WERT_20mA": "Messwert bei 20 mA (obere Grenze).",
         "MESSWERT_NN": "Geländehöhe über NN [m].",
         "MESSINTERVAL": "Messintervall [s].",
         "ADMIN_PIN": "PIN für Web-Login (4–8 Ziffern)."
     }
+
 
     # Automatische Erweiterung: Für alle Kanalvarianten
     descriptions = {}
