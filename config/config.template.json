@@ -16,6 +16,7 @@
   "WERT_4mA_A0": 0.0,
   "WERT_20mA_A0": 3.0,
   "MESSWERT_NN_A0": 0.0,
+  "TEST123_A0": 100.0,
 
   "NAME_A1": "",
   "SENSOR_TYP_A1": "LEVEL",
