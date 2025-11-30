@@ -32,10 +32,10 @@
           <label class="block font-semibold text-gray-700 mb-1">{{ key }}</label>
           {% if "SENSOR_TYP" in key %}
               <select name="{{ key }}" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none">
-                <option value="LEVEL" {% if val == "LEVEL" %}selected{% endif %}>LEVEL</option>
-                <option value="TEMP" {% if val == "TEMP" %}selected{% endif %}>TEMP</option>
-                <option value="FLOW" {% if val == "FLOW" %}selected{% endif %}>FLOW</option>
-                <option value="ANALOG" {% if val == "ANALOG" %}selected{% endif %}>ANALOG</option>
+                <option value="Wasserlevel" {% if val == "LEVEL" %}selected{% endif %}>LEVEL</option>
+                <option value="Temperatur" {% if val == "TEMP" %}selected{% endif %}>TEMP</option>
+                <option value="Durchfluss" {% if val == "FLOW" %}selected{% endif %}>FLOW</option>
+                <option value="Analog" {% if val == "ANALOG" %}selected{% endif %}>ANALOG</option>
               </select>
 
             {% elif "SENSOR_EINHEIT" in key %}
