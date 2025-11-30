@@ -40,6 +40,7 @@ DEFAULT_CONFIG = {
 for ch in ["A0", "A1", "A2", "A3"]:
     DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_{ch}", "LEVEL")
     DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_{ch}", "m")
+    DEFAULT_CONFIG.setdefault(f"TEST123_{ch}", "m")
 
 logging.basicConfig(
     level=logging.INFO,
