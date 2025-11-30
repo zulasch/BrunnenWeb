@@ -23,6 +23,57 @@ CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
 DB_PATH = os.path.join(BASE_DIR, "data", "offline_cache.db")
 LOGFILE = os.path.join(BASE_DIR, "logs", "wasserstand.log")
 
+DEFAULT_CONFIG = {
+    "STARTABSTICH": 0.0,
+    "INITIAL_WASSERTIEFE": 0.0,
+    "SHUNT_OHMS": 150.0,
+    "WERT_4mA": 0.0,
+    "WERT_20mA": 3.0,
+    "MESSWERT_NN": 500.0,
+    "MESSINTERVAL": 5,
+    "INFLUX_URL": "",
+    "INFLUX_TOKEN": "",
+    "INFLUX_ORG": "",
+    "INFLUX_BUCKET": "",
+}
+
+# Kanal-spezifische Defaults generieren
+#for ch in ["A0", "A1", "A2", "A3"]:
+
+DEFAULT_CONFIG.setdefault(f"NAME_A0", "Nordbrunnen ABC")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A0", "m")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A0", "LEVEL")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A0", 0.0,)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A0", 3.0)
+DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A0", 100.0)
+DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A0", 25.0)
+DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A0", 100.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A0", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A1", "Pumpentemperatur")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A1", "°C")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A1", "TEMP")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A1", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A1", 3.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A1", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A2", "Pumpendurchfluss")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A2", "m3/h")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A2", "FLOW")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A2", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A2", 3.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A2", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A3", "reserve")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A3", "m")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A3", "LEVEL")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A3", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A3", 3.0)
+DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A3", 100.0)
+DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A3", 15.0)
+DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A3", 00.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A3", 150.0)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -33,8 +84,32 @@ logging.basicConfig(
 # ⚙️ KONFIGURATION LADEN
 # ============================================================
 def load_config():
-    with open(CONFIG_PATH, "r") as f:
-        return json.load(f)
+    cfg = {}
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, "r") as f:
+                cfg = json.load(f)
+        except Exception as e:
+            logging.error(f"Konfiguration konnte nicht gelesen werden: {e}")
+            cfg = {}
+
+    changed = False
+    for key, value in DEFAULT_CONFIG.items():
+        if key not in cfg:
+            cfg[key] = value
+            changed = True
+
+    if changed:
+        try:
+            os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+            with open(CONFIG_PATH, "w") as f:
+                json.dump(cfg, f, indent=2)
+            logging.info("🔧 Konfiguration automatisch aktualisiert (neue Defaults ergänzt).")
+        except Exception as e:
+            logging.error(f"Konfiguration konnte nicht geschrieben werden: {e}")
+
+    return cfg
+
 
 config = load_config()
 last_config_mtime = os.path.getmtime(CONFIG_PATH)

@@ -3,6 +3,7 @@
 # 💧 Brunnen-Web Installationsskript
 # Erstellt Verzeichnisse, virtuelle Umgebung, Abhängigkeiten
 # und richtet den Systemd-Dienst ein.
+#
 # ============================================================
 
 set -e  # Bei Fehlern abbrechen
@@ -119,9 +120,8 @@ if [ ! -f "$CONFIG_FILE" ]; then
 cat <<EOF > "$CONFIG_FILE"
 {
   "NAME_A0": "Nordbrunnen ABC",
-  "SENSOR_TYP_A0": "LEVEL",       // LEVEL, TEMP, FLOW, ...
-  "SENSOR_EINHEIT_A0": "m",       // m, °C, m3/h, l/s …
-
+  "SENSOR_TYP_A0": "LEVEL",
+  "SENSOR_EINHEIT_A0": "m",
   "WERT_4mA_A0": 0.0,
   "WERT_20mA_A0": 3.0,
   "SHUNT_OHMS_A0": 150.0,
@@ -132,21 +132,23 @@ cat <<EOF > "$CONFIG_FILE"
   "NAME_A1": "Pumpentemperatur",
   "SENSOR_TYP_A1": "TEMP",
   "SENSOR_EINHEIT_A1": "°C",
-  "WERT_4mA_A1": 0.0,             // Temperatur bei 4 mA
-  "WERT_20mA_A1": 80.0,           // Temperatur bei 20 mA
+  "WERT_4mA_A1": 0.0,
+  "WERT_20mA_A1": 80.0,
   "SHUNT_OHMS_A1": 150.0,
 
   "NAME_A2": "Pumpendurchfluss",
   "SENSOR_TYP_A2": "FLOW",
   "SENSOR_EINHEIT_A2": "m3/h",
-  "WERT_4mA_A2": 0.0,             // Durchfluss bei 4 mA
-  "WERT_20mA_A2": 60.0,           // Durchfluss bei 20 mA
+  "WERT_4mA_A2": 0.0,
+  "WERT_20mA_A2": 60.0,
   "SHUNT_OHMS_A2": 150.0,
 
   "NAME_A3": "reserve",
+  "SENSOR_TYP_A2": "LEVEL",
+  "SENSOR_EINHEIT_A2": "m3/h",
   "WERT_4mA_A3": 0.0,
   "WERT_20mA_A3": 10.0,
-  "SHUNT_OHMS_A3": 0,
+  "SHUNT_OHMS_A3": 150.0,
   "STARTABSTICH_A3": 0,
   "INITIAL_WASSERTIEFE_A3": 0,
   "MESSWERT_NN_A3": 0,

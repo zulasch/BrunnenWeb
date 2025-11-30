@@ -12,6 +12,54 @@ LOG_DIR = os.path.join(BASE_DIR, "logs")
 SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
 NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
 
+# 🔧 Standard-Konfiguration – wird mit lokaler config.json gemerged
+DEFAULT_CONFIG = {
+    "MESSINTERVAL": 5,
+    "ADMIN_PIN": 1234,
+    "INFLUX_URL": "",
+    "INFLUX_TOKEN": "",
+    "INFLUX_ORG": "",
+    "INFLUX_BUCKET": "",
+}
+
+# Kanal-spezifische Defaults generieren
+#for ch in ["A0", "A1", "A2", "A3"]:
+
+DEFAULT_CONFIG.setdefault(f"NAME_A0", "Nordbrunnen ABC")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A0", "m")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A0", "LEVEL")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A0", 0.0,)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A0", 3.0)
+DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A0", 100.0)
+DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A0", 25.0)
+DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A0", 100.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A0", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A1", "Pumpentemperatur")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A1", "°C")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A1", "TEMP")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A1", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A1", 3.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A1", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A2", "Pumpendurchfluss")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A2", "m3/h")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A2", "FLOW")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A2", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A2", 3.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A2", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A3", "reserve")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A3", "m")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A3", "LEVEL")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A3", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A3", 3.0)
+DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A3", 100.0)
+DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A3", 15.0)
+DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A3", 00.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A3", 150.0)
+
+
 # ===== Flask =====
 app = Flask(__name__, template_folder="templates")
 # Geheimschlüssel (für Sessions). In Produktion in ENV legen!
@@ -43,8 +91,40 @@ def save_names(data):
         
 
 def load_config():
-    with open(CONFIG_PATH, "r") as f:
-        return json.load(f)
+    # Leere Basis
+    cfg = {}
+
+    # 1️⃣ Lokale config.json einlesen (wenn vorhanden)
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, "r") as f:
+                cfg = json.load(f)
+        except Exception as e:
+            # Notfall: kaputte Datei -> mit leerem Dict weitermachen
+            print(f"Warnung: Konnte config.json nicht lesen: {e}")
+
+    # 2️⃣ Defaults ergänzen
+    changed = False
+    for key, value in DEFAULT_CONFIG.items():
+        if key not in cfg:
+            cfg[key] = value
+            changed = True
+
+    # 3️⃣ (Optional) Ungültige Keys aufräumen:
+    allowed_keys = set(DEFAULT_CONFIG.keys()) | {k for k in cfg.keys() if k.startswith("NAME_")}
+    for key in list(cfg.keys()):
+        if key not in allowed_keys:
+            cfg.pop(key)
+            changed = True
+
+    # 4️⃣ Wenn sich was geändert hat -> wieder speichern
+    if changed:
+        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+        with open(CONFIG_PATH, "w") as f:
+            json.dump(cfg, f, indent=2)
+
+    return cfg
+
 
 def save_config(cfg: dict):
     with open(CONFIG_PATH, "w") as f:
