@@ -23,6 +23,24 @@ CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
 DB_PATH = os.path.join(BASE_DIR, "data", "offline_cache.db")
 LOGFILE = os.path.join(BASE_DIR, "logs", "wasserstand.log")
 
+DEFAULT_CONFIG = {
+    "STARTABSTICH": 0.0,
+    "INITIAL_WASSERTIEFE": 0.0,
+    "SHUNT_OHMS": 150.0,
+    "WERT_4mA": 0.0,
+    "WERT_20mA": 3.0,
+    "MESSWERT_NN": 500.0,
+    "MESSINTERVAL": 5,
+    "INFLUX_URL": "",
+    "INFLUX_TOKEN": "",
+    "INFLUX_ORG": "",
+    "INFLUX_BUCKET": "",
+}
+
+for ch in ["A0", "A1", "A2", "A3"]:
+    DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_{ch}", "LEVEL")
+    DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_{ch}", "m")
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -33,8 +51,32 @@ logging.basicConfig(
 # ⚙️ KONFIGURATION LADEN
 # ============================================================
 def load_config():
-    with open(CONFIG_PATH, "r") as f:
-        return json.load(f)
+    cfg = {}
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, "r") as f:
+                cfg = json.load(f)
+        except Exception as e:
+            logging.error(f"Konfiguration konnte nicht gelesen werden: {e}")
+            cfg = {}
+
+    changed = False
+    for key, value in DEFAULT_CONFIG.items():
+        if key not in cfg:
+            cfg[key] = value
+            changed = True
+
+    if changed:
+        try:
+            os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+            with open(CONFIG_PATH, "w") as f:
+                json.dump(cfg, f, indent=2)
+            logging.info("🔧 Konfiguration automatisch aktualisiert (neue Defaults ergänzt).")
+        except Exception as e:
+            logging.error(f"Konfiguration konnte nicht geschrieben werden: {e}")
+
+    return cfg
+
 
 config = load_config()
 last_config_mtime = os.path.getmtime(CONFIG_PATH)

@@ -12,6 +12,22 @@ LOG_DIR = os.path.join(BASE_DIR, "logs")
 SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
 NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
 
+# 🔧 Standard-Konfiguration – wird mit lokaler config.json gemerged
+DEFAULT_CONFIG = {
+    "MESSINTERVAL": 5,
+    "ADMIN_PIN": 1234,
+    "INFLUX_URL": "",
+    "INFLUX_TOKEN": "",
+    "INFLUX_ORG": "",
+    "INFLUX_BUCKET": "",
+}
+
+# Kanal-spezifische Defaults generieren
+for ch in ["A0", "A1", "A2", "A3"]:
+    DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_{ch}", "LEVEL")
+    DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_{ch}", "m")
+
+
 # ===== Flask =====
 app = Flask(__name__, template_folder="templates")
 # Geheimschlüssel (für Sessions). In Produktion in ENV legen!
@@ -43,8 +59,40 @@ def save_names(data):
         
 
 def load_config():
-    with open(CONFIG_PATH, "r") as f:
-        return json.load(f)
+    # Leere Basis
+    cfg = {}
+
+    # 1️⃣ Lokale config.json einlesen (wenn vorhanden)
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, "r") as f:
+                cfg = json.load(f)
+        except Exception as e:
+            # Notfall: kaputte Datei -> mit leerem Dict weitermachen
+            print(f"Warnung: Konnte config.json nicht lesen: {e}")
+
+    # 2️⃣ Defaults ergänzen
+    changed = False
+    for key, value in DEFAULT_CONFIG.items():
+        if key not in cfg:
+            cfg[key] = value
+            changed = True
+
+    # 3️⃣ (Optional) Ungültige Keys aufräumen:
+    # allowed_keys = set(DEFAULT_CONFIG.keys()) | {k for k in cfg.keys() if k.startswith("NAME_")}
+    # for key in list(cfg.keys()):
+    #     if key not in allowed_keys:
+    #         cfg.pop(key)
+    #         changed = True
+
+    # 4️⃣ Wenn sich was geändert hat -> wieder speichern
+    if changed:
+        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+        with open(CONFIG_PATH, "w") as f:
+            json.dump(cfg, f, indent=2)
+
+    return cfg
+
 
 def save_config(cfg: dict):
     with open(CONFIG_PATH, "w") as f:
