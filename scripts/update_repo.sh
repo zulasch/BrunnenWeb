@@ -4,6 +4,7 @@
 # ============================================================
 # Dieses Skript aktualisiert den Brunnen-Code aus GitHub
 # und startet anschließend den Systemd-Service neu. 
+#
 # ============================================================
 
 BASE_DIR="/opt/brunnen_web"
