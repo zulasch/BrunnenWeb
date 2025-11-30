@@ -37,10 +37,15 @@ DEFAULT_CONFIG = {
     "INFLUX_BUCKET": "",
 }
 
-for ch in ["A0", "A1", "A2", "A3"]:
-    DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_{ch}", "LEVEL")
-    DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_{ch}", "m")
-    DEFAULT_CONFIG.setdefault(f"TEST123_{ch}", "m")
+# Kanal-spezifische Defaults generieren
+#for ch in ["A0", "A1", "A2", "A3"]:
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A0", "LEVEL")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A0", "m")
+DEFAULT_CONFIG.setdefault(f"TEST123_A0", "m")
+
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A1", "LEVEL")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A1", "m")
+DEFAULT_CONFIG.setdefault(f"TEST456_A1", "m")
 
 logging.basicConfig(
     level=logging.INFO,
