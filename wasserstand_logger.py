@@ -39,13 +39,40 @@ DEFAULT_CONFIG = {
 
 # Kanal-spezifische Defaults generieren
 #for ch in ["A0", "A1", "A2", "A3"]:
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A0", "LEVEL")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A0", "m")
-DEFAULT_CONFIG.setdefault(f"TEST123_A0", "m")
 
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A1", "LEVEL")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A1", "m")
-DEFAULT_CONFIG.setdefault(f"TEST456_A1", "m")
+DEFAULT_CONFIG.setdefault(f"NAME_A0", "Nordbrunnen ABC")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A0", "m")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A0", "LEVEL")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A0", 0.0,)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A0", 3.0)
+DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A0", 100.0)
+DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A0", 25.0)
+DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A0", 100.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A0", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A1", "Pumpentemperatur")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A1", "°C")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A1", "TEMP")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A1", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A1", 3.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A1", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A2", "Pumpendurchfluss")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A2", "m3/h")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A2", "FLOW")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A2", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A2", 3.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A2", 150.0)
+
+DEFAULT_CONFIG.setdefault(f"NAME_A3", "reserve")
+DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A3", "m")
+DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A3", "LEVEL")
+DEFAULT_CONFIG.setdefault(f"WERT_4mA_A3", 0.0)
+DEFAULT_CONFIG.setdefault(f"WERT_20mA_A3", 3.0)
+DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A3", 100.0)
+DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A3", 15.0)
+DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A3", 00.0)
+DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A3", 150.0)
 
 logging.basicConfig(
     level=logging.INFO,
