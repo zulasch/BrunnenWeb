@@ -8,7 +8,7 @@
 # ============================================================
 
 BASE_DIR="/opt/brunnen_web"
-SERVICE="brunnen_web.service brunnen_logger.service"
+SERVICE="brunnen_web.service brunnen_logger.service brunnen_display.service"
 USER="brunnen"
 LOG="$BASE_DIR/logs/update.log"
 
@@ -39,6 +39,36 @@ if [ -d "$BASE_DIR/venv" ]; then
   source "$BASE_DIR/venv/bin/activate"
   pip install -r "$BASE_DIR/requirements.txt" >>"$LOG" 2>&1
 fi
+
+# ------------------------------------------------------------
+# 🧩 Systemd Units deployen (z.B. Display-Service)
+# ------------------------------------------------------------
+SYSTEMD_DIR="/etc/systemd/system"
+UNITS=(
+  "brunnen_display.service"
+)
+
+for unit in "${UNITS[@]}"; do
+  SRC="$BASE_DIR/deploy/systemd/$unit"
+  DST="$SYSTEMD_DIR/$unit"
+
+  if [ -f "$SRC" ]; then
+    echo "🔧 Deploy systemd unit: $unit" | tee -a "$LOG"
+    sudo cp "$SRC" "$DST"
+    sudo chmod 644 "$DST"
+  else
+    echo "⚠️ Unit nicht gefunden im Repo: $SRC" | tee -a "$LOG"
+  fi
+done
+
+sudo systemctl daemon-reload
+
+# Unit beim Boot aktivieren (idempotent)
+sudo systemctl enable brunnen_display.service >>"$LOG" 2>&1
+
+# Optional: direkt neu starten, wenn sie existiert
+sudo systemctl restart brunnen_display.service >>"$LOG" 2>&1
+
 
 # Service neu starten
 # Service-Neustart verzögern (3 Sekunden nach Abschluss)

@@ -1,0 +1,15 @@
+[Unit]
+Description=Brunnen OLED Display Controller
+After=network.target
+
+[Service]
+User=brunnen
+Group=brunnen
+WorkingDirectory=/opt/brunnen_web
+ExecStart=/opt/brunnen_web/venv/bin/python /opt/brunnen_web/display_controller.py
+Restart=always
+Environment="PATH=/opt/brunnen_web/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+StandardError=append:/opt/brunnen_web/logs/display.err.log
+
+[Install]
+WantedBy=multi-user.target
