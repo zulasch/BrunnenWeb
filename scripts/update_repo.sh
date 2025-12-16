@@ -8,7 +8,7 @@
 # ============================================================
 
 BASE_DIR="/opt/brunnen_web"
-SERVICE="brunnen_web.service brunnen_logger.service"
+SERVICE="brunnen_web.service brunnen_logger.service brunnen_display.service"
 USER="brunnen"
 LOG="$BASE_DIR/logs/update.log"
 

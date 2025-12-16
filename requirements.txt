@@ -6,3 +6,4 @@ adafruit-blinka
 RPi.GPIO
 gunicorn
 lgpio
+luma.oled
