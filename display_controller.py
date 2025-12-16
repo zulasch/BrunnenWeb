@@ -18,8 +18,12 @@ DB_PATH     = os.path.join(BASE_DIR, "data", "offline_cache.db")
 # --- GPIO Button ---
 BUTTON_GPIO = 16  # Pin 36
 chip = lgpio.gpiochip_open(0)
-lgpio.gpio_claim_input(chip, BUTTON_GPIO)
-lgpio.gpio_set_pull_up_down(chip, BUTTON_GPIO, lgpio.SET_PULL_UP)
+lgpio.gpio_claim_input(
+    chip,
+    BUTTON_GPIO,
+    lgpio.SET_PULL_UP
+)
+
 
 # --- OLED ---
 I2C_ADDR = 0x3C
