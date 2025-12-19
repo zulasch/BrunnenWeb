@@ -342,8 +342,14 @@ def send_to_influx(data_list):
                         .tag("type",   sensor_type)
                         .tag("unit",   unit)
                         .time(entry["timestamp"], WritePrecision.S)
-                        .field("Strom_in_mA", float(entry["current_mA"]))
                     )
+
+                    current_ma = entry.get("current_mA")
+                    if current_ma is not None:
+                        try:
+                            p = p.field("Strom_in_mA", float(current_ma))
+                        except Exception:
+                            logging.warning(f"⚠️ Stromfeld übersprungen (channel {entry.get('channel')}): {current_ma}")
 
                     if sensor_type == "LEVEL":
                         p = (
