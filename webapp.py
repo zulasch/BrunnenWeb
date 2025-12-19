@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, json, socket, subprocess, functools, time
+from pathlib import Path
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash
 import mosfet_control
 from datetime import datetime
@@ -20,6 +21,7 @@ DEFAULT_CONFIG = {
     "INFLUX_TOKEN": "",
     "INFLUX_ORG": "",
     "INFLUX_BUCKET": "",
+    "LOG_LEVEL": "ERROR",
 }
 
 # Kanal-spezifische Defaults generieren
@@ -130,6 +132,14 @@ def save_config(cfg: dict):
     with open(CONFIG_PATH, "w") as f:
         json.dump(cfg, f, indent=2)
 
+def signal_config_update():
+    BASE_DATA_DIR = os.path.join(BASE_DIR, "data")
+    FLAG_FILE = os.path.join(BASE_DATA_DIR, "config_update.flag")
+    LAST_UPDATE_FILE = os.path.join(BASE_DATA_DIR, "last_config_update")
+    Path(BASE_DATA_DIR).mkdir(exist_ok=True)
+    Path(FLAG_FILE).touch()
+    return Path(LAST_UPDATE_FILE).exists()
+
 def get_ip():
     try:
         return subprocess.check_output(["hostname", "-I"]).decode().split()[0]
@@ -220,8 +230,6 @@ def index():
 
     return render_template("index.html", config=cfg, descriptions=descriptions, title="Messsystem")
 
-from pathlib import Path
-
 @app.route("/update", methods=["POST"])
 @login_required
 def update_config():
@@ -244,19 +252,9 @@ def update_config():
 
         save_config(cfg)
 
-        # 🔔 Signal an Logger: neue Konfiguration liegt vor
-        BASE_DATA_DIR = os.path.join(BASE_DIR, "data")
-        FLAG_FILE = os.path.join(BASE_DATA_DIR, "config_update.flag")
-        LAST_UPDATE_FILE = os.path.join(BASE_DATA_DIR, "last_config_update")
-
-        Path(BASE_DATA_DIR).mkdir(exist_ok=True)
-        Path(FLAG_FILE).touch()
-
-        # 🔍 Prüfen, ob Logger wirklich reagiert hat
-        if Path(LAST_UPDATE_FILE).exists():
-                    return jsonify({"success": True, "message": "✅ Änderungen gespeichert und aktiv im Messsystem."})
-        else:
-            return jsonify({"success": True, "message": "💾 Gespeichert"})
+        if signal_config_update():
+            return jsonify({"success": True, "message": "✅ Änderungen gespeichert und aktiv im Messsystem."})
+        return jsonify({"success": True, "message": "💾 Gespeichert"})
 
     except Exception as e:
         app.logger.exception("Fehler beim Speichern der Konfiguration:")
@@ -420,10 +418,39 @@ def logs_page():
         "Logger": os.path.join(LOG_DIR, "logger.err.log")
         #"Webapp": os.path.join(LOG_DIR, "webapp.log")
     }
+    cfg = load_config()
+    current_level = str(cfg.get("LOG_LEVEL", "ERROR")).upper()
     chosen = request.args.get("file","Service")
     path = files.get(chosen, list(files.values())[0])
     content = tail_file(path, lines=30)
-    return render_template("logs.html", files=list(files.keys()), chosen=chosen, content=content, title="Logs")
+    return render_template(
+        "logs.html",
+        files=list(files.keys()),
+        chosen=chosen,
+        content=content,
+        current_level=current_level,
+        title="Logs"
+    )
+
+@app.route("/logs/level", methods=["POST"])
+@login_required
+def set_log_level():
+    allowed = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+    level = str(request.form.get("level", "")).upper()
+
+    if level not in allowed:
+        return jsonify({"success": False, "message": "Ungültiges Logging-Level."}), 400
+
+    cfg = load_config()
+    cfg["LOG_LEVEL"] = level
+    save_config(cfg)
+    active = signal_config_update()
+
+    message = f"Logging-Level auf {level} gesetzt."
+    if active:
+        message += " Logger übernimmt die Einstellung in wenigen Sekunden."
+
+    return jsonify({"success": True, "message": message, "level": level})
 
 @app.route("/database", methods=["GET", "POST"])
 @login_required

@@ -15,6 +15,14 @@ from adafruit_ads1x15 import ads1x15
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
+LOG_LEVELS = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
+}
+
 # ============================================================
 # 🔧 GRUNDEINSTELLUNGEN
 # ============================================================
@@ -35,6 +43,7 @@ DEFAULT_CONFIG = {
     "INFLUX_TOKEN": "",
     "INFLUX_ORG": "",
     "INFLUX_BUCKET": "",
+    "LOG_LEVEL": "ERROR",
 }
 
 # Kanal-spezifische Defaults generieren
@@ -80,6 +89,15 @@ logging.basicConfig(
     handlers=[logging.FileHandler(LOGFILE), logging.StreamHandler()]
 )
 
+
+def apply_logging_level(level_name: str):
+    level = LOG_LEVELS.get(str(level_name).upper(), logging.ERROR)
+    root_logger = logging.getLogger()
+    root_logger.setLevel(level)
+    for handler in root_logger.handlers:
+        handler.setLevel(level)
+    return level
+
 # ============================================================
 # ⚙️ KONFIGURATION LADEN
 # ============================================================
@@ -112,6 +130,7 @@ def load_config():
 
 
 config = load_config()
+apply_logging_level(config.get("LOG_LEVEL", "ERROR"))
 last_config_mtime = os.path.getmtime(CONFIG_PATH)
 
 # Initiale Defaults (werden pro Kanal übersteuert)
@@ -153,6 +172,7 @@ def reload_config_if_changed():
             INFLUX_ORG         = config.get("INFLUX_ORG", INFLUX_ORG)
             INFLUX_BUCKET      = config.get("INFLUX_BUCKET", INFLUX_BUCKET)
             last_config_mtime  = current_mtime
+            apply_logging_level(config.get("LOG_LEVEL", "ERROR"))
     except Exception as e:
         logging.error(f"Fehler beim Neuladen der Config: {e}")
 
