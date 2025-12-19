@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-xl font-bold mb-4">🪵 Logs</h2>
+<h2 class="text-xl font-bold mb-4">Logs</h2>
+
+<div class="bg-white shadow rounded p-4 mb-4">
+  <h3 class="font-semibold mb-2">Logging-Level für den Logger</h3>
+  <p class="text-sm text-gray-600 mb-3">Aktuell: <span id="logLevelCurrent" class="font-semibold">{{ current_level }}</span></p>
+  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+    <select id="logLevelSelect" class="border p-2 rounded">
+      <option value="ERROR" {% if current_level == "ERROR" %}selected{% endif %}>Nur Fehler</option>
+      <option value="WARNING" {% if current_level == "WARNING" %}selected{% endif %}>Warnungen + Fehler</option>
+      <option value="INFO" {% if current_level == "INFO" %}selected{% endif %}>Infos</option>
+      <option value="DEBUG" {% if current_level == "DEBUG" %}selected{% endif %}>Debug</option>
+    </select>
+    <button type="button" onclick="updateLogLevel()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Logging speichern</button>
+    <span id="logLevelStatus" class="text-sm text-gray-600"></span>
+  </div>
+</div>
 
 <form class="mb-4">
   <label class="mr-2">Datei:</label>
@@ -12,4 +27,28 @@
 </form>
 
 <pre class="bg-black text-green-400 p-4 rounded overflow-auto" style="max-height: 70vh;">{{ content }}</pre>
+<script>
+async function updateLogLevel() {
+  const select = document.getElementById("logLevelSelect");
+  const status = document.getElementById("logLevelStatus");
+  const current = document.getElementById("logLevelCurrent");
+  status.textContent = "Speichere...";
+  try {
+    const res = await fetch("/logs/level", {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: `level=${encodeURIComponent(select.value)}`
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      current.textContent = data.level || select.value;
+      status.textContent = data.message || "Gespeichert.";
+    } else {
+      status.textContent = data.message || "Fehler beim Speichern.";
+    }
+  } catch (err) {
+    status.textContent = `Fehler: ${err}`;
+  }
+}
+</script>
 {% endblock %}
