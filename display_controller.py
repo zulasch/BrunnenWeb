@@ -33,8 +33,8 @@ device = sh1106(serial, width=128, height=64, rotate=0)
 # Optional: schmale Default-Font (Pillow)
 font = ImageFont.load_default()
 
-CHANNEL_ORDER = ["A0", "A1", "A2", "A3"]
-CHANNEL_ORDER.append("BMP280")
+BASE_CHANNELS = ["A0", "A1", "A2", "A3"]
+CHANNEL_ORDER = list(BASE_CHANNELS)
 channel_idx = -1
 
 display_on = False
@@ -201,6 +201,15 @@ def format_value_by_type(sensor_type, row):
     return "Messwert: --"
 
 
+def available_channels(cfg, measurements):
+    """Stellt Kanäle zusammen, BMP280 nur wenn aktiviert und Messung vorhanden."""
+    chans = list(BASE_CHANNELS)
+    has_bmp = cfg.get("BMP280_ENABLED") and any(r.get("channel") == "BMP280" for r in measurements)
+    if has_bmp:
+        chans.append("BMP280")
+    return chans
+
+
 
 def draw_screen(ch, row, sensor_type):
     with canvas(device) as draw:
@@ -236,6 +245,13 @@ def main():
     while True:
         now = time.time()
         state = lgpio.gpio_read(chip, BUTTON_GPIO)
+        cfg = load_config()
+        measurements = read_latest_measurements()
+        current_channels = available_channels(cfg, measurements)
+        if not current_channels:
+            current_channels = list(BASE_CHANNELS)
+        if channel_idx >= len(current_channels):
+            channel_idx = 0
 
         # fallende Flanke (1 -> 0)
         if last_state == 1 and state == 0:
@@ -245,20 +261,17 @@ def main():
 
                 oled_show()
                 # Kanal weiterschalten
-                channel_idx = (channel_idx + 1) % len(CHANNEL_ORDER)
+                channel_idx = (channel_idx + 1) % len(current_channels)
 
         last_state = state
 
         # Wenn Display an: aktualisieren
         if display_on:
-            measurements = read_latest_measurements()
-
             # Kanal bestimmen
-            ch = CHANNEL_ORDER[channel_idx]
+            ch = current_channels[channel_idx]
             row = get_channel_data(measurements, ch)
 
             # 🔹 Punkt 4: Config laden + Sensortyp ermitteln
-            cfg = load_config()
             sensor_type = get_sensor_type(cfg, ch)
 
             # 🔹 Neue Anzeige (4 Zeilen)

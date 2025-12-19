@@ -135,6 +135,22 @@ def save_config(cfg: dict):
     with open(CONFIG_PATH, "w") as f:
         json.dump(cfg, f, indent=2)
 
+def validate_config(cfg: dict):
+    errors = []
+    try:
+        if float(cfg.get("MESSINTERVAL", 1)) <= 0:
+            errors.append("MESSINTERVAL muss > 0 sein.")
+    except Exception:
+        errors.append("MESSINTERVAL ist ungültig.")
+
+    try:
+        addr = int(str(cfg.get("BMP280_ADDRESS", 0x76)), 0)
+        if addr not in (0x76, 0x77):
+            errors.append("BMP280_ADDRESS muss 0x76 oder 0x77 sein.")
+    except Exception:
+        errors.append("BMP280_ADDRESS ist ungültig.")
+    return errors
+
 def signal_config_update():
     BASE_DATA_DIR = os.path.join(BASE_DIR, "data")
     FLAG_FILE = os.path.join(BASE_DATA_DIR, "config_update.flag")
@@ -245,7 +261,7 @@ def update_config():
 
         # Felder, die immer als Text behandelt werden sollen
         string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS"]
-        bool_keys = ["BMP280_ENABLED"]
+        bool_keys = set(["BMP280_ENABLED"] + [k for k in cfg.keys() if k.endswith("_ENABLED")])
 
         for key, value in data.items():
             if key in cfg:
@@ -263,6 +279,10 @@ def update_config():
                         cfg[key] = float(value)
                     except ValueError:
                         cfg[key] = value
+
+        errors = validate_config(cfg)
+        if errors:
+            return jsonify({"success": False, "message": "; ".join(errors)}), 400
 
         save_config(cfg)
 
