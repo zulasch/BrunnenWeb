@@ -325,7 +325,12 @@ def send_to_influx(data_list):
                     sensor_type = str(entry.get("type", "LEVEL")).upper()
                     unit        = entry.get("unit", "")
                     sensor_name = cfg.get(f"NAME_{entry.get('channel','A0')}", entry.get("name", entry.get("channel","A0")))
-                    value       = float(entry.get("value", entry.get("level_m", 0.0)))
+                    value_raw   = entry.get("value", entry.get("level_m"))
+                    try:
+                        value = float(value_raw)
+                    except Exception:
+                        logging.warning(f"⚠️ Überspringe Punkt {entry.get('channel')}: kein numerischer Wert ({value_raw})")
+                        continue
 
                     p = (
                         Point("wasserstand")   # Messname kannst du lassen
@@ -352,8 +357,11 @@ def send_to_influx(data_list):
                     elif sensor_type == "PRESSURE":
                         p = p.field("Luftdruck_hPa", value)
                         temp = entry.get("temperature_C")
-                        if temp is not None:
-                            p = p.field("Temperatur", float(temp))
+                        try:
+                            if temp is not None:
+                                p = p.field("Temperatur", float(temp))
+                        except Exception:
+                            logging.warning(f"⚠️ Temperaturfeld für BMP280 übersprungen: {temp}")
                     else:
                         # Fallback für sonstige Sensoren
                         p = p.field("Messwert", value)
