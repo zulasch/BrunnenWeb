@@ -142,7 +142,6 @@ def load_config():
 
 config = load_config()
 apply_logging_level(config.get("LOG_LEVEL", "ERROR"))
-setup_bmp280(config)
 last_config_mtime = os.path.getmtime(CONFIG_PATH)
 
 # Initiale Defaults (werden pro Kanal übersteuert)
@@ -265,6 +264,9 @@ def read_bmp280(cfg):
     except Exception as e:
         logging.error(f"Fehler beim Lesen des BMP280: {e}")
         return None
+
+# Initiales BMP280-Setup nach I2C-Initialisierung
+setup_bmp280(config)
 
 # ============================================================
 # 📨 OFFLINE-QUEUE HELFER
