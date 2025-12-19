@@ -7,6 +7,10 @@
   "INFLUX_ORG": "",
   "INFLUX_BUCKET": "",
 
+  "BMP280_ENABLED": true,
+  "BMP280_ADDRESS": 118,
+  "NAME_BMP280": "Barometer",
+
   "NAME_A0": "",
   "SENSOR_TYP_A0": "LEVEL",
   "SENSOR_EINHEIT_A0": "m",

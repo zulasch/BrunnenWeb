@@ -3,6 +3,7 @@ psutil
 influxdb-client
 adafruit-circuitpython-ads1x15
 adafruit-blinka
+adafruit-circuitpython-bmp280
 RPi.GPIO
 gunicorn
 lgpio

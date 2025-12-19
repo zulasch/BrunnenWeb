@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Barometer (BMP280)</h2>
+
+<div class="bg-white rounded-xl shadow p-6 space-y-4">
+  <div>
+    <p class="text-gray-600 text-sm">Zeitstempel</p>
+    <p id="baroTimestamp" class="text-lg font-semibold">-</p>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="border rounded-lg p-4">
+      <p class="text-gray-600 text-sm">Luftdruck</p>
+      <p id="baroPressure" class="text-3xl font-bold text-blue-700">-</p>
+    </div>
+    <div class="border rounded-lg p-4">
+      <p class="text-gray-600 text-sm">Temperatur</p>
+      <p id="baroTemp" class="text-3xl font-bold text-amber-700">-</p>
+    </div>
+  </div>
+  <div>
+    <p class="text-gray-600 text-sm">Name</p>
+    <p id="baroName" class="text-lg font-semibold">-</p>
+  </div>
+  <div id="baroStatus" class="text-sm text-gray-600"></div>
+</div>
+
+<script>
+async function loadBarometer() {
+  const tsEl = document.getElementById("baroTimestamp");
+  const pEl = document.getElementById("baroPressure");
+  const tEl = document.getElementById("baroTemp");
+  const nEl = document.getElementById("baroName");
+  const status = document.getElementById("baroStatus");
+  status.textContent = "Aktualisiere...";
+
+  try {
+    const res = await fetch("{{ url_for('barometer_api') }}");
+    const data = await res.json();
+    if (!res.ok || !data || data.error) {
+      status.textContent = data.error || "Keine Daten vorhanden.";
+      tsEl.textContent = pEl.textContent = tEl.textContent = nEl.textContent = "-";
+      return;
+    }
+    const pressure = data.value ?? data.level_m;
+    const temp = data.temperature_C;
+    tsEl.textContent = data.timestamp ? new Date(data.timestamp).toLocaleString() : "-";
+    pEl.textContent = pressure != null ? `${Number(pressure).toFixed(1)} hPa` : "-";
+    tEl.textContent = temp != null ? `${Number(temp).toFixed(1)} °C` : "-";
+    nEl.textContent = data.name || data.channel || "BMP280";
+    status.textContent = "Letzte Aktualisierung erfolgreich.";
+  } catch (err) {
+    status.textContent = `Fehler: ${err}`;
+  }
+}
+
+loadBarometer();
+setInterval(loadBarometer, 5000);
+</script>
+{% endblock %}

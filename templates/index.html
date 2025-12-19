@@ -20,6 +20,29 @@
   {% endfor %}
 </div>
 
+<!-- BMP280 Barometer -->
+<div class="bg-white p-6 rounded-xl shadow mb-6">
+  <h2 class="text-xl font-bold mb-4">🌡️ Barometer (BMP280)</h2>
+  <div class="mb-4">
+    <label class="block font-semibold text-gray-700 mb-1">BMP280_ENABLED</label>
+    <select name="BMP280_ENABLED" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none">
+      <option value="True" {% if config.get("BMP280_ENABLED") %}selected{% endif %}>Aktiviert</option>
+      <option value="False" {% if not config.get("BMP280_ENABLED") %}selected{% endif %}>Deaktiviert</option>
+    </select>
+    <p class="text-gray-500 text-sm mt-1">{{ descriptions.get("BMP280_ENABLED") }}</p>
+  </div>
+  <div class="mb-4">
+    <label class="block font-semibold text-gray-700 mb-1">BMP280_ADDRESS</label>
+    <input name="BMP280_ADDRESS" value="{{ config.get('BMP280_ADDRESS', '0x76') }}" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none" />
+    <p class="text-gray-500 text-sm mt-1">{{ descriptions.get("BMP280_ADDRESS") }}</p>
+  </div>
+  <div class="mb-4">
+    <label class="block font-semibold text-gray-700 mb-1">NAME_BMP280</label>
+    <input name="NAME_BMP280" value="{{ config.get('NAME_BMP280', 'Barometer') }}" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none" />
+    <p class="text-gray-500 text-sm mt-1">{{ descriptions.get("NAME_BMP280") }}</p>
+  </div>
+</div>
+
 <!-- Analoge Kanäle -->
 {% set colors = ["bg-blue-50", "bg-green-50", "bg-yellow-50", "bg-purple-50"] %}
 {% for channel in ["A0", "A1", "A2", "A3"] %}

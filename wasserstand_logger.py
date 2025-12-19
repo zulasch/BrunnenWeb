@@ -14,6 +14,7 @@ from adafruit_ads1x15.analog_in import AnalogIn
 from adafruit_ads1x15 import ads1x15
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
+from adafruit_bmp280 import Adafruit_BMP280_I2C
 
 LOG_LEVELS = {
     "DEBUG": logging.DEBUG,
@@ -44,6 +45,9 @@ DEFAULT_CONFIG = {
     "INFLUX_ORG": "",
     "INFLUX_BUCKET": "",
     "LOG_LEVEL": "ERROR",
+    "BMP280_ENABLED": True,
+    "BMP280_ADDRESS": 0x76,
+    "NAME_BMP280": "Barometer",
 }
 
 # Kanal-spezifische Defaults generieren
@@ -117,6 +121,13 @@ def load_config():
             cfg[key] = value
             changed = True
 
+    # Typen sicherstellen
+    cfg["BMP280_ENABLED"] = str(cfg.get("BMP280_ENABLED", True)).lower() in ("1", "true", "yes", "on")
+    try:
+        cfg["BMP280_ADDRESS"] = int(str(cfg.get("BMP280_ADDRESS", 0x76)), 0)
+    except Exception:
+        cfg["BMP280_ADDRESS"] = 0x76
+
     if changed:
         try:
             os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
@@ -131,6 +142,7 @@ def load_config():
 
 config = load_config()
 apply_logging_level(config.get("LOG_LEVEL", "ERROR"))
+setup_bmp280(config)
 last_config_mtime = os.path.getmtime(CONFIG_PATH)
 
 # Initiale Defaults (werden pro Kanal übersteuert)
@@ -173,6 +185,7 @@ def reload_config_if_changed():
             INFLUX_BUCKET      = config.get("INFLUX_BUCKET", INFLUX_BUCKET)
             last_config_mtime  = current_mtime
             apply_logging_level(config.get("LOG_LEVEL", "ERROR"))
+            setup_bmp280(config)
     except Exception as e:
         logging.error(f"Fehler beim Neuladen der Config: {e}")
 
@@ -205,6 +218,53 @@ channels = {
     "A2": AnalogIn(ads, ads1x15.Pin.A2),
     "A3": AnalogIn(ads, ads1x15.Pin.A3),
 }
+
+bmp280_sensor = None
+
+def parse_i2c_address(value, default=0x76):
+    try:
+        return int(str(value), 0)
+    except Exception:
+        return default
+
+def setup_bmp280(cfg):
+    """Initialisiere BMP280, falls aktiviert und erreichbar."""
+    global bmp280_sensor
+    if not cfg.get("BMP280_ENABLED", True):
+        bmp280_sensor = None
+        return
+    address = parse_i2c_address(cfg.get("BMP280_ADDRESS", 0x76))
+    try:
+        bmp280_sensor = Adafruit_BMP280_I2C(i2c, address=address)
+    except Exception as e:
+        bmp280_sensor = None
+        logging.warning(f"BMP280 nicht verfügbar: {e}")
+
+def read_bmp280(cfg):
+    if not bmp280_sensor:
+        return None
+    try:
+        pressure = float(bmp280_sensor.pressure)  # hPa
+        temperature = float(bmp280_sensor.temperature)  # °C
+        timestamp = datetime.now(UTC).isoformat()
+        name = cfg.get("NAME_BMP280", "BMP280")
+        return {
+            "channel": "BMP280",
+            "timestamp": timestamp,
+            "current_mA": None,
+            "level_m": pressure,
+            "wasser_oberflaeche_m": 0.0,
+            "messwert_NN": 0.0,
+            "pegel_diff": 0.0,
+            "name": name,
+            "type": "PRESSURE",
+            "unit": "hPa",
+            "value": pressure,
+            "temperature_C": temperature,
+        }
+    except Exception as e:
+        logging.error(f"Fehler beim Lesen des BMP280: {e}")
+        return None
 
 # ============================================================
 # 📨 OFFLINE-QUEUE HELFER
@@ -287,6 +347,11 @@ def send_to_influx(data_list):
                         p = p.field("Temperatur", value)
                     elif sensor_type == "FLOW":
                         p = p.field("Durchfluss", value)
+                    elif sensor_type == "PRESSURE":
+                        p = p.field("Luftdruck_hPa", value)
+                        temp = entry.get("temperature_C")
+                        if temp is not None:
+                            p = p.field("Temperatur", float(temp))
                     else:
                         # Fallback für sonstige Sensoren
                         p = p.field("Messwert", value)
@@ -407,6 +472,12 @@ try:
 
             except Exception as e:
                 logging.error(f"❌ Fehler bei Kanal {ch_name}: {e}")
+
+        # BMP280 Barometer einlesen (optional)
+        bmp_entry = read_bmp280(config)
+        if bmp_entry:
+            queue_insert(bmp_entry)
+            all_data.append(bmp_entry)
 
 
         # Für Web-GUI letzte Messungen sichern

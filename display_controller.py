@@ -34,6 +34,7 @@ device = sh1106(serial, width=128, height=64, rotate=0)
 font = ImageFont.load_default()
 
 CHANNEL_ORDER = ["A0", "A1", "A2", "A3"]
+CHANNEL_ORDER.append("BMP280")
 channel_idx = -1
 
 display_on = False
@@ -51,6 +52,8 @@ def load_config():
 
 def get_sensor_type(cfg, ch):
     # ch z.B. "A0"
+    if ch == "BMP280":
+        return "PRESSURE"
     return (cfg.get(f"SENSOR_TYP_{ch}", "ANALOG") or "ANALOG").strip().upper()
 
 def systemctl_is_active(unit: str) -> bool:
@@ -154,6 +157,7 @@ SENSOR_LABELS = {
     "LEVEL":  "Wasserlevel",
     "TEMP":   "Temperatur",
     "FLOW":   "Durchfluss",
+    "PRESSURE": "Luftdruck",
     "ANALOG": "Analog"
 }
 
@@ -179,6 +183,16 @@ def format_value_by_type(sensor_type, row):
     if st == "FLOW":
         # aktuell kommt Durchfluss (noch) nicht als eigenes Feld -> nutze level_m
         return f"Messwert: {v:.2f} L/min" if isinstance(v, (int, float)) else "Messwert: --"
+
+    if st == "PRESSURE":
+        pressure = row.get("value", row.get("level_m"))
+        temp = row.get("temperature_C")
+        if isinstance(pressure, (int, float)):
+            base = f"Druck: {pressure:.1f} hPa"
+            if isinstance(temp, (int, float)):
+                base += f" {temp:.1f}C"
+            return base
+        return "Messwert: --"
 
     if st == "ANALOG":
         ma = row.get("current_mA")

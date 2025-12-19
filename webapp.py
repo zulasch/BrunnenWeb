@@ -22,6 +22,9 @@ DEFAULT_CONFIG = {
     "INFLUX_ORG": "",
     "INFLUX_BUCKET": "",
     "LOG_LEVEL": "ERROR",
+    "BMP280_ENABLED": True,
+    "BMP280_ADDRESS": 0x76,
+    "NAME_BMP280": "Barometer",
 }
 
 # Kanal-spezifische Defaults generieren
@@ -212,7 +215,10 @@ def index():
         "WERT_20mA": "Messwert bei 20 mA (obere Grenze).",
         "MESSWERT_NN": "Geländehöhe über NN [m].",
         "MESSINTERVAL": "Messintervall [s].",
-        "ADMIN_PIN": "PIN für Web-Login (4–8 Ziffern)."
+        "ADMIN_PIN": "PIN für Web-Login (4-8 Ziffern).",
+        "BMP280_ENABLED": "BMP280 Barometer aktivieren/deaktivieren.",
+        "BMP280_ADDRESS": "I2C-Adresse des BMP280 (Standard 0x76).",
+        "NAME_BMP280": "Anzeigename für das Barometer.",
     }
 
 
@@ -239,10 +245,18 @@ def update_config():
 
         # Felder, die immer als Text behandelt werden sollen
         string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS"]
+        bool_keys = ["BMP280_ENABLED"]
 
         for key, value in data.items():
             if key in cfg:
-                if key in string_keys:
+                if key in bool_keys:
+                    cfg[key] = str(value).lower() in ("1", "true", "yes", "on")
+                elif key == "BMP280_ADDRESS":
+                    try:
+                        cfg[key] = int(str(value), 0)
+                    except Exception:
+                        cfg[key] = value
+                elif key in string_keys:
                     cfg[key] = value.strip()
                 else:
                     try:
@@ -485,7 +499,7 @@ def measurements_page():
     # Pfad zur temporären Datei, die der Logger schreiben soll
     data_file = os.path.join(BASE_DIR, "data", "latest_measurement.json")
     data = {
-        "timestamp": "—",
+        "timestamp": "-",
         "voltage_V": 0,
         "current_mA": 0,
         "depth_m": 0,
@@ -514,6 +528,40 @@ def measurements_api():
         except Exception as e:
             return jsonify({"error": str(e)})
     return jsonify({"error": "Keine Messdaten gefunden"})
+
+
+def load_latest_measurements():
+    data_file = os.path.join(BASE_DIR, "data", "latest_measurement.json")
+    if not os.path.exists(data_file):
+        return []
+    try:
+        with open(data_file, "r") as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+def get_bmp280_entry():
+    measurements = load_latest_measurements()
+    for entry in measurements:
+        if entry.get("channel") == "BMP280" or str(entry.get("type","")).upper() == "PRESSURE":
+            return entry
+    return None
+
+
+@app.route("/barometer")
+@login_required
+def barometer_page():
+    entry = get_bmp280_entry()
+    return render_template("barometer.html", data=entry, title="Barometer")
+
+@app.route("/api/barometer")
+@login_required
+def barometer_api():
+    entry = get_bmp280_entry()
+    if entry:
+        return jsonify(entry)
+    return jsonify({"error": "Keine Barometerdaten vorhanden"}), 404
 
 # Systemstatus
 
