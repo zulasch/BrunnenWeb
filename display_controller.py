@@ -40,6 +40,19 @@ display_on = False
 last_press = 0.0
 AUTO_OFF_S = 90
 
+CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
+
+def load_config():
+    try:
+        with open(CONFIG_PATH, "r") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+def get_sensor_type(cfg, ch):
+    # ch z.B. "A0"
+    return (cfg.get(f"SENSOR_TYP_{ch}", "ANALOG") or "ANALOG").strip().upper()
+
 def systemctl_is_active(unit: str) -> bool:
     try:
         out = subprocess.check_output(["systemctl", "is-active", unit], text=True).strip()
@@ -137,32 +150,66 @@ def oled_hide():
         device.hide()
         display_on = False
 
-def draw_screen(ch, row, status_code, status_msg):
+SENSOR_LABELS = {
+    "LEVEL":  "Wasserlevel",
+    "TEMP":   "Temperatur",
+    "FLOW":   "Durchfluss",
+    "ANALOG": "Analog"
+}
+
+def sensor_label(sensor_type):
+    return SENSOR_LABELS.get(sensor_type, sensor_type)
+
+def format_value_by_type(sensor_type, row):
+    if not row:
+        return "Messwert: --"
+
+    st = (sensor_type or "").upper()
+
+    # LEVEL -> Wassertiefe: bei dir ist das level_m (wird vom Logger geschrieben) 
+    if st == "LEVEL":
+        v = row.get("level_m")
+        return f"Messwert: {v:.2f} m" if isinstance(v, (int, float)) else "Messwert: --"
+
+    # TEMP -> Temperatur (Feldnamen nachziehen, wenn Logger es liefert)
+    if st == "TEMP":
+        v = row.get("temperature_c")
+        if not isinstance(v, (int, float)):
+            v = row.get("temp_c")
+        return f"Messwert: {v:.1f} °C" if isinstance(v, (int, float)) else "Messwert: --"
+
+    # FLOW -> Durchfluss (Feldnamen nachziehen, wenn Logger es liefert)
+    if st == "FLOW":
+        v = row.get("flow_l_min")
+        if isinstance(v, (int, float)):
+            return f"Messwert: {v:.2f} L/min"
+        v2 = row.get("flow_m3_h")
+        return f"Messwert: {v2:.3f} m³/h" if isinstance(v2, (int, float)) else "Messwert: --"
+
+    # ANALOG -> zeig den Rohwert (bei dir: current_mA ist vorhanden)
+    if st == "ANALOG":
+        ma = row.get("current_mA")
+        return f"Messwert: {ma:.2f} mA" if isinstance(ma, (int, float)) else "Messwert: --"
+
+    return "Messwert: --"
+
+
+def draw_screen(ch, row, sensor_type):
     with canvas(device) as draw:
-        # Header
-        name = (row.get("name") if row else ch) if row else ch
-        draw.text((0, 0), f"{ch} {name}"[:21], font=font, fill=255)
+        # 1) Kanalnummer
+        draw.text((0, 0), f"Kanal: {ch}", font=font, fill=255)
 
-        # Values
-        if row:
-            ma   = row.get("current_mA")
-            lvl  = row.get("level_m")
-            nn   = row.get("messwert_NN")
-            dlt  = row.get("pegel_diff")
-            ts   = row.get("timestamp","")
+        # 2) Kanalname (kommt bei dir aus latest_measurement.json als "name")
+        name = (row.get("name") if row else "") or ""
+        draw.text((0, 16), f"Name: {name}"[:21], font=font, fill=255)
 
-            draw.text((0, 14), f"I: {ma:5.2f} mA" if isinstance(ma,(int,float)) else "I: --", font=font, fill=255)
-            draw.text((0, 26), f"T: {lvl:5.2f} m"  if isinstance(lvl,(int,float)) else "T: --", font=font, fill=255)
-            draw.text((0, 38), f"NN:{nn:6.2f} m"   if isinstance(nn,(int,float))  else "NN: --", font=font, fill=255)
-            draw.text((0, 50), f"d:{dlt:+5.2f} m"  if isinstance(dlt,(int,float)) else "d: --", font=font, fill=255)
-        else:
-            draw.text((0, 22), "Keine Daten", font=font, fill=255)
+        # 3) Sensortyp (Label)
+        draw.text((0, 32), f"Typ: {sensor_label(sensor_type)}"[:21], font=font, fill=255)
 
-        # Status (rechts unten)
-        st = status_code
-        if status_msg:
-            st = f"{status_code}:{status_msg}"
-        draw.text((0, 56), st[:21], font=font, fill=255)
+        # 4) Messwert je nach Sensortyp
+        value_text = format_value_by_type(sensor_type, row)
+        draw.text((0, 48), value_text[:21], font=font, fill=255)
+
 
 def button_pressed() -> bool:
     # Active-low
@@ -197,14 +244,22 @@ def main():
         # Wenn Display an: aktualisieren
         if display_on:
             measurements = read_latest_measurements()
+
+            # Kanal bestimmen
             ch = CHANNEL_ORDER[channel_idx]
             row = get_channel_data(measurements, ch)
-            st_code, st_msg = compute_status(measurements)
-            draw_screen(ch, row, st_code, st_msg)
 
-            # Auto-off
+            # 🔹 Punkt 4: Config laden + Sensortyp ermitteln
+            cfg = load_config()
+            sensor_type = get_sensor_type(cfg, ch)
+
+            # 🔹 Neue Anzeige (4 Zeilen)
+            draw_screen(ch, row, sensor_type)
+
+            # Auto-Off
             if now - last_press > AUTO_OFF_S:
                 oled_hide()
+
 
         time.sleep(0.1)
 
