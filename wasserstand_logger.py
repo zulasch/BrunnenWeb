@@ -15,6 +15,7 @@ from adafruit_ads1x15 import ads1x15
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 from adafruit_bmp280 import Adafruit_BMP280_I2C
+import math
 
 LOG_LEVELS = {
     "DEBUG": logging.DEBUG,
@@ -219,6 +220,9 @@ channels = {
 }
 
 bmp280_sensor = None
+bmp_fail_count = 0
+bmp_last_init = 0.0
+bmp_last_warn = 0.0
 
 def parse_i2c_address(value, default=0x76):
     try:
@@ -228,16 +232,30 @@ def parse_i2c_address(value, default=0x76):
 
 def setup_bmp280(cfg):
     """Initialisiere BMP280, falls aktiviert und erreichbar."""
-    global bmp280_sensor
+    global bmp280_sensor, bmp_fail_count, bmp_last_init
     if not cfg.get("BMP280_ENABLED", True):
         bmp280_sensor = None
         return
     address = parse_i2c_address(cfg.get("BMP280_ADDRESS", 0x76))
     try:
         bmp280_sensor = Adafruit_BMP280_I2C(i2c, address=address)
+        bmp_fail_count = 0
+        bmp_last_init = time.time()
     except Exception as e:
         bmp280_sensor = None
         logging.warning(f"BMP280 nicht verfügbar: {e}")
+
+def bmp_plausible(pressure, temp):
+    # grobe Grenzen: Druck 300–1100 hPa, Temperatur -40..85°C (Sensor-Range)
+    if pressure is None or math.isnan(float(pressure)) or pressure < 300 or pressure > 1100:
+        return False
+    if temp is not None:
+        try:
+            if math.isnan(float(temp)) or temp < -40 or temp > 85:
+                return False
+        except Exception:
+            return False
+    return True
 
 def read_bmp280(cfg):
     if not bmp280_sensor:
@@ -247,6 +265,8 @@ def read_bmp280(cfg):
         temperature = float(bmp280_sensor.temperature)  # °C
         timestamp = datetime.now(UTC).isoformat()
         name = cfg.get("NAME_BMP280", "BMP280")
+        if not bmp_plausible(pressure, temperature):
+            return None
         return {
             "channel": "BMP280",
             "timestamp": timestamp,
@@ -262,7 +282,15 @@ def read_bmp280(cfg):
             "temperature_C": temperature,
         }
     except Exception as e:
-        logging.error(f"Fehler beim Lesen des BMP280: {e}")
+        global bmp_fail_count, bmp_last_warn
+        bmp_fail_count += 1
+        now = time.time()
+        if now - bmp_last_warn > 30:
+            logging.error(f"Fehler beim Lesen des BMP280: {e}")
+            bmp_last_warn = now
+        # versuche Neuinitialisierung nach mehreren Fehlversuchen
+        if bmp_fail_count >= 3 and (now - bmp_last_init) > 30:
+            setup_bmp280(cfg)
         return None
 
 # Initiales BMP280-Setup nach I2C-Initialisierung
@@ -335,8 +363,10 @@ def send_to_influx(data_list):
                         logging.warning(f"⚠️ Überspringe Punkt {entry.get('channel')}: kein numerischer Wert ({value_raw})")
                         continue
 
+                    measurement = "barometer" if sensor_type == "PRESSURE" else "wasserstand"
+
                     p = (
-                        Point("wasserstand")   # Messname kannst du lassen
+                        Point(measurement)
                         .tag("channel", entry.get("channel","A0"))
                         .tag("name",   sensor_name)
                         .tag("type",   sensor_type)
@@ -416,12 +446,13 @@ logging.info("🌊 Starte Mehrkanal-Messung mit Offline-Puffer...")
 try:
     while True:
         reload_config_if_changed()
+        loop_cfg = config.copy()
         all_data = []
 
         for ch_name, chan in channels.items():
             try:
                 # Kanal-Parameter aus Config lesen
-                cfg            = load_config()
+                cfg            = loop_cfg
                 sensor_type    = str(cfg.get(f"SENSOR_TYP_{ch_name}", "LEVEL")).upper()
                 unit           = str(cfg.get(f"SENSOR_EINHEIT_{ch_name}", "m" if sensor_type == "LEVEL" else "")).strip()
 
