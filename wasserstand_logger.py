@@ -325,7 +325,10 @@ def send_to_influx(data_list):
                     sensor_type = str(entry.get("type", "LEVEL")).upper()
                     unit        = entry.get("unit", "")
                     sensor_name = cfg.get(f"NAME_{entry.get('channel','A0')}", entry.get("name", entry.get("channel","A0")))
-                    value_raw   = entry.get("value", entry.get("level_m"))
+                    # Fallback: wenn "value" None ist, Level-Messwert verwenden
+                    value_raw = entry.get("value")
+                    if value_raw is None:
+                        value_raw = entry.get("level_m")
                     try:
                         value = float(value_raw)
                     except Exception:
