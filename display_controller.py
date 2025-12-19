@@ -164,34 +164,28 @@ def format_value_by_type(sensor_type, row):
     if not row:
         return "Messwert: --"
 
-    st = (sensor_type or "").upper()
+    st = (sensor_type or "").strip().upper()
 
-    # LEVEL -> Wassertiefe: bei dir ist das level_m (wird vom Logger geschrieben) 
+    # Basiswert, den dein Logger schon liefert
+    v = row.get("level_m")
+
     if st == "LEVEL":
-        v = row.get("level_m")
         return f"Messwert: {v:.2f} m" if isinstance(v, (int, float)) else "Messwert: --"
 
-    # TEMP -> Temperatur (Feldnamen nachziehen, wenn Logger es liefert)
     if st == "TEMP":
-        v = row.get("temperature_c")
-        if not isinstance(v, (int, float)):
-            v = row.get("temp_c")
+        # aktuell kommt Temperatur (noch) nicht als eigenes Feld -> nutze level_m
         return f"Messwert: {v:.1f} °C" if isinstance(v, (int, float)) else "Messwert: --"
 
-    # FLOW -> Durchfluss (Feldnamen nachziehen, wenn Logger es liefert)
     if st == "FLOW":
-        v = row.get("flow_l_min")
-        if isinstance(v, (int, float)):
-            return f"Messwert: {v:.2f} L/min"
-        v2 = row.get("flow_m3_h")
-        return f"Messwert: {v2:.3f} m³/h" if isinstance(v2, (int, float)) else "Messwert: --"
+        # aktuell kommt Durchfluss (noch) nicht als eigenes Feld -> nutze level_m
+        return f"Messwert: {v:.2f} L/min" if isinstance(v, (int, float)) else "Messwert: --"
 
-    # ANALOG -> zeig den Rohwert (bei dir: current_mA ist vorhanden)
     if st == "ANALOG":
         ma = row.get("current_mA")
         return f"Messwert: {ma:.2f} mA" if isinstance(ma, (int, float)) else "Messwert: --"
 
     return "Messwert: --"
+
 
 
 def draw_screen(ch, row, sensor_type):
