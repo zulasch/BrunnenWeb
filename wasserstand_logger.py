@@ -49,6 +49,9 @@ DEFAULT_CONFIG = {
     "BMP280_ENABLED": True,
     "BMP280_ADDRESS": 0x76,
     "NAME_BMP280": "Barometer",
+    "MODEM_URL": "http://192.168.0.1",
+    "MODEM_POLL_INTERVAL": 300,
+    "DATA_CYCLE_START": 1,
 }
 
 # Kanal-spezifische Defaults generieren

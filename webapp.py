@@ -25,6 +25,9 @@ DEFAULT_CONFIG = {
     "BMP280_ENABLED": True,
     "BMP280_ADDRESS": 0x76,
     "NAME_BMP280": "Barometer",
+    "MODEM_URL": "http://192.168.0.1",
+    "MODEM_POLL_INTERVAL": 300,
+    "DATA_CYCLE_START": 1,
 }
 
 # Kanal-spezifische Defaults generieren
@@ -221,6 +224,9 @@ def index():
 
     # Basisbeschreibungen – ohne Kanalendung
     base_descriptions = {
+        "MODEM_URL": "Basis-URL des ZTE-Modems (z. B. http://192.168.0.1).",
+        "MODEM_POLL_INTERVAL": "Abfrageintervall fr Modem-Traffic in Sekunden.",
+        "DATA_CYCLE_START": "Starttag des Monats-Zyklus (1-28) fr Traffic-Z„hlung.",
         "NAME": "Bezeichnung oder Standort dieses Sensors.",
         "SENSOR_TYP": "Art des Sensors (z. B. LEVEL, TEMP, FLOW).",
         "SENSOR_EINHEIT": "Einheit des Messwerts (z. B. m, °C, m3/h).",
