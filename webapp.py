@@ -12,6 +12,7 @@ CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
 NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
+ZTE_SUMMARY_FILE = os.path.join(BASE_DIR, "data", "zte_traffic_summary.json")
 
 # 🔧 Standard-Konfiguration – wird mit lokaler config.json gemerged
 DEFAULT_CONFIG = {
@@ -575,6 +576,39 @@ def get_bmp280_entry():
     return None
 
 
+def load_zte_summary():
+    """Liest die vom Poller erzeugte Traffic-Zusammenfassung ein."""
+    default = {
+        "online": False,
+        "last_poll": None,
+        "today_bytes": 0,
+        "week_bytes": 0,
+        "cycle_bytes": 0,
+        "history": [],
+        "latest": {},
+    }
+    if not os.path.exists(ZTE_SUMMARY_FILE):
+        return default
+    try:
+        with open(ZTE_SUMMARY_FILE, "r") as f:
+            data = json.load(f)
+        # Defaults ergänzen, falls Felder fehlen
+        result = {**default, **data}
+        try:
+            lp = result.get("last_poll")
+            result["last_poll_human"] = datetime.fromtimestamp(int(lp)).strftime("%Y-%m-%d %H:%M:%S") if lp else "-"
+        except Exception:
+            result["last_poll_human"] = "-"
+        # Komfortwerte in MB
+        mb = lambda v: round(float(v or 0) / (1024 * 1024), 2)
+        result["today_mb"] = mb(result.get("today_bytes", 0))
+        result["week_mb"] = mb(result.get("week_bytes", 0))
+        result["cycle_mb"] = mb(result.get("cycle_bytes", 0))
+        return result
+    except Exception as exc:
+        return {**default, "error": str(exc)}
+
+
 @app.route("/barometer")
 @login_required
 def barometer_page():
@@ -648,7 +682,8 @@ def systemstatus_page():
             "os": platform.platform(),
             "networks": networks
         }
-        return render_template("systemstatus.html", title="Systemstatus", sys=data)
+        zte = load_zte_summary()
+        return render_template("systemstatus.html", title="Systemstatus", sys=data, zte=zte)
     except Exception as e:
         return f"Fehler beim Laden des Systemstatus: {e}", 500
 
