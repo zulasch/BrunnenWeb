@@ -54,39 +54,39 @@ DEFAULT_CONFIG = {
 # Kanal-spezifische Defaults generieren
 #for ch in ["A0", "A1", "A2", "A3"]:
 
-DEFAULT_CONFIG.setdefault(f"NAME_A0", "Nordbrunnen ABC")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A0", "m")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A0", "LEVEL")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A0", 0.0,)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A0", 3.0)
-DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A0", 100.0)
-DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A0", 25.0)
-DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A0", 100.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A0", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A0", "Nordbrunnen ABC")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A0", "m")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A0", "LEVEL")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A0", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A0", 3.0)
+DEFAULT_CONFIG.setdefault("STARTABSTICH_A0", 100.0)
+DEFAULT_CONFIG.setdefault("INITIAL_WASSERTIEFE_A0", 25.0)
+DEFAULT_CONFIG.setdefault("MESSWERT_NN_A0", 100.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A0", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A1", "Pumpentemperatur")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A1", "°C")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A1", "TEMP")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A1", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A1", 3.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A1", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A1", "Pumpentemperatur")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A1", "°C")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A1", "TEMP")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A1", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A1", 3.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A1", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A2", "Pumpendurchfluss")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A2", "m3/h")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A2", "FLOW")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A2", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A2", 3.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A2", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A2", "Pumpendurchfluss")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A2", "m3/h")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A2", "FLOW")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A2", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A2", 3.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A2", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A3", "reserve")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A3", "m")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A3", "LEVEL")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A3", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A3", 3.0)
-DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A3", 100.0)
-DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A3", 15.0)
-DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A3", 00.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A3", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A3", "reserve")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A3", "m")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A3", "LEVEL")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A3", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A3", 3.0)
+DEFAULT_CONFIG.setdefault("STARTABSTICH_A3", 100.0)
+DEFAULT_CONFIG.setdefault("INITIAL_WASSERTIEFE_A3", 15.0)
+DEFAULT_CONFIG.setdefault("MESSWERT_NN_A3", 0.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A3", 150.0)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -335,7 +335,7 @@ def send_to_influx(data_list):
       channel, timestamp, current_mA, level_m, wasser_oberflaeche_m, messwert_NN, pegel_diff, name
     """
     try:
-        cfg = load_config()
+        cfg = config
         influx_url   = cfg.get("INFLUX_URL")
         influx_token = cfg.get("INFLUX_TOKEN")
         influx_org   = cfg.get("INFLUX_ORG")
@@ -446,13 +446,12 @@ logging.info("🌊 Starte Mehrkanal-Messung mit Offline-Puffer...")
 try:
     while True:
         reload_config_if_changed()
-        loop_cfg = config.copy()
+        cfg = config.copy()
         all_data = []
 
         for ch_name, chan in channels.items():
             try:
                 # Kanal-Parameter aus Config lesen
-                cfg            = loop_cfg
                 sensor_type    = str(cfg.get(f"SENSOR_TYP_{ch_name}", "LEVEL")).upper()
                 unit           = str(cfg.get(f"SENSOR_EINHEIT_{ch_name}", "m" if sensor_type == "LEVEL" else "")).strip()
 
@@ -469,10 +468,7 @@ try:
                 current_mA  = voltage / shunt * 1000.0
 
                 # 4–20 mA begrenzen
-                if current_mA < 4:
-                    current_mA = 4
-                if current_mA > 20:
-                    current_mA = 20
+                current_mA = max(4.0, min(20.0, current_mA))
 
                 # Generische lineare Skalierung: 4–20 mA -> WERT_4mA..WERT_20mA
                 value = w4 + (current_mA - 4) * (w20 - w4) / 16.0
@@ -513,7 +509,7 @@ try:
                     # Neu:
                     "type": sensor_type,
                     "unit": unit,
-                    "value": level_m if level_m is not None else value
+                    "value": level_m
                 }
 
                 # 💾 sofort in Offline-Queue (damit nichts verloren geht)
@@ -544,11 +540,11 @@ try:
         else:
             logging.info("📦 Offline: Werte bleiben in der Queue und werden später nachgesendet.")
 
-        time.sleep(float(MESSINTERVAL))
+        time.sleep(float(cfg.get("MESSINTERVAL", MESSINTERVAL)))
 
 except KeyboardInterrupt:
     logging.info("🛑 Messung manuell beendet.")
-    conn.close()
 except Exception as e:
     logging.error(f"❌ Unerwarteter Fehler: {e}")
+finally:
     conn.close()
