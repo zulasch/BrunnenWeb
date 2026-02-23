@@ -5,7 +5,7 @@ import threading
 _gpio_lock = threading.Lock()
 
 # Alle verwendeten GPIO-Kanäle
-CHANNELS = [4, 17, 18, 27, 22, 23, 24, 25]
+CHANNELS = [4, 17, 18, 22, 23, 24, 25, 27]
 
 # Globale Variablen
 chip = None
