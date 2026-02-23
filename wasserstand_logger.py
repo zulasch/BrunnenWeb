@@ -8,6 +8,7 @@ import os
 import socket
 import logging
 import board
+import reed_contact
 import busio
 from datetime import datetime, UTC
 from adafruit_ads1x15.ads1115 import ADS1115 as ADS
@@ -307,6 +308,12 @@ def read_bmp280(cfg):
 setup_bmp280(config)
 
 # ============================================================
+# 🔌 REEDKONTAKT-SETUP
+# ============================================================
+REED_COUNT_FILE = os.path.join(BASE_DIR, "data", "reed_counts.json")
+reed_contact.init(REED_COUNT_FILE)
+
+# ============================================================
 # 📨 OFFLINE-QUEUE HELFER
 # ============================================================
 def queue_insert(entry: dict):
@@ -408,6 +415,11 @@ def send_to_influx(data_list):
                         p = p.field("Temperatur", value)
                     elif sensor_type == "FLOW":
                         p = p.field("Durchfluss", value)
+                    elif sensor_type == "COUNTER":
+                        p = p.field("Liter_gesamt", value)
+                        impulse = entry.get("impulse_total")
+                        if impulse is not None:
+                            p = p.field("Impulse_gesamt", int(impulse))
                     elif sensor_type == "PRESSURE":
                         p = p.field("Luftdruck_hPa", value)
                         temp = entry.get("temperature_C")
@@ -540,6 +552,34 @@ try:
             queue_insert(bmp_entry)
             all_data.append(bmp_entry)
 
+        # Reedkontakt-Zähler einlesen
+        try:
+            reed_counts = reed_contact.get_counts()
+            timestamp = datetime.now(UTC).isoformat()
+            for i, gpio in enumerate([25, 27], 1):
+                count = reed_counts.get(gpio, 0)
+                liter_pro_impuls = float(cfg.get(f"REED_{i}_LITER_PRO_IMPULS", 1.0))
+                name = cfg.get(f"REED_{i}_NAME", f"Wasserzähler {i}")
+                liter_total = round(count * liter_pro_impuls, 3)
+                reed_entry = {
+                    "channel": f"REED{i}",
+                    "gpio": gpio,
+                    "timestamp": timestamp,
+                    "name": name,
+                    "type": "COUNTER",
+                    "unit": "L",
+                    "impulse_total": count,
+                    "value": liter_total,
+                    "current_mA": None,
+                    "level_m": 0.0,
+                    "wasser_oberflaeche_m": 0.0,
+                    "messwert_NN": 0.0,
+                    "pegel_diff": 0.0,
+                }
+                queue_insert(reed_entry)
+                all_data.append(reed_entry)
+        except Exception as e:
+            logging.error(f"❌ Fehler beim Lesen der Reedkontakte: {e}")
 
         # Für Web-GUI letzte Messungen sichern (atomar: temp-Datei → rename)
         latest_file = os.path.join(BASE_DIR, "data", "latest_measurement.json")
@@ -564,4 +604,5 @@ except KeyboardInterrupt:
 except Exception as e:
     logging.error(f"❌ Unerwarteter Fehler: {e}")
 finally:
+    reed_contact.shutdown()
     conn.close()

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">💧 Wasserzähler (Reedkontakte)</h2>
+
+<div id="messageBox" class="hidden mb-4"></div>
+
+<!-- Zähler-Karten -->
+<div id="reedGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+  <div class="text-center text-gray-400 col-span-2 py-8">Lade Zählerstände...</div>
+</div>
+
+<!-- Hinweis -->
+<div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
+  <strong>ℹ️ Hinweis:</strong> Der Zählerstand wird persistent gespeichert und überlebt einen Neustart des Systems.
+  Liter pro Impuls kann unter <a href="/" class="underline font-semibold">Konfiguration → Wasserzähler</a> eingestellt werden.
+</div>
+
+<script>
+async function loadReed() {
+  try {
+    const res = await fetch('/api/reed');
+    const data = await res.json();
+    const grid = document.getElementById('reedGrid');
+    grid.innerHTML = '';
+
+    data.forEach(z => {
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-2xl shadow p-6 border-t-4 border-blue-400';
+      card.innerHTML = `
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-xl font-bold text-gray-800">${z.name}</h3>
+            <p class="text-sm text-gray-500">GPIO ${z.gpio} &nbsp;|&nbsp; ${z.liter_pro_impuls} L/Impuls</p>
+          </div>
+          <span class="text-4xl">🌊</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-5">
+          <div class="bg-blue-50 rounded-xl p-3 text-center">
+            <p class="text-xs text-gray-500 mb-1">Gesamtvolumen</p>
+            <p class="text-2xl font-bold text-blue-700">${z.liter.toFixed(2)}</p>
+            <p class="text-sm text-gray-500">Liter</p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-3 text-center">
+            <p class="text-xs text-gray-500 mb-1">Impulse gesamt</p>
+            <p class="text-2xl font-bold text-gray-700">${z.impulse}</p>
+            <p class="text-sm text-gray-500">Impulse</p>
+          </div>
+        </div>
+
+        <button onclick="resetCounter(${z.gpio}, '${z.name}')"
+          class="w-full py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 font-semibold transition text-sm">
+          🔄 Zähler zurücksetzen
+        </button>
+      `;
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    document.getElementById('reedGrid').innerHTML =
+      `<div class="col-span-2 text-center text-red-500 py-8">⚠️ Fehler beim Laden: ${err}</div>`;
+  }
+}
+
+async function resetCounter(gpio, name) {
+  if (!confirm(`Zähler „${name}" wirklich auf 0 zurücksetzen?`)) return;
+  const box = document.getElementById('messageBox');
+  try {
+    const res = await fetch(`/reed/reset/${gpio}`, { method: 'POST' });
+    const data = await res.json();
+    box.classList.remove('hidden');
+    box.textContent = data.message;
+    box.className = data.success
+      ? 'p-3 rounded bg-green-100 text-green-800 border border-green-400 mb-4'
+      : 'p-3 rounded bg-red-100 text-red-800 border border-red-400 mb-4';
+    setTimeout(() => box.classList.add('hidden'), 4000);
+    // Anzeige nach kurzer Verzögerung aktualisieren (Logger braucht ~100ms)
+    setTimeout(loadReed, 500);
+  } catch (err) {
+    box.classList.remove('hidden');
+    box.textContent = '❌ Fehler: ' + err;
+    box.className = 'p-3 rounded bg-red-100 text-red-800 border border-red-400 mb-4';
+  }
+}
+
+loadReed();
+setInterval(loadReed, 5000);
+</script>
+{% endblock %}

@@ -19,6 +19,10 @@ NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
 DEFAULT_CONFIG = {
     "DEVICE_ID": socket.gethostname(),
     "LOCATION": "",
+    "REED_1_NAME": "Wasserzähler 1",
+    "REED_1_LITER_PRO_IMPULS": 1.0,
+    "REED_2_NAME": "Wasserzähler 2",
+    "REED_2_LITER_PRO_IMPULS": 1.0,
     "MESSINTERVAL": 5,
     "ADMIN_PIN": 1234,
     "INFLUX_URL": "",
@@ -265,6 +269,10 @@ def index():
     base_descriptions = {
         "DEVICE_ID": "Eindeutige Geräte-ID für InfluxDB (Standard: Hostname).",
         "LOCATION": "Standort des Geräts (z. B. Liegenschaft Musterstrasse 12).",
+        "REED_1_NAME": "Bezeichnung des ersten Wasserzählers (GPIO 25).",
+        "REED_1_LITER_PRO_IMPULS": "Liter pro Impuls für Wasserzähler 1 (z. B. 1.0 oder 0.1).",
+        "REED_2_NAME": "Bezeichnung des zweiten Wasserzählers (GPIO 27).",
+        "REED_2_LITER_PRO_IMPULS": "Liter pro Impuls für Wasserzähler 2 (z. B. 1.0 oder 0.1).",
         "NAME": "Bezeichnung oder Standort dieses Sensors.",
         "SENSOR_TYP": "Art des Sensors (z. B. LEVEL, TEMP, FLOW).",
         "SENSOR_EINHEIT": "Einheit des Messwerts (z. B. m, °C, m3/h).",
@@ -304,7 +312,8 @@ def update_config():
         cfg = load_config()
 
         # Felder, die immer als Text behandelt werden sollen
-        string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS", "DEVICE_ID", "LOCATION"]
+        string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS", "DEVICE_ID", "LOCATION",
+                       "REED_1_NAME", "REED_2_NAME"]
         bool_keys = set(["BMP280_ENABLED"] + [k for k in cfg.keys() if k.endswith("_ENABLED")])
 
         for key, value in data.items():
@@ -622,6 +631,47 @@ def barometer_api():
     if entry:
         return jsonify(entry)
     return jsonify({"error": "Keine Barometerdaten vorhanden"}), 404
+
+# ===== Reedkontakt / Wasserzähler =====
+
+@app.route("/reed")
+@login_required
+def reed_page():
+    return render_template("reed.html", title="Wasserzähler")
+
+@app.route("/api/reed")
+@login_required
+def reed_api():
+    cfg = load_config()
+    counts_file = os.path.join(BASE_DIR, "data", "reed_counts.json")
+    counts = {}
+    if os.path.exists(counts_file):
+        try:
+            with open(counts_file) as f:
+                counts = {int(k): int(v) for k, v in json.load(f).items()}
+        except Exception:
+            pass
+    result = []
+    for i, gpio in enumerate([25, 27], 1):
+        count = counts.get(gpio, 0)
+        liter_pro_impuls = float(cfg.get(f"REED_{i}_LITER_PRO_IMPULS", 1.0))
+        result.append({
+            "gpio": gpio,
+            "name": cfg.get(f"REED_{i}_NAME", f"Wasserzähler {i}"),
+            "impulse": count,
+            "liter": round(count * liter_pro_impuls, 2),
+            "liter_pro_impuls": liter_pro_impuls,
+        })
+    return jsonify(result)
+
+@app.route("/reed/reset/<int:gpio>", methods=["POST"])
+@login_required
+def reed_reset(gpio):
+    if gpio not in (25, 27):
+        abort(400)
+    flag_path = os.path.join(BASE_DIR, "data", f"reed_reset_{gpio}.flag")
+    Path(flag_path).touch()
+    return jsonify({"success": True, "message": f"Zähler wird zurückgesetzt."})
 
 # Systemstatus
 

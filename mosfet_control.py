@@ -4,8 +4,8 @@ import lgpio
 import threading
 _gpio_lock = threading.Lock()
 
-# Alle verwendeten GPIO-Kanäle
-CHANNELS = [4, 17, 18, 22, 23, 24, 25, 27]
+# Alle verwendeten GPIO-Kanäle (GPIO 25 und 27 sind Reedkontakt-Eingänge)
+CHANNELS = [4, 17, 18, 22, 23, 24]
 
 # Globale Variablen
 chip = None
