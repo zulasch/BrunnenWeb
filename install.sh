@@ -70,7 +70,14 @@ usermod -aG gpio $USER
 SUDOERS_FILE="/etc/sudoers.d/$USER"
 cat <<EOF > "$SUDOERS_FILE"
 # Erlaubt dem Benutzer '$USER' kontrollierte Service-Kommandos ohne Passwort
-brunnen ALL=NOPASSWD: /usr/bin/tee -a /etc/wpa_supplicant/wpa_supplicant.conf, /bin/bash -c *, /usr/bin/bash -c *, /usr/bin/wpa_cli, /bin/bash, /usr/bin/bash, /usr/bin/wpa_cli, /usr/bin/systemctl, /bin/systemctl, /usr/bin/nmcli, /bin/systemctl restart brunnen_logger.service, /bin/systemctl restart brunnen_web.service, /bin/systemctl is-active brunnen_logger.service, /bin/systemctl is-active brunnen_web.service, $BASE_DIR/scripts/update_repo.sh
+brunnen ALL=NOPASSWD: /usr/bin/tee -a /etc/wpa_supplicant/wpa_supplicant.conf
+brunnen ALL=NOPASSWD: /usr/bin/wpa_cli
+brunnen ALL=NOPASSWD: /usr/bin/systemctl restart brunnen_web.service
+brunnen ALL=NOPASSWD: /usr/bin/systemctl restart brunnen_logger.service
+brunnen ALL=NOPASSWD: /bin/systemctl restart brunnen_web.service
+brunnen ALL=NOPASSWD: /bin/systemctl restart brunnen_logger.service
+brunnen ALL=NOPASSWD: /usr/bin/systemctl restart NetworkManager
+brunnen ALL=NOPASSWD: $BASE_DIR/scripts/update_repo.sh
 EOF
 
 chmod 440 "$SUDOERS_FILE"
@@ -167,6 +174,9 @@ else
 fi
 
 section "5️⃣  Systemd-Service konfigurieren"
+WEBAPP_SECRET=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+ok "Zufälliger WEBAPP_SECRET generiert"
+
 cat <<EOF > "$WEB_SERVICE_FILE"
 [Unit]
 Description=Brunnen Webinterface (Flask via Gunicorn)
@@ -180,6 +190,7 @@ WorkingDirectory=$BASE_DIR
 ExecStart=$BASE_DIR/venv/bin/gunicorn -w 1 --threads 1 -t 180 -b 0.0.0.0:8080 webapp:app
 Restart=always
 Environment="PATH=$BASE_DIR/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="WEBAPP_SECRET=$WEBAPP_SECRET"
 StandardError=append:$BASE_DIR/logs/webapp.err.log
 
 [Install]

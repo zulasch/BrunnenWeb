@@ -3,6 +3,8 @@
 
 import os, json, socket, subprocess, functools, time
 from pathlib import Path
+from threading import Thread
+from urllib.parse import urlparse, urljoin
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash
 import mosfet_control
 from datetime import datetime
@@ -187,6 +189,35 @@ def tail_file(path, lines=200):
         return f"(Kein Zugriff auf {path} – {e})"
 
 # ===== Auth (PIN) =====
+_login_attempts: dict = {}  # {ip: (count, first_fail_ts)}
+_LOGIN_MAX_ATTEMPTS = 5
+_LOGIN_LOCKOUT_SECONDS = 60
+
+def _get_client_ip():
+    return request.headers.get("X-Forwarded-For", request.remote_addr or "").split(",")[0].strip()
+
+def _is_locked_out(ip: str) -> bool:
+    entry = _login_attempts.get(ip)
+    if not entry:
+        return False
+    count, ts = entry
+    if time.time() - ts > _LOGIN_LOCKOUT_SECONDS:
+        _login_attempts.pop(ip, None)
+        return False
+    return count >= _LOGIN_MAX_ATTEMPTS
+
+def _record_failed_attempt(ip: str):
+    entry = _login_attempts.get(ip)
+    if entry and time.time() - entry[1] <= _LOGIN_LOCKOUT_SECONDS:
+        _login_attempts[ip] = (entry[0] + 1, entry[1])
+    else:
+        _login_attempts[ip] = (1, time.time())
+
+def _is_safe_url(target: str) -> bool:
+    ref = urlparse(request.host_url)
+    test = urlparse(urljoin(request.host_url, target))
+    return test.scheme in ("http", "https") and ref.netloc == test.netloc
+
 def login_required(view):
     @functools.wraps(view)
     def wrapped(*args, **kwargs):
@@ -197,14 +228,23 @@ def login_required(view):
 
 @app.route("/login", methods=["GET","POST"])
 def login():
+    ip = _get_client_ip()
+    if _is_locked_out(ip):
+        flash("Zu viele Fehlversuche. Bitte warte 60 Sekunden.", "error")
+        return render_template("login.html")
+
     cfg = load_config()
     required_pin = str(cfg.get("ADMIN_PIN", "1234"))
     if request.method == "POST":
         pin = request.form.get("pin", "")
         if pin == required_pin:
+            _login_attempts.pop(ip, None)
             session["auth_ok"] = True
-            nxt = request.args.get("next") or url_for("index")
-            return redirect(nxt)
+            nxt = request.args.get("next", "")
+            if nxt and _is_safe_url(nxt):
+                return redirect(nxt)
+            return redirect(url_for("index"))
+        _record_failed_attempt(ip)
         flash("Falsche PIN.", "error")
     return render_template("login.html")
 
@@ -377,7 +417,7 @@ def service_action():
 
     try:
         if action == "status":
-            st = service_status(service)
+            st = service_status(service_name)
             return jsonify({"status": "ok", "message": st})
 
         # Wenn die WebApp sich selbst neu startet → gleich Erfolg melden
@@ -391,10 +431,6 @@ def service_action():
                 "status": "ok",
                 "message": "🔄 WebApp wird neu gestartet. Bitte warte ein paar Sekunden und lade neu."
             })
-        
-        if action == "status":
-            st = service_status(service_name)
-            return jsonify({"status": "ok", "message": st})
 
         # 🔄 Neustart ausführen
         result = subprocess.run(
@@ -654,8 +690,12 @@ def wifi_configure():
 
     if not ssid:
         return jsonify({"status": "error", "message": "❌ SSID darf nicht leer sein."})
+    if len(ssid) > 32 or any(c in ssid for c in ('"', '\n', '\r', '\\')):
+        return jsonify({"status": "error", "message": "❌ SSID enthält ungültige Zeichen."})
     if not psk:
         return jsonify({"status": "error", "message": "❌ Passwort darf nicht leer sein."})
+    if any(c in psk for c in ('"', '\n', '\r', '\\')):
+        return jsonify({"status": "error", "message": "❌ Passwort enthält ungültige Zeichen."})
 
     try:
         config_block = f'\nnetwork={{\n  ssid="{ssid}"\n  psk="{psk}"\n}}\n'
@@ -690,31 +730,19 @@ def wifi_configure():
 
 
 
-# Ausgänge Zeitsteuerung
-
-from threading import Thread
-from datetime import datetime
-import json, time
-
-SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
-
-def load_schedule():
-    if os.path.exists(SCHEDULE_FILE):
-        with open(SCHEDULE_FILE) as f:
-            return json.load(f)
-    return []
-
-def save_schedule(data):
-    with open(SCHEDULE_FILE, "w") as f:
-        json.dump(data, f, indent=2)
-
 def scheduler_loop():
     while True:
-        now = datetime.now().strftime("%H:%M")
-        schedule = load_schedule()
-        for job in schedule:
-            if job["time"] == now:
-                mosfet_control.set_output(job["channel"], job["state"])
+        try:
+            now = datetime.now().strftime("%H:%M")
+            schedule = load_schedule()
+            for job in schedule:
+                if job["time"] == now:
+                    try:
+                        mosfet_control.set_output(job["channel"], job["state"])
+                    except Exception as e:
+                        app.logger.error(f"Scheduler: Fehler bei Kanal {job.get('channel')}: {e}")
+        except Exception as e:
+            app.logger.error(f"Scheduler-Loop Fehler: {e}")
         time.sleep(60)
 
 Thread(target=scheduler_loop, daemon=True).start()

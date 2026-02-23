@@ -313,7 +313,8 @@ def queue_fetch_batch(limit=500):
         try:
             items.append(json.loads(payload))
             ids.append(rid)
-        except Exception:
+        except Exception as e:
+            logging.warning(f"Korrumpierter Queue-Eintrag id={rid} wird gelöscht: {e}")
             cur.execute("DELETE FROM offline_queue WHERE id=?", (rid,))
     if rows:
         conn.commit()
@@ -526,11 +527,13 @@ try:
             all_data.append(bmp_entry)
 
 
-        # Für Web-GUI letzte Messungen sichern
+        # Für Web-GUI letzte Messungen sichern (atomar: temp-Datei → rename)
         latest_file = os.path.join(BASE_DIR, "data", "latest_measurement.json")
+        tmp_file = latest_file + ".tmp"
         try:
-            with open(latest_file, "w") as f:
+            with open(tmp_file, "w") as f:
                 json.dump(all_data, f, indent=2)
+            os.replace(tmp_file, latest_file)
         except Exception as e:
             logging.warning(f"Konnte latest_measurement.json nicht schreiben: {e}")
 
