@@ -17,6 +17,8 @@ NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
 
 # 🔧 Standard-Konfiguration – wird mit lokaler config.json gemerged
 DEFAULT_CONFIG = {
+    "DEVICE_ID": socket.gethostname(),
+    "LOCATION": "",
     "MESSINTERVAL": 5,
     "ADMIN_PIN": 1234,
     "INFLUX_URL": "",
@@ -261,6 +263,8 @@ def index():
 
     # Basisbeschreibungen – ohne Kanalendung
     base_descriptions = {
+        "DEVICE_ID": "Eindeutige Geräte-ID für InfluxDB (Standard: Hostname).",
+        "LOCATION": "Standort des Geräts (z. B. Liegenschaft Musterstrasse 12).",
         "NAME": "Bezeichnung oder Standort dieses Sensors.",
         "SENSOR_TYP": "Art des Sensors (z. B. LEVEL, TEMP, FLOW).",
         "SENSOR_EINHEIT": "Einheit des Messwerts (z. B. m, °C, m3/h).",
@@ -300,7 +304,7 @@ def update_config():
         cfg = load_config()
 
         # Felder, die immer als Text behandelt werden sollen
-        string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS"]
+        string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS", "DEVICE_ID", "LOCATION"]
         bool_keys = set(["BMP280_ENABLED"] + [k for k in cfg.keys() if k.endswith("_ENABLED")])
 
         for key, value in data.items():

@@ -6,6 +6,24 @@
 
 <form id="configForm" onsubmit="saveConfig(event)" class="bg-white p-6 rounded-xl shadow space-y-4">
 
+<!-- Gerät / Standort -->
+<div class="bg-white p-6 rounded-xl shadow mb-6">
+  <h2 class="text-xl font-bold mb-4">🏷️ Gerät & Standort</h2>
+  <div class="mb-4">
+    <label class="block font-semibold text-gray-700 mb-1">DEVICE_ID</label>
+    <input name="DEVICE_ID" value="{{ config.get('DEVICE_ID', '') }}"
+      class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none font-mono" />
+    <p class="text-gray-500 text-sm mt-1">{{ descriptions.get("DEVICE_ID") }}</p>
+  </div>
+  <div class="mb-4">
+    <label class="block font-semibold text-gray-700 mb-1">LOCATION</label>
+    <input name="LOCATION" value="{{ config.get('LOCATION', '') }}"
+      placeholder="z. B. Liegenschaft Musterstrasse 12"
+      class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none" />
+    <p class="text-gray-500 text-sm mt-1">{{ descriptions.get("LOCATION") }}</p>
+  </div>
+</div>
+
 <!-- Globale Einstellungen -->
 <div class="bg-white p-6 rounded-xl shadow mb-6">
   <h2 class="text-xl font-bold mb-4">⚙️ Allgemeine Einstellungen</h2>

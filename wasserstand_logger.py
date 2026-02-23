@@ -5,6 +5,7 @@ import time
 import sqlite3
 import json
 import os
+import socket
 import logging
 import board
 import busio
@@ -34,6 +35,8 @@ DB_PATH = os.path.join(BASE_DIR, "data", "offline_cache.db")
 LOGFILE = os.path.join(BASE_DIR, "logs", "wasserstand.log")
 
 DEFAULT_CONFIG = {
+    "DEVICE_ID": socket.gethostname(),
+    "LOCATION": "",
     "STARTABSTICH": 0.0,
     "INITIAL_WASSERTIEFE": 0.0,
     "SHUNT_OHMS": 150.0,
@@ -145,6 +148,10 @@ config = load_config()
 apply_logging_level(config.get("LOG_LEVEL", "ERROR"))
 last_config_mtime = os.path.getmtime(CONFIG_PATH)
 
+# Geräteidentifikation
+DEVICE_ID        = config.get("DEVICE_ID", socket.gethostname())
+LOCATION         = config.get("LOCATION", "")
+
 # Initiale Defaults (werden pro Kanal übersteuert)
 STARTABSTICH     = config.get("STARTABSTICH", 0.0)
 INITIAL_WASSERTIEFE = config.get("INITIAL_WASSERTIEFE", 0.0)
@@ -163,6 +170,7 @@ INFLUX_BUCKET    = config.get("INFLUX_BUCKET", "")
 # ============================================================
 def reload_config_if_changed():
     global config, last_config_mtime
+    global DEVICE_ID, LOCATION
     global STARTABSTICH, INITIAL_WASSERTIEFE, SHUNT_OHMS
     global WERT_4mA, WERT_20mA, MESSWERT_NN, MESSINTERVAL
     global INFLUX_URL, INFLUX_TOKEN, INFLUX_ORG, INFLUX_BUCKET
@@ -172,6 +180,8 @@ def reload_config_if_changed():
         if current_mtime != last_config_mtime:
             logging.info("🔄 Neue Konfiguration erkannt — lade neu...")
             config = load_config()
+            DEVICE_ID          = config.get("DEVICE_ID", DEVICE_ID)
+            LOCATION           = config.get("LOCATION", LOCATION)
             STARTABSTICH       = config.get("STARTABSTICH", STARTABSTICH)
             INITIAL_WASSERTIEFE= config.get("INITIAL_WASSERTIEFE", INITIAL_WASSERTIEFE)
             SHUNT_OHMS         = config.get("SHUNT_OHMS", SHUNT_OHMS)
@@ -366,12 +376,16 @@ def send_to_influx(data_list):
 
                     measurement = "barometer" if sensor_type == "PRESSURE" else "wasserstand"
 
+                    device_id = cfg.get("DEVICE_ID", DEVICE_ID)
+                    location  = cfg.get("LOCATION",  LOCATION)
                     p = (
                         Point(measurement)
-                        .tag("channel", entry.get("channel","A0"))
-                        .tag("name",   sensor_name)
-                        .tag("type",   sensor_type)
-                        .tag("unit",   unit)
+                        .tag("device_id", device_id)
+                        .tag("location",  location)
+                        .tag("channel",   entry.get("channel","A0"))
+                        .tag("name",      sensor_name)
+                        .tag("type",      sensor_type)
+                        .tag("unit",      unit)
                         .time(entry["timestamp"], WritePrecision.S)
                     )
 
