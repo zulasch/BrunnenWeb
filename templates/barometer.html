@@ -1,55 +1,90 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">Barometer (BMP280)</h2>
 
-<div class="bg-white rounded-xl shadow p-6 space-y-4">
-  <div>
-    <p class="text-gray-600 text-sm">Zeitstempel</p>
-    <p id="baroTimestamp" class="text-lg font-semibold">-</p>
+<div class="flex items-center gap-3 mb-6">
+  <div class="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
+    <span class="text-lg">🌡️</span>
   </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div class="border rounded-lg p-4">
-      <p class="text-gray-600 text-sm">Luftdruck</p>
-      <p id="baroPressure" class="text-3xl font-bold text-blue-700">-</p>
+  <h2 class="text-xl font-bold text-white">Barometer (BMP280)</h2>
+  <span class="ml-auto text-xs text-slate-500 bg-slate-800 border border-slate-700 px-3 py-1 rounded-full">
+    Aktualisierung alle 5 s
+  </span>
+</div>
+
+<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-6 max-w-lg">
+
+  <!-- Timestamp & Name -->
+  <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-700">
+    <div>
+      <p class="text-xs text-slate-500 mb-1">Sensor</p>
+      <p id="baroName" class="text-sm font-semibold text-slate-200">–</p>
     </div>
-    <div class="border rounded-lg p-4">
-      <p class="text-gray-600 text-sm">Temperatur</p>
-      <p id="baroTemp" class="text-3xl font-bold text-amber-700">-</p>
+    <div class="text-right">
+      <p class="text-xs text-slate-500 mb-1">Zeitstempel</p>
+      <p id="baroTimestamp" class="text-sm text-slate-300">–</p>
     </div>
   </div>
-  <div>
-    <p class="text-gray-600 text-sm">Name</p>
-    <p id="baroName" class="text-lg font-semibold">-</p>
+
+  <!-- Metric cards -->
+  <div class="grid grid-cols-2 gap-4 mb-5">
+
+    <!-- Luftdruck -->
+    <div class="bg-slate-700/40 border border-slate-600/50 rounded-xl p-5">
+      <p class="text-xs text-slate-400 mb-2 flex items-center gap-1">
+        <span>🌀</span> Luftdruck
+      </p>
+      <p id="baroPressure" class="text-3xl font-bold text-sky-400 leading-none">–</p>
+    </div>
+
+    <!-- Temperatur -->
+    <div class="bg-slate-700/40 border border-slate-600/50 rounded-xl p-5">
+      <p class="text-xs text-slate-400 mb-2 flex items-center gap-1">
+        <span>🌡️</span> Temperatur
+      </p>
+      <p id="baroTemp" class="text-3xl font-bold text-amber-400 leading-none">–</p>
+    </div>
   </div>
-  <div id="baroStatus" class="text-sm text-gray-600"></div>
+
+  <!-- Status -->
+  <div class="flex items-center gap-2">
+    <span id="baroStatusDot" class="w-2 h-2 rounded-full bg-slate-600 inline-block"></span>
+    <p id="baroStatus" class="text-xs text-slate-500">Warte auf Daten...</p>
+  </div>
 </div>
 
 <script>
 async function loadBarometer() {
   const tsEl = document.getElementById("baroTimestamp");
-  const pEl = document.getElementById("baroPressure");
-  const tEl = document.getElementById("baroTemp");
-  const nEl = document.getElementById("baroName");
+  const pEl  = document.getElementById("baroPressure");
+  const tEl  = document.getElementById("baroTemp");
+  const nEl  = document.getElementById("baroName");
   const status = document.getElementById("baroStatus");
-  status.textContent = "Aktualisiere...";
+  const dot    = document.getElementById("baroStatusDot");
 
   try {
     const res = await fetch("{{ url_for('barometer_api') }}");
     const data = await res.json();
+
     if (!res.ok || !data || data.error) {
       status.textContent = data.error || "Keine Daten vorhanden.";
-      tsEl.textContent = pEl.textContent = tEl.textContent = nEl.textContent = "-";
+      dot.className = "w-2 h-2 rounded-full bg-rose-500 inline-block";
+      tsEl.textContent = pEl.textContent = tEl.textContent = nEl.textContent = "–";
       return;
     }
+
     const pressure = data.value ?? data.level_m;
     const temp = data.temperature_C;
-    tsEl.textContent = data.timestamp ? new Date(data.timestamp).toLocaleString() : "-";
-    pEl.textContent = pressure != null ? `${Number(pressure).toFixed(1)} hPa` : "-";
-    tEl.textContent = temp != null ? `${Number(temp).toFixed(1)} °C` : "-";
-    nEl.textContent = data.name || data.channel || "BMP280";
+
+    tsEl.textContent = data.timestamp ? new Date(data.timestamp).toLocaleString() : "–";
+    pEl.textContent  = pressure != null ? `${Number(pressure).toFixed(1)} hPa` : "–";
+    tEl.textContent  = temp != null ? `${Number(temp).toFixed(1)} °C` : "–";
+    nEl.textContent  = data.name || data.channel || "BMP280";
     status.textContent = "Letzte Aktualisierung erfolgreich.";
+    dot.className = "w-2 h-2 rounded-full bg-emerald-500 inline-block";
+
   } catch (err) {
     status.textContent = `Fehler: ${err}`;
+    dot.className = "w-2 h-2 rounded-full bg-rose-500 inline-block";
   }
 }
 

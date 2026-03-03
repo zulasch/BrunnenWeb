@@ -1,11 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">🔐 Login</h1>
-<form method="post" class="space-y-4 max-w-sm">
-  <div>
-    <label class="font-semibold">PIN</label>
-    <input name="pin" type="password" class="border p-2 rounded w-full" autofocus>
+<div class="min-h-[60vh] flex items-center justify-center">
+  <div class="w-full max-w-sm">
+
+    <!-- Logo card -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 rounded-2xl bg-sky-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/30">
+        <span class="text-3xl">💧</span>
+      </div>
+      <h1 class="text-2xl font-bold text-white">BrunnenWeb</h1>
+      <p class="text-slate-400 text-sm mt-1">Bitte anmelden</p>
+    </div>
+
+    <!-- Login form -->
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8">
+      {% if error %}
+      <div class="bg-rose-900/40 border border-rose-700 text-rose-300 rounded-lg p-3 mb-5 text-sm">
+        ⚠️ {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="post" class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-2">PIN</label>
+          <input name="pin" type="password"
+            class="border rounded-lg w-full px-4 py-3 text-base focus:outline-none"
+            placeholder="••••••"
+            autofocus>
+        </div>
+        <button type="submit"
+          class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 rounded-lg transition shadow-lg shadow-sky-900/30 text-sm">
+          Anmelden
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-slate-600 text-xs mt-6">© 2025 BrunnenWeb</p>
   </div>
-  <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Anmelden</button>
-</form>
+</div>
 {% endblock %}

@@ -1,35 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">📈 Aktuelle Messwerte</h2>
+
+<div class="flex items-center gap-3 mb-6">
+  <div class="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
+    <span class="text-lg">📈</span>
+  </div>
+  <h2 class="text-xl font-bold text-white">Aktuelle Messwerte</h2>
+  <span class="ml-auto text-xs text-slate-500 bg-slate-800 border border-slate-700 px-3 py-1 rounded-full">
+    Aktualisierung alle 5 s
+  </span>
+</div>
 
 <!-- Statusbox -->
 <div id="messageBox" class="hidden mb-4"></div>
 
 <!-- Messwert-Tabelle -->
-<div class="overflow-x-auto bg-white p-6 rounded-xl shadow">
-  <table class="min-w-full border-collapse">
-<thead>
-  <tr class="bg-blue-100 text-blue-800 text-left">
-    <th class="p-2">🔌 Kanal</th>
-    <th class="p-2">🏷 Name</th>
-    <th class="p-2">⏱ Zeitstempel</th>
-    <th class="p-2">⚡ Strom [mA]</th>
-    <th class="p-2">📏 Messwert</th>
-    <th class="p-2">📐 Einheit</th>
-    <th class="p-2">🌊 Tiefe [m] (LEVEL)</th>
-    <th class="p-2">🪣 Wasseroberfläche [m u. Gelände]</th>
-    <th class="p-2">🏔 Messwert NN [m ü. NN]</th>
-    <th class="p-2">📉 Δ Pegel [m]</th>
-  </tr>
-</thead>
-
-    <tbody id="tableBody">
-      <tr><td colspan="7" class="text-center p-4 text-gray-500">Lade aktuelle Messdaten...</td></tr>
-    </tbody>
-  </table>
+<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead>
+        <tr class="bg-slate-700/60 text-slate-300 text-left border-b border-slate-700">
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Kanal</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Name</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Zeitstempel</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Strom [mA]</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Messwert</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Einheit</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Tiefe [m]</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Wasseroberfläche [m u. Gel.]</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Messwert NN [m ü. NN]</th>
+          <th class="px-4 py-3 font-medium whitespace-nowrap">Δ Pegel [m]</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr>
+          <td colspan="10" class="text-center px-4 py-8 text-slate-500">
+            <span class="inline-block animate-pulse">Lade aktuelle Messdaten...</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
-<!-- Automatische Aktualisierung -->
 <script>
 async function loadMeasurements() {
   try {
@@ -40,40 +53,39 @@ async function loadMeasurements() {
     body.innerHTML = "";
 
     if (!Array.isArray(data)) {
-      body.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-gray-500">Keine gültigen Messdaten gefunden.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="10" class="text-center px-4 py-8 text-slate-500">Keine gültigen Messdaten gefunden.</td></tr>`;
       return;
     }
 
-    data.forEach(row => {
+    data.forEach((row, idx) => {
       const tr = document.createElement("tr");
-      tr.className = "border-b hover:bg-blue-50";
+      tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition";
 
       const type = (row.type || "LEVEL").toUpperCase();
       const value = (row.value ?? row.level_m);
       const unit = row.unit || (type === "LEVEL" ? "m" : "");
 
       tr.innerHTML = `
-        <td class="p-2 font-semibold">${row.channel}</td>
-        <td class="p-2">${row.name ?? "–"}</td>
-        <td class="p-2">${new Date(row.timestamp).toLocaleString()}</td>
-        <td class="p-2">${row.current_mA != null ? row.current_mA.toFixed(2) : "–"}</td>
-        <td class="p-2">${value != null ? value.toFixed(2) : "–"}</td>
-        <td class="p-2">${unit || "–"}</td>
-        <td class="p-2">${type === "LEVEL" && row.level_m != null ? row.level_m.toFixed(2) : "–"}</td>
-        <td class="p-2">${type === "LEVEL" && row.wasser_oberflaeche_m != null ? row.wasser_oberflaeche_m.toFixed(2) : "–"}</td>
-        <td class="p-2">${type === "LEVEL" && row.messwert_NN != null ? row.messwert_NN.toFixed(2) : "–"}</td>
-        <td class="p-2">${type === "LEVEL" && row.pegel_diff != null ? row.pegel_diff.toFixed(2) : "–"}</td>
+        <td class="px-4 py-3 font-mono text-sky-400 font-semibold">${row.channel}</td>
+        <td class="px-4 py-3 text-slate-200">${row.name ?? "–"}</td>
+        <td class="px-4 py-3 text-slate-400 whitespace-nowrap">${new Date(row.timestamp).toLocaleString()}</td>
+        <td class="px-4 py-3 text-slate-300">${row.current_mA != null ? row.current_mA.toFixed(2) : "–"}</td>
+        <td class="px-4 py-3 font-semibold text-white">${value != null ? value.toFixed(2) : "–"}</td>
+        <td class="px-4 py-3 text-slate-400">${unit || "–"}</td>
+        <td class="px-4 py-3 text-slate-300">${type === "LEVEL" && row.level_m != null ? row.level_m.toFixed(2) : "–"}</td>
+        <td class="px-4 py-3 text-slate-300">${type === "LEVEL" && row.wasser_oberflaeche_m != null ? row.wasser_oberflaeche_m.toFixed(2) : "–"}</td>
+        <td class="px-4 py-3 text-slate-300">${type === "LEVEL" && row.messwert_NN != null ? row.messwert_NN.toFixed(2) : "–"}</td>
+        <td class="px-4 py-3 text-slate-300">${type === "LEVEL" && row.pegel_diff != null ? row.pegel_diff.toFixed(2) : "–"}</td>
       `;
       body.appendChild(tr);
     });
 
   } catch (err) {
     const body = document.getElementById("tableBody");
-    body.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-red-500">⚠️ Fehler beim Laden: ${err}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="10" class="text-center px-4 py-8 text-rose-400">⚠️ Fehler beim Laden: ${err}</td></tr>`;
   }
 }
 
-// Alle 5 Sekunden aktualisieren
 loadMeasurements();
 setInterval(loadMeasurements, 5000);
 </script>
