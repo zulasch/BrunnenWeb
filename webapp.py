@@ -769,7 +769,7 @@ def wifi_configure():
         if result.returncode == 0:
             return jsonify({
                 “status”: “ok”,
-                “message”: f”✅ Erfolgreich mit „{ssid}” verbunden.”
+                “message”: f”✅ Erfolgreich mit '{ssid}' verbunden.”
             })
         else:
             error_msg = (result.stderr.strip() or result.stdout.strip()) or “Unbekannter Fehler”
