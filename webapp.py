@@ -742,25 +742,25 @@ def systemstatus_page():
     except Exception as e:
         return f"Fehler beim Laden des Systemstatus: {e}", 500
 
-@app.route(“/wifi/configure”, methods=[“POST”])
+@app.route("/wifi/configure", methods=["POST"])
 @login_required
 def wifi_configure():
-    ssid = (request.form.get(“ssid”, “”) or request.form.get(“ssid_manual”, “”)).strip()
-    psk = request.form.get(“psk”, “”).strip()
+    ssid = (request.form.get("ssid", "") or request.form.get("ssid_manual", "")).strip()
+    psk = request.form.get("psk", "").strip()
 
     if not ssid:
-        return jsonify({“status”: “error”, “message”: “❌ SSID darf nicht leer sein.”})
+        return jsonify({"status": "error", "message": "❌ SSID darf nicht leer sein."})
     if len(ssid) > 32 or any(c in ssid for c in ('\n', '\r')):
-        return jsonify({“status”: “error”, “message”: “❌ SSID enthält ungültige Zeichen.”})
+        return jsonify({"status": "error", "message": "❌ SSID enthält ungültige Zeichen."})
     if not psk:
-        return jsonify({“status”: “error”, “message”: “❌ Passwort darf nicht leer sein.”})
+        return jsonify({"status": "error", "message": "❌ Passwort darf nicht leer sein."})
     if any(c in psk for c in ('\n', '\r')):
-        return jsonify({“status”: “error”, “message”: “❌ Passwort enthält ungültige Zeichen.”})
+        return jsonify({"status": "error", "message": "❌ Passwort enthält ungültige Zeichen."})
 
     try:
         # nmcli übernimmt Verbindungsaufbau direkt über NetworkManager (kein wpa_supplicant)
         result = subprocess.run(
-            [“sudo”, “-n”, “nmcli”, “device”, “wifi”, “connect”, ssid, “password”, psk],
+            ["sudo", "-n", "nmcli", "device", "wifi", "connect", ssid, "password", psk],
             capture_output=True,
             text=True,
             timeout=30
@@ -768,41 +768,41 @@ def wifi_configure():
 
         if result.returncode == 0:
             return jsonify({
-                “status”: “ok”,
-                “message”: f”✅ Erfolgreich mit '{ssid}' verbunden.”
+                "status": "ok",
+                "message": f"✅ Erfolgreich mit '{ssid}' verbunden."
             })
         else:
-            error_msg = (result.stderr.strip() or result.stdout.strip()) or “Unbekannter Fehler”
+            error_msg = (result.stderr.strip() or result.stdout.strip()) or "Unbekannter Fehler"
             return jsonify({
-                “status”: “error”,
-                “message”: f”❌ Verbindung fehlgeschlagen: {error_msg}”
+                "status": "error",
+                "message": f"❌ Verbindung fehlgeschlagen: {error_msg}"
             })
 
     except subprocess.TimeoutExpired:
         return jsonify({
-            “status”: “error”,
-            “message”: “❌ Zeitüberschreitung. Bitte SSID und Passwort prüfen.”
+            "status": "error",
+            "message": "❌ Zeitüberschreitung. Bitte SSID und Passwort prüfen."
         })
     except FileNotFoundError:
         return jsonify({
-            “status”: “error”,
-            “message”: “❌ nmcli nicht gefunden. Ist NetworkManager installiert? (sudo apt install network-manager)”
+            "status": "error",
+            "message": "❌ nmcli nicht gefunden. Ist NetworkManager installiert? (sudo apt install network-manager)"
         })
     except Exception as e:
         return jsonify({
-            “status”: “error”,
-            “message”: f”❌ Unerwarteter Fehler: {e}”
+            "status": "error",
+            "message": f"❌ Unerwarteter Fehler: {e}"
         })
 
 
-@app.route(“/wifi/scan”)
+@app.route("/wifi/scan")
 @login_required
 def wifi_scan():
-    “””Scannt WLAN-Netzwerke via nmcli und gibt die Liste zurück.”””
+    """Scannt WLAN-Netzwerke via nmcli und gibt die Liste zurück."""
     networks = []
     try:
         subprocess.run(
-            [“sudo”, “-n”, “nmcli”, “device”, “wifi”, “rescan”],
+            ["sudo", "-n", "nmcli", "device", "wifi", "rescan"],
             stderr=subprocess.DEVNULL, timeout=8
         )
         time.sleep(2)
@@ -811,23 +811,23 @@ def wifi_scan():
 
     try:
         result = subprocess.check_output(
-            [“nmcli”, “-t”, “-f”, “SSID,SIGNAL”, “dev”, “wifi”],
+            ["nmcli", "-t", "-f", "SSID,SIGNAL", "dev", "wifi"],
             stderr=subprocess.DEVNULL,
             timeout=10
         )
         seen = set()
-        for line in result.decode(errors=”ignore”).splitlines():
-            if “:” not in line:
+        for line in result.decode(errors="ignore").splitlines():
+            if ":" not in line:
                 continue
-            ssid_part, signal_part = line.rsplit(“:”, 1)  # rsplit: letzten Doppelpunkt nehmen
+            ssid_part, signal_part = line.rsplit(":", 1)  # rsplit: letzten Doppelpunkt nehmen
             ssid = ssid_part.strip()
             if ssid and ssid not in seen:
                 seen.add(ssid)
-                networks.append({“ssid”: ssid, “signal”: signal_part.strip()})
+                networks.append({"ssid": ssid, "signal": signal_part.strip()})
     except Exception as e:
-        return jsonify({“error”: str(e), “networks”: []})
+        return jsonify({"error": str(e), "networks": []})
 
-    return jsonify({“networks”: networks})
+    return jsonify({"networks": networks})
 
 
 
