@@ -112,39 +112,139 @@
   <h3 class="text-base font-semibold text-sky-400 mb-5 flex items-center gap-2">
     <span>📶</span> WLAN-Konfiguration
   </h3>
+
+  <!-- Modus-Umschalter -->
+  <div class="flex gap-2 mb-4">
+    <button type="button" id="btnScan" onclick="setWifiMode('scan')"
+      class="flex-1 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white transition">
+      Netzwerk auswählen
+    </button>
+    <button type="button" id="btnManual" onclick="setWifiMode('manual')"
+      class="flex-1 py-1.5 rounded-lg text-xs font-medium bg-slate-700 text-slate-400 hover:bg-slate-600 transition">
+      SSID manuell eingeben
+    </button>
+  </div>
+
   <form id="wifiForm" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-slate-300 mb-1">SSID auswählen</label>
-      <select name="ssid" class="border rounded-lg px-3 py-2 w-full text-sm">
-        {% for net in sys.networks %}
-          <option value="{{ net.ssid }}">{{ net.ssid }} (Signal: {{ net.signal }}%)</option>
-        {% endfor %}
-      </select>
+
+    <!-- Scan-Modus -->
+    <div id="scanMode">
+      <label class="block text-sm font-medium text-slate-300 mb-1">Netzwerk</label>
+      <div class="flex gap-2">
+        <select id="ssidSelect" class="border rounded-lg px-3 py-2 text-sm flex-1">
+          {% if sys.networks %}
+            {% for net in sys.networks %}
+              <option value="{{ net.ssid }}">{{ net.ssid }} &nbsp;({{ net.signal }}%)</option>
+            {% endfor %}
+          {% else %}
+            <option value="">— Keine Netzwerke gefunden —</option>
+          {% endif %}
+        </select>
+        <button type="button" id="rescanBtn" onclick="rescanNetworks()"
+          class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg text-xs transition whitespace-nowrap">
+          🔄 Scan
+        </button>
+      </div>
     </div>
-    <div>
-      <label class="block text-sm font-medium text-slate-300 mb-1">Kennwort</label>
-      <input type="password" name="psk" class="border rounded-lg px-3 py-2 w-full text-sm" placeholder="••••••••">
+
+    <!-- Manuell-Modus -->
+    <div id="manualMode" class="hidden">
+      <label class="block text-sm font-medium text-slate-300 mb-1">SSID</label>
+      <input type="text" id="ssidManual" placeholder="Netzwerkname eingeben..."
+        class="border rounded-lg px-3 py-2 w-full text-sm">
     </div>
+
+    <!-- Passwort -->
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">Passwort</label>
+      <input type="password" id="wifiPsk" placeholder="••••••••"
+        class="border rounded-lg px-3 py-2 w-full text-sm">
+    </div>
+
     <button type="submit"
       class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-6 py-2.5 rounded-lg transition w-full text-sm">
-      💾 Verbinden
+      📶 Verbinden
     </button>
   </form>
-  <p id="msg" class="text-center mt-4 text-sm hidden"></p>
+
+  <div id="wifiMsg" class="hidden mt-3 p-3 rounded-lg text-sm"></div>
 </div>
 
 <script>
+let wifiMode = 'scan';
+
+function setWifiMode(mode) {
+  wifiMode = mode;
+  const isScan = mode === 'scan';
+  document.getElementById('scanMode').classList.toggle('hidden', !isScan);
+  document.getElementById('manualMode').classList.toggle('hidden', isScan);
+  document.getElementById('btnScan').className =
+    isScan
+      ? 'flex-1 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white transition'
+      : 'flex-1 py-1.5 rounded-lg text-xs font-medium bg-slate-700 text-slate-400 hover:bg-slate-600 transition';
+  document.getElementById('btnManual').className =
+    !isScan
+      ? 'flex-1 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white transition'
+      : 'flex-1 py-1.5 rounded-lg text-xs font-medium bg-slate-700 text-slate-400 hover:bg-slate-600 transition';
+}
+
+async function rescanNetworks() {
+  const select = document.getElementById('ssidSelect');
+  const btn = document.getElementById('rescanBtn');
+  btn.textContent = '⏳ Scannt...';
+  btn.disabled = true;
+  select.innerHTML = '<option>Scanne Netzwerke...</option>';
+
+  try {
+    const res = await fetch('/wifi/scan');
+    const data = await res.json();
+    if (data.networks && data.networks.length > 0) {
+      select.innerHTML = data.networks
+        .map(n => `<option value="${n.ssid}">${n.ssid} &nbsp;(${n.signal}%)</option>`)
+        .join('');
+    } else {
+      select.innerHTML = '<option value="">— Keine Netzwerke gefunden —</option>';
+    }
+  } catch (err) {
+    select.innerHTML = `<option value="">— Fehler beim Scannen —</option>`;
+  } finally {
+    btn.textContent = '🔄 Scan';
+    btn.disabled = false;
+  }
+}
+
 document.getElementById('wifiForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const formData = new FormData(e.target);
-  const res = await fetch('/wifi/configure', { method: 'POST', body: formData });
-  const data = await res.json();
-  const msg = document.getElementById('msg');
-  msg.innerText = data.message;
+
+  const ssid = wifiMode === 'scan'
+    ? document.getElementById('ssidSelect').value
+    : document.getElementById('ssidManual').value.trim();
+  const psk = document.getElementById('wifiPsk').value;
+
+  const msg = document.getElementById('wifiMsg');
+  msg.textContent = '⏳ Verbinde... (kann bis zu 30 Sekunden dauern)';
+  msg.className = 'mt-3 p-3 rounded-lg text-sm bg-amber-900/40 border border-amber-700 text-amber-300';
   msg.classList.remove('hidden');
-  msg.className = data.status === 'ok'
-    ? 'block text-emerald-400 text-sm mt-4'
-    : 'block text-rose-400 text-sm mt-4';
+
+  const formData = new FormData();
+  if (wifiMode === 'scan') {
+    formData.append('ssid', ssid);
+  } else {
+    formData.append('ssid_manual', ssid);
+  }
+  formData.append('psk', psk);
+
+  try {
+    const res = await fetch('/wifi/configure', { method: 'POST', body: formData });
+    const data = await res.json();
+    msg.textContent = data.message;
+    msg.className = data.status === 'ok'
+      ? 'mt-3 p-3 rounded-lg text-sm bg-emerald-900/40 border border-emerald-700 text-emerald-300'
+      : 'mt-3 p-3 rounded-lg text-sm bg-rose-900/40 border border-rose-700 text-rose-300';
+  } catch (err) {
+    msg.textContent = '❌ Netzwerkfehler: ' + err;
+    msg.className = 'mt-3 p-3 rounded-lg text-sm bg-rose-900/40 border border-rose-700 text-rose-300';
+  }
 });
 </script>
 {% endblock %}
