@@ -151,11 +151,12 @@ def save_config(cfg: dict):
 
 # ===== Nextcloud / WebDAV Backup =====
 _BACKUP_FILES = ["config.json", "output_schedule.json", "output_names.json"]
+_MAX_BACKUPS = 100
 
 def _webdav_url(cfg, filename=""):
     base = cfg.get("NEXTCLOUD_URL", "").rstrip("/")
     user = cfg.get("NEXTCLOUD_USER", "")
-    path = cfg.get("NEXTCLOUD_PATH", "Backups").strip("/")
+    path = cfg.get("NEXTCLOUD_PATH", "Brunnen/Backups").strip("/")
     url = f"{base}/remote.php/dav/files/{user}/{path}"
     return f"{url}/{filename}" if filename else url
 
@@ -164,6 +165,26 @@ def _webdav_auth(cfg):
 
 def _nextcloud_configured(cfg):
     return bool(cfg.get("NEXTCLOUD_URL") and cfg.get("NEXTCLOUD_USER") and cfg.get("NEXTCLOUD_PASSWORD"))
+
+def _ensure_webdav_folders(cfg) -> tuple:
+    """Erstellt alle Ordner im Backup-Pfad Ebene für Ebene (behebt HTTP 409 bei verschachtelten Pfaden)."""
+    base = cfg.get("NEXTCLOUD_URL", "").rstrip("/")
+    user = cfg.get("NEXTCLOUD_USER", "")
+    parts = cfg.get("NEXTCLOUD_PATH", "Brunnen/Backups").strip("/").split("/")
+    auth = _webdav_auth(cfg)
+    for i in range(1, len(parts) + 1):
+        partial = "/".join(parts[:i])
+        url = f"{base}/remote.php/dav/files/{user}/{partial}"
+        r = requests.request("MKCOL", url, auth=auth, timeout=15)
+        if r.status_code not in (201, 405):  # 201=erstellt, 405=existiert bereits
+            return False, f"Ordner '{partial}' konnte nicht angelegt werden (HTTP {r.status_code})"
+    return True, "OK"
+
+def _backup_prefix(cfg) -> str:
+    device_id = cfg.get("DEVICE_ID", socket.gethostname()).strip() or "brunnen"
+    # Nur sichere Zeichen für Dateinamen
+    safe = "".join(c if c.isalnum() or c in "-_." else "_" for c in device_id)
+    return safe
 
 def create_backup_zip() -> bytes:
     buf = io.BytesIO()
@@ -180,24 +201,27 @@ def backup_to_nextcloud(cfg) -> tuple:
     """Lädt alle Config-Dateien als ZIP auf Nextcloud hoch. Gibt (ok, message) zurück."""
     try:
         auth = _webdav_auth(cfg)
-        folder_url = _webdav_url(cfg)
 
-        # Ordner anlegen falls nötig (MKCOL ist idempotent)
-        r = requests.request("MKCOL", folder_url, auth=auth, timeout=15)
-        if r.status_code not in (201, 405):  # 405 = existiert bereits
-            return False, f"Ordner konnte nicht angelegt werden (HTTP {r.status_code})"
+        # Ordner rekursiv anlegen (behebt HTTP 409 bei mehrstufigen Pfaden)
+        ok, msg = _ensure_webdav_folders(cfg)
+        if not ok:
+            return False, msg
 
-        # ZIP erstellen und hochladen
+        # ZIP mit DEVICE_ID-Präfix erstellen und hochladen
         zip_bytes = create_backup_zip()
+        prefix = _backup_prefix(cfg)
         ts = time.strftime("%Y-%m-%d_%H-%M-%S")
-        filename = f"brunnen_backup_{ts}.zip"
+        filename = f"{prefix}_backup_{ts}.zip"
         put_url = _webdav_url(cfg, filename)
 
         r = requests.put(put_url, data=zip_bytes, auth=auth,
                          headers={"Content-Type": "application/zip"}, timeout=30)
-        if r.status_code in (200, 201, 204):
-            return True, filename
-        return False, f"Upload fehlgeschlagen (HTTP {r.status_code})"
+        if r.status_code not in (200, 201, 204):
+            return False, f"Upload fehlgeschlagen (HTTP {r.status_code})"
+
+        # Alte Backups bereinigen (max. _MAX_BACKUPS)
+        _cleanup_old_backups(cfg)
+        return True, filename
 
     except requests.exceptions.ConnectionError:
         return False, "Verbindung fehlgeschlagen – Server nicht erreichbar."
@@ -207,23 +231,24 @@ def backup_to_nextcloud(cfg) -> tuple:
         return False, str(e)
 
 def list_backups_from_nextcloud(cfg) -> list:
-    """Gibt eine Liste der verfügbaren Backups zurück: [{'name': ..., 'date': ..., 'size': ...}]"""
+    """Gibt die Backups des aktuellen Geräts zurück (gefiltert nach DEVICE_ID-Präfix)."""
     try:
         auth = _webdav_auth(cfg)
         folder_url = _webdav_url(cfg) + "/"
         headers = {"Depth": "1", "Content-Type": "application/xml"}
         body = '<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:displayname/><d:getlastmodified/><d:getcontentlength/></d:prop></d:propfind>'
         r = requests.request("PROPFIND", folder_url, headers=headers, data=body, auth=auth, timeout=15)
-        if r.status_code not in (207,):
+        if r.status_code != 207:
             return []
         ns = {"d": "DAV:"}
         tree = ET.fromstring(r.text)
+        prefix = _backup_prefix(cfg)
         results = []
         for resp in tree.findall("d:response", ns):
             href = resp.findtext("d:href", namespaces=ns) or ""
-            if not href.endswith(".zip"):
-                continue
             name = href.split("/")[-1]
+            if not name.endswith(".zip") or not name.startswith(prefix):
+                continue
             props = resp.find("d:propstat/d:prop", ns) or resp
             date = props.findtext("d:getlastmodified", namespaces=ns) or ""
             size = props.findtext("d:getcontentlength", namespaces=ns) or "0"
@@ -232,6 +257,18 @@ def list_backups_from_nextcloud(cfg) -> list:
         return results
     except Exception:
         return []
+
+def _cleanup_old_backups(cfg):
+    """Löscht die ältesten Backups dieses Geräts wenn mehr als _MAX_BACKUPS vorhanden sind."""
+    backups = list_backups_from_nextcloud(cfg)
+    if len(backups) <= _MAX_BACKUPS:
+        return
+    auth = _webdav_auth(cfg)
+    for old in backups[_MAX_BACKUPS:]:
+        try:
+            requests.delete(_webdav_url(cfg, old["name"]), auth=auth, timeout=10)
+        except Exception:
+            pass
 
 def restore_from_nextcloud(cfg, filename) -> tuple:
     """Lädt ein Backup-ZIP herunter und entpackt die Config-Dateien."""
@@ -253,7 +290,6 @@ def restore_from_nextcloud(cfg, filename) -> tuple:
                     continue  # fremde Dateien ignorieren
                 zf.extract(member, config_dir)
 
-        # Logger über Konfig-Änderung informieren
         signal_config_update()
         return True, f"Backup '{filename}' erfolgreich wiederhergestellt."
     except zipfile.BadZipFile:
