@@ -155,7 +155,7 @@ _BACKUP_FILES = ["config.json", "output_schedule.json", "output_names.json"]
 def _webdav_url(cfg, filename=""):
     base = cfg.get("NEXTCLOUD_URL", "").rstrip("/")
     user = cfg.get("NEXTCLOUD_USER", "")
-    path = cfg.get("NEXTCLOUD_PATH", "Brunnen/Backups").strip("/")
+    path = cfg.get("NEXTCLOUD_PATH", "Backups").strip("/")
     url = f"{base}/remote.php/dav/files/{user}/{path}"
     return f"{url}/{filename}" if filename else url
 
