@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="flex items-center gap-3 mb-6">
+  <div class="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
+    <span class="text-lg">☁️</span>
+  </div>
+  <h1 class="text-xl font-bold text-white">Nextcloud-Backup</h1>
+</div>
+
+<div id="messageBox" class="hidden mb-5"></div>
+
+<!-- Abschnitt 1: Zugangsdaten -->
+<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-6 max-w-2xl mb-6">
+  <div class="flex items-center gap-2 mb-4">
+    <span class="text-base">🔐</span>
+    <h2 class="font-semibold text-slate-100 text-sm">Nextcloud-Zugangsdaten</h2>
+  </div>
+
+  <div class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">Server-URL</label>
+      <input id="NEXTCLOUD_URL" name="NEXTCLOUD_URL" type="url"
+        value="{{ nc_config.NEXTCLOUD_URL }}" placeholder="https://cloud.example.com"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      <p class="text-xs text-slate-500 mt-1">URL deiner Nextcloud-Instanz ohne abschliessenden Schrägstrich.</p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">Benutzername</label>
+      <input id="NEXTCLOUD_USER" name="NEXTCLOUD_USER" type="text"
+        value="{{ nc_config.NEXTCLOUD_USER }}"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">App-Passwort</label>
+      <input id="NEXTCLOUD_PASSWORD" name="NEXTCLOUD_PASSWORD" type="password"
+        value="{{ nc_config.NEXTCLOUD_PASSWORD }}"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      <p class="text-xs text-slate-500 mt-1">
+        Empfohlen: App-Passwort unter Nextcloud → Einstellungen → Sicherheit erstellen.
+      </p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">Backup-Pfad auf Nextcloud</label>
+      <input id="NEXTCLOUD_PATH" name="NEXTCLOUD_PATH" type="text"
+        value="{{ nc_config.NEXTCLOUD_PATH }}"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      <p class="text-xs text-slate-500 mt-1">Ordner auf Nextcloud, z.B. <code class="text-slate-400">Brunnen/Backups</code>. Wird automatisch erstellt.</p>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <button id="btnTest"
+        class="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-5 py-2.5 rounded-lg transition text-sm">
+        🔍 Verbindung testen
+      </button>
+      <button id="btnSave"
+        class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-5 py-2.5 rounded-lg transition text-sm">
+        💾 Speichern
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Abschnitt 2: Manuelles Backup -->
+<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-6 max-w-2xl mb-6">
+  <div class="flex items-center gap-2 mb-3">
+    <span class="text-base">📦</span>
+    <h2 class="font-semibold text-slate-100 text-sm">Manuelles Backup</h2>
+  </div>
+  <p class="text-xs text-slate-400 mb-4">
+    Sichert <code class="text-slate-300">config.json</code>, <code class="text-slate-300">output_schedule.json</code>
+    und <code class="text-slate-300">output_names.json</code> als ZIP auf Nextcloud.<br>
+    Ein Backup wird auch automatisch beim Speichern der Konfiguration erstellt.
+  </p>
+  <button id="btnBackup"
+    class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm w-full">
+    ☁️ Backup jetzt erstellen
+  </button>
+  <div id="backupResult" class="mt-3"></div>
+</div>
+
+<!-- Abschnitt 3: Backups wiederherstellen -->
+<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-6 max-w-2xl">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <span class="text-base">🔁</span>
+      <h2 class="font-semibold text-slate-100 text-sm">Verfügbare Backups</h2>
+    </div>
+    <button id="btnRefresh"
+      class="text-xs text-slate-400 hover:text-slate-200 transition px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">
+      ↻ Aktualisieren
+    </button>
+  </div>
+
+  <div id="backupList" class="space-y-2">
+    <p class="text-xs text-slate-500 italic">Lade Backup-Liste…</p>
+  </div>
+</div>
+
+<script>
+function showMessage(msg, success) {
+  const box = document.getElementById("messageBox");
+  box.textContent = msg;
+  box.className = success
+    ? "p-3 rounded-lg bg-emerald-900/40 border border-emerald-700 text-emerald-300 text-sm mb-5"
+    : "p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-5";
+}
+
+function ncFormData() {
+  const fd = new FormData();
+  ["NEXTCLOUD_URL","NEXTCLOUD_USER","NEXTCLOUD_PASSWORD","NEXTCLOUD_PATH"].forEach(k => {
+    fd.append(k, document.getElementById(k).value);
+  });
+  return fd;
+}
+
+// Verbindung testen
+document.getElementById("btnTest").addEventListener("click", async () => {
+  const btn = document.getElementById("btnTest");
+  btn.disabled = true;
+  btn.textContent = "⏳ Teste…";
+  try {
+    // Erst speichern, dann testen
+    const saveResp = await fetch("{{ url_for('update_config') }}", { method: "POST", body: ncFormData() });
+    const saveData = await saveResp.json();
+    if (!saveData.success) { showMessage(saveData.message, false); return; }
+
+    const resp = await fetch("/backup/test", { method: "POST" });
+    const data = await resp.json();
+    showMessage(data.message, data.success);
+  } catch(e) {
+    showMessage("❌ Netzwerkfehler: " + e, false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "🔍 Verbindung testen";
+  }
+});
+
+// Einstellungen speichern
+document.getElementById("btnSave").addEventListener("click", async () => {
+  const btn = document.getElementById("btnSave");
+  btn.disabled = true;
+  btn.textContent = "⏳ Speichere…";
+  try {
+    const resp = await fetch("{{ url_for('update_config') }}", { method: "POST", body: ncFormData() });
+    const data = await resp.json();
+    showMessage(data.message, data.success);
+  } catch(e) {
+    showMessage("❌ Netzwerkfehler: " + e, false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "💾 Speichern";
+  }
+});
+
+// Manuelles Backup
+document.getElementById("btnBackup").addEventListener("click", async () => {
+  const btn = document.getElementById("btnBackup");
+  const resultBox = document.getElementById("backupResult");
+  btn.disabled = true;
+  btn.textContent = "⏳ Backup läuft…";
+  resultBox.innerHTML = "";
+  try {
+    const resp = await fetch("/backup/run", { method: "POST" });
+    const data = await resp.json();
+    resultBox.innerHTML = data.success
+      ? `<div class='p-3 rounded-lg bg-emerald-900/40 border border-emerald-700 text-emerald-300 text-sm'>${data.message}</div>`
+      : `<div class='p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm'>${data.message}</div>`;
+    if (data.success) loadBackupList();
+  } catch(e) {
+    resultBox.innerHTML = `<div class='p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm'>❌ Netzwerkfehler: ${e}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "☁️ Backup jetzt erstellen";
+  }
+});
+
+// Backup-Liste laden
+async function loadBackupList() {
+  const listEl = document.getElementById("backupList");
+  listEl.innerHTML = '<p class="text-xs text-slate-500 italic">Lade…</p>';
+  try {
+    const resp = await fetch("/backup/list");
+    const backups = await resp.json();
+    if (!backups.length) {
+      listEl.innerHTML = '<p class="text-xs text-slate-500 italic">Keine Backups gefunden.</p>';
+      return;
+    }
+    listEl.innerHTML = backups.map(b => {
+      const sizeKB = (b.size / 1024).toFixed(1);
+      return `
+        <div class="flex items-center justify-between bg-slate-700/50 rounded-lg px-4 py-3">
+          <div>
+            <p class="text-sm text-slate-200 font-mono">${b.name}</p>
+            <p class="text-xs text-slate-500 mt-0.5">${b.date} &middot; ${sizeKB} KB</p>
+          </div>
+          <button onclick="restoreBackup('${b.name}')"
+            class="text-xs bg-amber-600 hover:bg-amber-500 text-white font-semibold px-3 py-1.5 rounded-lg transition shrink-0 ml-4">
+            🔁 Wiederherstellen
+          </button>
+        </div>`;
+    }).join("");
+  } catch(e) {
+    listEl.innerHTML = `<p class="text-xs text-rose-400">Fehler beim Laden: ${e}</p>`;
+  }
+}
+
+async function restoreBackup(filename) {
+  if (!confirm(`Backup "${filename}" wiederherstellen?\n\nDie aktuellen Konfigurationsdateien werden überschrieben!`)) return;
+  const listEl = document.getElementById("backupList");
+  try {
+    const fd = new FormData();
+    fd.append("filename", filename);
+    const resp = await fetch("/backup/restore", { method: "POST", body: fd });
+    const data = await resp.json();
+    showMessage(data.message, data.success);
+  } catch(e) {
+    showMessage("❌ Netzwerkfehler: " + e, false);
+  }
+}
+
+document.getElementById("btnRefresh").addEventListener("click", loadBackupList);
+loadBackupList();
+</script>
+
+{% endblock %}

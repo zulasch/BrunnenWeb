@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, json, socket, subprocess, functools, time
+import os, json, socket, subprocess, functools, time, zipfile, io
 from pathlib import Path
 from threading import Thread
 from urllib.parse import urlparse, urljoin
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash
+import requests
+from xml.etree import ElementTree as ET
 import mosfet_control
 from datetime import datetime
 
@@ -30,6 +32,10 @@ DEFAULT_CONFIG = {
     "INFLUX_ORG": "",
     "INFLUX_BUCKET": "",
     "LOG_LEVEL": "ERROR",
+    "NEXTCLOUD_URL": "",
+    "NEXTCLOUD_USER": "",
+    "NEXTCLOUD_PASSWORD": "",
+    "NEXTCLOUD_PATH": "Brunnen/Backups",
     "BMP280_ENABLED": True,
     "BMP280_ADDRESS": 0x76,
     "NAME_BMP280": "Barometer",
@@ -142,6 +148,124 @@ def load_config():
 def save_config(cfg: dict):
     with open(CONFIG_PATH, "w") as f:
         json.dump(cfg, f, indent=2)
+
+# ===== Nextcloud / WebDAV Backup =====
+_BACKUP_FILES = ["config.json", "output_schedule.json", "output_names.json"]
+
+def _webdav_url(cfg, filename=""):
+    base = cfg.get("NEXTCLOUD_URL", "").rstrip("/")
+    user = cfg.get("NEXTCLOUD_USER", "")
+    path = cfg.get("NEXTCLOUD_PATH", "Brunnen/Backups").strip("/")
+    url = f"{base}/remote.php/dav/files/{user}/{path}"
+    return f"{url}/{filename}" if filename else url
+
+def _webdav_auth(cfg):
+    return (cfg.get("NEXTCLOUD_USER", ""), cfg.get("NEXTCLOUD_PASSWORD", ""))
+
+def _nextcloud_configured(cfg):
+    return bool(cfg.get("NEXTCLOUD_URL") and cfg.get("NEXTCLOUD_USER") and cfg.get("NEXTCLOUD_PASSWORD"))
+
+def create_backup_zip() -> bytes:
+    buf = io.BytesIO()
+    config_dir = os.path.join(BASE_DIR, "config")
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for fname in _BACKUP_FILES:
+            fpath = os.path.join(config_dir, fname)
+            if os.path.exists(fpath):
+                zf.write(fpath, fname)
+    buf.seek(0)
+    return buf.read()
+
+def backup_to_nextcloud(cfg) -> tuple:
+    """Lädt alle Config-Dateien als ZIP auf Nextcloud hoch. Gibt (ok, message) zurück."""
+    try:
+        auth = _webdav_auth(cfg)
+        folder_url = _webdav_url(cfg)
+
+        # Ordner anlegen falls nötig (MKCOL ist idempotent)
+        r = requests.request("MKCOL", folder_url, auth=auth, timeout=15)
+        if r.status_code not in (201, 405):  # 405 = existiert bereits
+            return False, f"Ordner konnte nicht angelegt werden (HTTP {r.status_code})"
+
+        # ZIP erstellen und hochladen
+        zip_bytes = create_backup_zip()
+        ts = time.strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"brunnen_backup_{ts}.zip"
+        put_url = _webdav_url(cfg, filename)
+
+        r = requests.put(put_url, data=zip_bytes, auth=auth,
+                         headers={"Content-Type": "application/zip"}, timeout=30)
+        if r.status_code in (200, 201, 204):
+            return True, filename
+        return False, f"Upload fehlgeschlagen (HTTP {r.status_code})"
+
+    except requests.exceptions.ConnectionError:
+        return False, "Verbindung fehlgeschlagen – Server nicht erreichbar."
+    except requests.exceptions.Timeout:
+        return False, "Zeitüberschreitung beim Upload."
+    except Exception as e:
+        return False, str(e)
+
+def list_backups_from_nextcloud(cfg) -> list:
+    """Gibt eine Liste der verfügbaren Backups zurück: [{'name': ..., 'date': ..., 'size': ...}]"""
+    try:
+        auth = _webdav_auth(cfg)
+        folder_url = _webdav_url(cfg) + "/"
+        headers = {"Depth": "1", "Content-Type": "application/xml"}
+        body = '<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:displayname/><d:getlastmodified/><d:getcontentlength/></d:prop></d:propfind>'
+        r = requests.request("PROPFIND", folder_url, headers=headers, data=body, auth=auth, timeout=15)
+        if r.status_code not in (207,):
+            return []
+        ns = {"d": "DAV:"}
+        tree = ET.fromstring(r.text)
+        results = []
+        for resp in tree.findall("d:response", ns):
+            href = resp.findtext("d:href", namespaces=ns) or ""
+            if not href.endswith(".zip"):
+                continue
+            name = href.split("/")[-1]
+            props = resp.find("d:propstat/d:prop", ns) or resp
+            date = props.findtext("d:getlastmodified", namespaces=ns) or ""
+            size = props.findtext("d:getcontentlength", namespaces=ns) or "0"
+            results.append({"name": name, "date": date, "size": int(size)})
+        results.sort(key=lambda x: x["name"], reverse=True)
+        return results
+    except Exception:
+        return []
+
+def restore_from_nextcloud(cfg, filename) -> tuple:
+    """Lädt ein Backup-ZIP herunter und entpackt die Config-Dateien."""
+    # Sicherheitsprüfung: nur .zip, kein Path-Traversal
+    if not filename.endswith(".zip") or "/" in filename or "\\" in filename:
+        return False, "Ungültiger Dateiname."
+    try:
+        auth = _webdav_auth(cfg)
+        get_url = _webdav_url(cfg, filename)
+        r = requests.get(get_url, auth=auth, timeout=30)
+        if r.status_code != 200:
+            return False, f"Download fehlgeschlagen (HTTP {r.status_code})"
+
+        config_dir = os.path.join(BASE_DIR, "config")
+        allowed = set(_BACKUP_FILES)
+        with zipfile.ZipFile(io.BytesIO(r.content)) as zf:
+            for member in zf.namelist():
+                if member not in allowed:
+                    continue  # fremde Dateien ignorieren
+                zf.extract(member, config_dir)
+
+        # Logger über Konfig-Änderung informieren
+        signal_config_update()
+        return True, f"Backup '{filename}' erfolgreich wiederhergestellt."
+    except zipfile.BadZipFile:
+        return False, "Ungültige ZIP-Datei."
+    except Exception as e:
+        return False, str(e)
+
+def _auto_backup(cfg):
+    """Wird im Hintergrund-Thread nach jeder Konfig-Änderung aufgerufen."""
+    if _nextcloud_configured(cfg):
+        backup_to_nextcloud(cfg)
+
 
 def validate_config(cfg: dict):
     errors = []
@@ -313,7 +437,8 @@ def update_config():
 
         # Felder, die immer als Text behandelt werden sollen
         string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS", "DEVICE_ID", "LOCATION",
-                       "REED_1_NAME", "REED_2_NAME"]
+                       "REED_1_NAME", "REED_2_NAME",
+                       "NEXTCLOUD_URL", "NEXTCLOUD_USER", "NEXTCLOUD_PASSWORD", "NEXTCLOUD_PATH"]
         bool_keys = set(["BMP280_ENABLED"] + [k for k in cfg.keys() if k.endswith("_ENABLED")])
 
         for key, value in data.items():
@@ -338,6 +463,7 @@ def update_config():
             return jsonify({"success": False, "message": "; ".join(errors)}), 400
 
         save_config(cfg)
+        Thread(target=_auto_backup, args=(cfg,), daemon=True).start()
 
         if signal_config_update():
             return jsonify({"success": True, "message": "✅ Änderungen gespeichert und aktiv im Messsystem."})
@@ -830,6 +956,76 @@ def wifi_scan():
     return jsonify({"networks": networks})
 
 
+
+
+@app.route("/backup")
+@login_required
+def backup_page():
+    cfg = load_config()
+    nc_config = {
+        "NEXTCLOUD_URL": cfg.get("NEXTCLOUD_URL", ""),
+        "NEXTCLOUD_USER": cfg.get("NEXTCLOUD_USER", ""),
+        "NEXTCLOUD_PASSWORD": cfg.get("NEXTCLOUD_PASSWORD", ""),
+        "NEXTCLOUD_PATH": cfg.get("NEXTCLOUD_PATH", "Brunnen/Backups"),
+    }
+    return render_template("backup.html", nc_config=nc_config, title="Backup")
+
+@app.route("/backup/test", methods=["POST"])
+@login_required
+def backup_test():
+    cfg = load_config()
+    if not _nextcloud_configured(cfg):
+        return jsonify({"success": False, "message": "❌ Nextcloud nicht konfiguriert."})
+    try:
+        auth = _webdav_auth(cfg)
+        folder_url = _webdav_url(cfg) + "/"
+        r = requests.request("PROPFIND", folder_url, auth=auth,
+                             headers={"Depth": "0"}, timeout=10)
+        if r.status_code in (207, 404):
+            return jsonify({"success": True, "message": "✅ Verbindung erfolgreich."})
+        if r.status_code == 401:
+            return jsonify({"success": False, "message": "❌ Authentifizierung fehlgeschlagen (falscher Benutzer oder Passwort)."})
+        return jsonify({"success": False, "message": f"❌ Server antwortet mit HTTP {r.status_code}."})
+    except requests.exceptions.ConnectionError:
+        return jsonify({"success": False, "message": "❌ Server nicht erreichbar."})
+    except requests.exceptions.Timeout:
+        return jsonify({"success": False, "message": "❌ Zeitüberschreitung."})
+    except Exception as e:
+        return jsonify({"success": False, "message": f"❌ Fehler: {e}"})
+
+@app.route("/backup/run", methods=["POST"])
+@login_required
+def backup_run():
+    cfg = load_config()
+    if not _nextcloud_configured(cfg):
+        return jsonify({"success": False, "message": "❌ Nextcloud nicht konfiguriert."})
+    ok, msg = backup_to_nextcloud(cfg)
+    if ok:
+        return jsonify({"success": True, "message": f"✅ Backup erstellt: {msg}"})
+    return jsonify({"success": False, "message": f"❌ {msg}"}), 500
+
+@app.route("/backup/list")
+@login_required
+def backup_list():
+    cfg = load_config()
+    if not _nextcloud_configured(cfg):
+        return jsonify([])
+    backups = list_backups_from_nextcloud(cfg)
+    return jsonify(backups)
+
+@app.route("/backup/restore", methods=["POST"])
+@login_required
+def backup_restore():
+    filename = request.form.get("filename", "").strip()
+    if not filename:
+        return jsonify({"success": False, "message": "❌ Kein Dateiname angegeben."}), 400
+    cfg = load_config()
+    if not _nextcloud_configured(cfg):
+        return jsonify({"success": False, "message": "❌ Nextcloud nicht konfiguriert."}), 400
+    ok, msg = restore_from_nextcloud(cfg, filename)
+    if ok:
+        return jsonify({"success": True, "message": f"✅ {msg}"})
+    return jsonify({"success": False, "message": f"❌ {msg}"}), 500
 
 
 def scheduler_loop():
