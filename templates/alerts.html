@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="flex items-center gap-3 mb-6">
+  <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+    <span class="text-lg">🔔</span>
+  </div>
+  <h1 class="text-xl font-bold text-white">Alarmierung</h1>
+</div>
+
+<div id="messageBox" class="hidden mb-5"></div>
+
+<!-- Abschnitt 1: SMTP-Konfiguration -->
+<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-6 max-w-2xl mb-6">
+  <div class="flex items-center gap-2 mb-4">
+    <span class="text-base">📧</span>
+    <h2 class="font-semibold text-slate-100 text-sm">Email-Server (SMTP)</h2>
+  </div>
+
+  <div class="space-y-4">
+    <div class="grid grid-cols-3 gap-3">
+      <div class="col-span-2">
+        <label class="block text-sm font-medium text-slate-300 mb-1">SMTP-Server</label>
+        <input id="SMTP_HOST" name="SMTP_HOST" type="text"
+          value="{{ smtp_cfg.SMTP_HOST }}" placeholder="smtp.gmail.com"
+          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1">Port</label>
+        <input id="SMTP_PORT" name="SMTP_PORT" type="number"
+          value="{{ smtp_cfg.SMTP_PORT }}"
+          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <label class="text-sm font-medium text-slate-300">STARTTLS</label>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="SMTP_TLS" name="SMTP_TLS"
+          class="sr-only peer" {% if smtp_cfg.SMTP_TLS %}checked{% endif %}>
+        <div class="w-10 h-5 bg-slate-600 peer-focus:ring-2 peer-focus:ring-sky-500 rounded-full peer
+                    peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5
+                    after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4
+                    after:transition-all peer-checked:bg-sky-600"></div>
+      </label>
+      <span class="text-xs text-slate-500">Deaktivieren bei Port 465 (SSL)</span>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">Benutzername</label>
+      <input id="SMTP_USER" name="SMTP_USER" type="text"
+        value="{{ smtp_cfg.SMTP_USER }}" placeholder="user@example.com"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">Passwort</label>
+      <input id="SMTP_PASSWORD" name="SMTP_PASSWORD" type="password"
+        value="{{ smtp_cfg.SMTP_PASSWORD }}"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">Absender-Adresse</label>
+      <input id="SMTP_FROM" name="SMTP_FROM" type="email"
+        value="{{ smtp_cfg.SMTP_FROM }}" placeholder="brunnen@example.com"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      <p class="text-xs text-slate-500 mt-1">Wenn leer, wird der Benutzername als Absender verwendet.</p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-300 mb-1">Empfänger</label>
+      <input id="SMTP_TO" name="SMTP_TO" type="text"
+        value="{{ smtp_cfg.SMTP_TO }}" placeholder="admin@example.com, techniker@example.com"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      <p class="text-xs text-slate-500 mt-1">Mehrere Adressen kommagetrennt.</p>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <button id="btnSaveSmtp"
+        class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-5 py-2.5 rounded-lg transition text-sm">
+        💾 Speichern
+      </button>
+      <button id="btnTest"
+        class="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-5 py-2.5 rounded-lg transition text-sm">
+        📧 Test-Email senden
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Abschnitt 2: Schwellwerte -->
+<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-6 max-w-2xl mb-6">
+  <div class="flex items-center gap-2 mb-5">
+    <span class="text-base">📊</span>
+    <h2 class="font-semibold text-slate-100 text-sm">Schwellwerte pro Sensor</h2>
+  </div>
+
+  <div class="space-y-5">
+    {% for ch in channels %}
+    <div class="border border-slate-700 rounded-lg p-4">
+      <p class="text-sm font-semibold text-slate-200 mb-3">
+        {{ ch.key }} – {{ ch.name }}
+        {% if ch.unit %}<span class="text-slate-500 font-normal">[{{ ch.unit }}]</span>{% endif %}
+      </p>
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Min -->
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="ALARM_{{ ch.key }}_MIN_EN" name="ALARM_{{ ch.key }}_MIN_EN"
+                class="sr-only peer" {% if ch.min_en %}checked{% endif %}>
+              <div class="w-9 h-4 bg-slate-600 rounded-full peer peer-checked:bg-rose-600
+                          peer-checked:after:translate-x-5 after:content-[''] after:absolute
+                          after:top-0.5 after:left-0.5 after:bg-white after:rounded-full
+                          after:h-3 after:w-3 after:transition-all"></div>
+            </label>
+            <label class="text-xs text-slate-300 font-medium">Min-Alarm</label>
+          </div>
+          <input id="ALARM_{{ ch.key }}_MIN" name="ALARM_{{ ch.key }}_MIN" type="number" step="any"
+            value="{{ ch.min_val }}"
+            class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+        </div>
+        <!-- Max -->
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="ALARM_{{ ch.key }}_MAX_EN" name="ALARM_{{ ch.key }}_MAX_EN"
+                class="sr-only peer" {% if ch.max_en %}checked{% endif %}>
+              <div class="w-9 h-4 bg-slate-600 rounded-full peer peer-checked:bg-amber-500
+                          peer-checked:after:translate-x-5 after:content-[''] after:absolute
+                          after:top-0.5 after:left-0.5 after:bg-white after:rounded-full
+                          after:h-3 after:w-3 after:transition-all"></div>
+            </label>
+            <label class="text-xs text-slate-300 font-medium">Max-Alarm</label>
+          </div>
+          <input id="ALARM_{{ ch.key }}_MAX" name="ALARM_{{ ch.key }}_MAX" type="number" step="any"
+            value="{{ ch.max_val }}"
+            class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <button id="btnSaveThresholds" class="mt-5 w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2.5 rounded-lg transition text-sm">
+    💾 Schwellwerte speichern
+  </button>
+</div>
+
+<!-- Abschnitt 3: Weitere Optionen -->
+<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-6 max-w-2xl mb-6">
+  <div class="flex items-center gap-2 mb-4">
+    <span class="text-base">⚙️</span>
+    <h2 class="font-semibold text-slate-100 text-sm">Weitere Alarm-Optionen</h2>
+  </div>
+
+  <div class="space-y-4">
+    <div class="flex items-start gap-3">
+      <label class="relative inline-flex items-center cursor-pointer mt-0.5">
+        <input type="checkbox" id="ALARM_SENSOR_FAIL_EN" name="ALARM_SENSOR_FAIL_EN"
+          class="sr-only peer" {% if alarm_sensor_fail %}checked{% endif %}>
+        <div class="w-10 h-5 bg-slate-600 rounded-full peer peer-checked:bg-sky-600
+                    peer-checked:after:translate-x-5 after:content-[''] after:absolute
+                    after:top-0.5 after:left-0.5 after:bg-white after:rounded-full
+                    after:h-4 after:w-4 after:transition-all"></div>
+      </label>
+      <div>
+        <p class="text-sm text-slate-200 font-medium">Alarm bei Sensorausfall</p>
+        <p class="text-xs text-slate-500">Email wenn ein Sensor nach 3 aufeinanderfolgenden Messungen Fehler liefert.</p>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-3">
+      <label class="relative inline-flex items-center cursor-pointer mt-0.5">
+        <input type="checkbox" id="ALARM_OUTPUT_CHANGES_EN" name="ALARM_OUTPUT_CHANGES_EN"
+          class="sr-only peer" {% if alarm_output %}checked{% endif %}>
+        <div class="w-10 h-5 bg-slate-600 rounded-full peer peer-checked:bg-sky-600
+                    peer-checked:after:translate-x-5 after:content-[''] after:absolute
+                    after:top-0.5 after:left-0.5 after:bg-white after:rounded-full
+                    after:h-4 after:w-4 after:transition-all"></div>
+      </label>
+      <div>
+        <p class="text-sm text-slate-200 font-medium">Alarm bei Ausgangsschaltung</p>
+        <p class="text-xs text-slate-500">Email wenn ein digitaler Ausgang ein- oder ausgeschaltet wird (z.B. Pumpe).</p>
+      </div>
+    </div>
+
+    <button id="btnSaveOptions" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2.5 rounded-lg transition text-sm mt-2">
+      💾 Optionen speichern
+    </button>
+  </div>
+</div>
+
+<p class="text-xs text-slate-500 max-w-2xl">
+  ℹ️ Alarm-Rate-Limiting: Pro Alarm-Typ wird maximal eine Email pro Stunde gesendet.
+</p>
+
+<script>
+function showMessage(msg, success) {
+  const box = document.getElementById("messageBox");
+  box.textContent = msg;
+  box.className = success
+    ? "p-3 rounded-lg bg-emerald-900/40 border border-emerald-700 text-emerald-300 text-sm mb-5"
+    : "p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-5";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function collectIds(ids) {
+  const fd = new FormData();
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.type === "checkbox") {
+      fd.append(id, el.checked ? "true" : "false");
+    } else {
+      fd.append(id, el.value);
+    }
+  });
+  return fd;
+}
+
+async function saveFields(ids, btnEl) {
+  const orig = btnEl.textContent;
+  btnEl.disabled = true; btnEl.textContent = "⏳ Speichere…";
+  try {
+    const resp = await fetch("{{ url_for('update_config') }}", { method: "POST", body: collectIds(ids) });
+    const data = await resp.json();
+    showMessage(data.message, data.success);
+  } catch(e) {
+    showMessage("❌ Netzwerkfehler: " + e, false);
+  } finally {
+    btnEl.disabled = false; btnEl.textContent = orig;
+  }
+}
+
+// SMTP speichern
+document.getElementById("btnSaveSmtp").addEventListener("click", function() {
+  saveFields(["SMTP_HOST","SMTP_PORT","SMTP_TLS","SMTP_USER","SMTP_PASSWORD","SMTP_FROM","SMTP_TO"], this);
+});
+
+// Test-Email
+document.getElementById("btnTest").addEventListener("click", async function() {
+  const btn = this;
+  // Erst speichern, dann testen
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = "⏳ Sende…";
+  try {
+    const saveResp = await fetch("{{ url_for('update_config') }}", {
+      method: "POST",
+      body: collectIds(["SMTP_HOST","SMTP_PORT","SMTP_TLS","SMTP_USER","SMTP_PASSWORD","SMTP_FROM","SMTP_TO"])
+    });
+    const saveData = await saveResp.json();
+    if (!saveData.success) { showMessage(saveData.message, false); return; }
+    const resp = await fetch("/alerts/test", { method: "POST" });
+    const data = await resp.json();
+    showMessage(data.message, data.success);
+  } catch(e) {
+    showMessage("❌ Netzwerkfehler: " + e, false);
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+  }
+});
+
+// Schwellwerte speichern
+document.getElementById("btnSaveThresholds").addEventListener("click", function() {
+  const ids = [];
+  {% for ch in channels %}
+  ids.push("ALARM_{{ ch.key }}_MIN_EN", "ALARM_{{ ch.key }}_MIN",
+           "ALARM_{{ ch.key }}_MAX_EN", "ALARM_{{ ch.key }}_MAX");
+  {% endfor %}
+  saveFields(ids, this);
+});
+
+// Optionen speichern
+document.getElementById("btnSaveOptions").addEventListener("click", function() {
+  saveFields(["ALARM_SENSOR_FAIL_EN","ALARM_OUTPUT_CHANGES_EN"], this);
+});
+</script>
+
+{% endblock %}

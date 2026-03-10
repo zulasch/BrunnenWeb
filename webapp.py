@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, json, socket, subprocess, functools, time, zipfile, io
+import os, json, socket, subprocess, functools, time, zipfile, io, re
 from pathlib import Path
 from threading import Thread
 from urllib.parse import urlparse, urljoin
@@ -9,6 +9,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 import requests
 from xml.etree import ElementTree as ET
 import mosfet_control
+import alarm as alarm_module
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -36,6 +37,25 @@ DEFAULT_CONFIG = {
     "NEXTCLOUD_USER": "",
     "NEXTCLOUD_PASSWORD": "",
     "NEXTCLOUD_PATH": "Brunnen/Backups",
+    # SMTP / Email-Alarmierung
+    "SMTP_HOST": "",
+    "SMTP_PORT": 587,
+    "SMTP_USER": "",
+    "SMTP_PASSWORD": "",
+    "SMTP_FROM": "",
+    "SMTP_TO": "",
+    "SMTP_TLS": True,
+    # Alarm-Schwellwerte pro Kanal
+    "ALARM_A0_MIN_EN": False, "ALARM_A0_MIN": 0.0,
+    "ALARM_A0_MAX_EN": False, "ALARM_A0_MAX": 0.0,
+    "ALARM_A1_MIN_EN": False, "ALARM_A1_MIN": 0.0,
+    "ALARM_A1_MAX_EN": False, "ALARM_A1_MAX": 0.0,
+    "ALARM_A2_MIN_EN": False, "ALARM_A2_MIN": 0.0,
+    "ALARM_A2_MAX_EN": False, "ALARM_A2_MAX": 0.0,
+    "ALARM_A3_MIN_EN": False, "ALARM_A3_MIN": 0.0,
+    "ALARM_A3_MAX_EN": False, "ALARM_A3_MAX": 0.0,
+    "ALARM_SENSOR_FAIL_EN": False,
+    "ALARM_OUTPUT_CHANGES_EN": False,
     "BMP280_ENABLED": True,
     "BMP280_ADDRESS": 0x76,
     "NAME_BMP280": "Barometer",
@@ -80,9 +100,14 @@ DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A3", 150.0)
 
 
 # ===== Flask =====
-app = Flask(__name__, template_folder="templates")
+app = Flask(__name__, template_folder="templates", static_folder="static")
 # Geheimschlüssel (für Sessions). In Produktion in ENV legen!
 app.config["SECRET_KEY"] = os.environ.get("WEBAPP_SECRET", "change-me-please")
+
+@app.context_processor
+def inject_globals():
+    cfg = load_config()
+    return {"device_id": cfg.get("DEVICE_ID", socket.gethostname())}
 
 # ===== Helpers =====
 def load_schedule():
@@ -303,6 +328,39 @@ def _auto_backup(cfg):
         backup_to_nextcloud(cfg)
 
 
+def _log_output_to_influx(channel: int, state: bool, cfg=None):
+    """Schreibt ein Output-Schaltevent nach InfluxDB (Hintergrund-Thread)."""
+    if cfg is None:
+        cfg = load_config()
+    if not cfg.get("INFLUX_URL") or not cfg.get("INFLUX_TOKEN"):
+        return
+    try:
+        from influxdb_client import InfluxDBClient, Point
+        from influxdb_client.client.write_api import SYNCHRONOUS
+        names = load_names()
+        ch_name = names.get(str(channel), f"Kanal {channel + 1}")
+        device_id = cfg.get("DEVICE_ID", socket.gethostname())
+        with InfluxDBClient(url=cfg["INFLUX_URL"], token=cfg["INFLUX_TOKEN"],
+                            org=cfg.get("INFLUX_ORG", "")) as client:
+            write_api = client.write_api(write_options=SYNCHRONOUS)
+            p = (Point("digital_output")
+                 .tag("device_id", device_id)
+                 .tag("location", cfg.get("LOCATION", ""))
+                 .tag("channel", str(channel))
+                 .tag("name", ch_name)
+                 .field("state", 1 if state else 0)
+                 .field("state_text", "EIN" if state else "AUS"))
+            write_api.write(bucket=cfg["INFLUX_BUCKET"], record=p)
+        # Optional: Alarm bei Output-Schaltung
+        if cfg.get("ALARM_OUTPUT_CHANGES_EN") and alarm_module.smtp_configured(cfg):
+            subject = f"[BrunnenWeb] Ausgang {ch_name} {'EIN' if state else 'AUS'}"
+            body = (f"Ausgang {channel + 1} ({ch_name}) wurde geschaltet: "
+                    f"{'EIN' if state else 'AUS'}")
+            alarm_module.send_alarm_email(cfg, subject, body)
+    except Exception as e:
+        app.logger.warning(f"InfluxDB Output-Log Fehler: {e}")
+
+
 def validate_config(cfg: dict):
     errors = []
     try:
@@ -474,14 +532,17 @@ def update_config():
         # Felder, die immer als Text behandelt werden sollen
         string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS", "DEVICE_ID", "LOCATION",
                        "REED_1_NAME", "REED_2_NAME",
-                       "NEXTCLOUD_URL", "NEXTCLOUD_USER", "NEXTCLOUD_PASSWORD", "NEXTCLOUD_PATH"]
-        bool_keys = set(["BMP280_ENABLED"] + [k for k in cfg.keys() if k.endswith("_ENABLED")])
+                       "NEXTCLOUD_URL", "NEXTCLOUD_USER", "NEXTCLOUD_PASSWORD", "NEXTCLOUD_PATH",
+                       "SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "SMTP_TO"]
+        bool_keys = set(
+            [k for k in cfg.keys() if k.endswith("_ENABLED") or k.endswith("_EN") or k.endswith("_TLS")]
+        )
 
         for key, value in data.items():
             if key in cfg:
                 if key in bool_keys:
                     cfg[key] = str(value).lower() in ("1", "true", "yes", "on")
-                elif key == "BMP280_ADDRESS":
+                elif key in ("BMP280_ADDRESS", "SMTP_PORT"):
                     try:
                         cfg[key] = int(str(value), 0)
                     except Exception:
@@ -528,6 +589,7 @@ def outputs_names():
 @login_required
 def set_output(channel, state):
     mosfet_control.set_output(channel, bool(state))
+    Thread(target=_log_output_to_influx, args=(channel, bool(state)), daemon=True).start()
     return jsonify({"success": True, "message": f"Kanal {channel+1} {'AN' if state else 'AUS'}"})
 
 @app.route("/outputs/state")
@@ -853,6 +915,21 @@ def systemstatus_page():
         hostname = socket.gethostname()
         ip = subprocess.getoutput("hostname -I").split()[0]
         wifi = subprocess.getoutput("iwgetid -r") or "nicht verbunden"
+
+        # VPN-Status (tun0-Interface)
+        vpn_connected = False
+        vpn_ip = ""
+        try:
+            vpn_out = subprocess.check_output(
+                ["ip", "addr", "show", "tun0"], stderr=subprocess.DEVNULL, timeout=3
+            ).decode()
+            m = re.search(r"inet (\d+\.\d+\.\d+\.\d+)", vpn_out)
+            if m:
+                vpn_connected = True
+                vpn_ip = m.group(1)
+        except Exception:
+            pass
+
         try:
             temps = psutil.sensors_temperatures()
             if "cpu_thermal" in temps:
@@ -900,7 +977,8 @@ def systemstatus_page():
             "os": platform.platform(),
             "networks": networks
         }
-        return render_template("systemstatus.html", title="Systemstatus", sys=data)
+        return render_template("systemstatus.html", title="Systemstatus", sys=data,
+                               vpn_connected=vpn_connected, vpn_ip=vpn_ip)
     except Exception as e:
         return f"Fehler beim Laden des Systemstatus: {e}", 500
 
@@ -1064,6 +1142,46 @@ def backup_restore():
     return jsonify({"success": False, "message": f"❌ {msg}"}), 500
 
 
+@app.route("/alerts")
+@login_required
+def alerts_page():
+    cfg = load_config()
+    channels = []
+    for ch in ["A0", "A1", "A2", "A3"]:
+        channels.append({
+            "key": ch,
+            "name": cfg.get(f"NAME_{ch}", ch),
+            "unit": cfg.get(f"SENSOR_EINHEIT_{ch}", ""),
+            "min_en": cfg.get(f"ALARM_{ch}_MIN_EN", False),
+            "min_val": cfg.get(f"ALARM_{ch}_MIN", 0.0),
+            "max_en": cfg.get(f"ALARM_{ch}_MAX_EN", False),
+            "max_val": cfg.get(f"ALARM_{ch}_MAX", 0.0),
+        })
+    smtp_cfg = {k: cfg.get(k, v) for k, v in {
+        "SMTP_HOST": "", "SMTP_PORT": 587, "SMTP_USER": "",
+        "SMTP_PASSWORD": "", "SMTP_FROM": "", "SMTP_TO": "", "SMTP_TLS": True
+    }.items()}
+    return render_template("alerts.html", smtp_cfg=smtp_cfg, channels=channels,
+                           alarm_sensor_fail=cfg.get("ALARM_SENSOR_FAIL_EN", False),
+                           alarm_output=cfg.get("ALARM_OUTPUT_CHANGES_EN", False),
+                           title="Alarme")
+
+@app.route("/alerts/test", methods=["POST"])
+@login_required
+def alerts_test():
+    cfg = load_config()
+    if not alarm_module.smtp_configured(cfg):
+        return jsonify({"success": False, "message": "❌ SMTP nicht konfiguriert."})
+    ok, msg = alarm_module.send_alarm_email(
+        cfg,
+        "[BrunnenWeb] Test-Nachricht",
+        "Dies ist eine Test-Email vom Brunnen-Web-System.\nWenn du diese Email erhältst, funktioniert die Alarmierung korrekt."
+    )
+    if ok:
+        return jsonify({"success": True, "message": "✅ Test-Email wurde gesendet."})
+    return jsonify({"success": False, "message": f"❌ {msg}"}), 500
+
+
 def scheduler_loop():
     while True:
         try:
@@ -1073,6 +1191,8 @@ def scheduler_loop():
                 if job["time"] == now:
                     try:
                         mosfet_control.set_output(job["channel"], job["state"])
+                        Thread(target=_log_output_to_influx,
+                               args=(job["channel"], bool(job["state"])), daemon=True).start()
                     except Exception as e:
                         app.logger.error(f"Scheduler: Fehler bei Kanal {job.get('channel')}: {e}")
         except Exception as e:
