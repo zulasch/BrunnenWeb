@@ -9,6 +9,7 @@ import socket
 import logging
 import board
 import reed_contact
+import alarm as alarm_module
 import busio
 from datetime import datetime, UTC
 from adafruit_ads1x15.ads1115 import ADS1115 as ADS
@@ -470,6 +471,9 @@ def flush_queue_to_influx(max_total=5000, batch_size=500):
 # ============================================================
 logging.info("🌊 Starte Mehrkanal-Messung mit Offline-Puffer...")
 
+_alarm_last_sent = {}    # Rate-Limiting: {alarm_key: timestamp}
+_alarm_fail_counts = {}  # Fehlerzähler pro Kanal
+
 try:
     while True:
         reload_config_if_changed()
@@ -543,8 +547,17 @@ try:
                 queue_insert(ch_data)
                 all_data.append(ch_data)
 
+                # Alarm-Schwellwerte prüfen
+                alarm_module.check_and_send(cfg, ch_name, level_m if level_m is not None else value,
+                                            sensor_name, unit, _alarm_last_sent)
+                alarm_module.reset_sensor_fail(_alarm_fail_counts, ch_name)
+
             except Exception as e:
                 logging.error(f"❌ Fehler bei Kanal {ch_name}: {e}")
+                _alarm_fail_counts, _alarm_last_sent = alarm_module.check_sensor_fail(
+                    cfg, ch_name, cfg.get(f"NAME_{ch_name}", ch_name),
+                    _alarm_fail_counts, _alarm_last_sent
+                )
 
         # BMP280 Barometer einlesen (optional)
         bmp_entry = read_bmp280(config)

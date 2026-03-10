@@ -46,6 +46,20 @@
         <span class="text-slate-500">WLAN</span>
         <span class="text-slate-200">{{ sys.wifi }}</span>
       </div>
+      <div class="flex justify-between items-center pt-1 border-t border-slate-700/50 mt-1">
+        <span class="text-slate-500">VPN</span>
+        {% if vpn_connected %}
+        <span class="flex items-center gap-1.5 text-emerald-400 font-mono text-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50 inline-block"></span>
+          {{ vpn_ip }}
+        </span>
+        {% else %}
+        <span class="flex items-center gap-1.5 text-slate-500 text-xs">
+          <span class="w-2 h-2 rounded-full bg-slate-600 inline-block"></span>
+          Nicht verbunden
+        </span>
+        {% endif %}
+      </div>
     </div>
   </div>
 
