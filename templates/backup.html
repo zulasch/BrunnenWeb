@@ -210,15 +210,16 @@ async function loadBackupList() {
 
 async function restoreBackup(filename) {
   if (!confirm(`Backup "${filename}" wiederherstellen?\n\nDie aktuellen Konfigurationsdateien werden überschrieben!`)) return;
-  const listEl = document.getElementById("backupList");
   try {
     const fd = new FormData();
     fd.append("filename", filename);
     const resp = await fetch("/backup/restore", { method: "POST", body: fd });
     const data = await resp.json();
     showMessage(data.message, data.success);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   } catch(e) {
     showMessage("❌ Netzwerkfehler: " + e, false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
 

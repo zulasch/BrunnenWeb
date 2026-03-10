@@ -101,7 +101,7 @@ def load_names():
     if os.path.exists(NAMES_FILE):
         with open(NAMES_FILE) as f:
             return json.load(f)
-    return {str(i): f"Kanal {i+1}" for i in range(8)}
+    return {str(i): f"Kanal {i+1}" for i in range(6)}
 
 
 def save_names(data):
