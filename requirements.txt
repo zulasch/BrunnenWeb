@@ -9,3 +9,4 @@ gunicorn
 lgpio
 luma.oled
 requests
+paho-mqtt>=1.6

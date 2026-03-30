@@ -37,6 +37,18 @@ DEFAULT_CONFIG = {
     "NEXTCLOUD_USER": "",
     "NEXTCLOUD_PASSWORD": "",
     "NEXTCLOUD_PATH": "Brunnen/Backups",
+    # MQTT Broker
+    "MQTT_ENABLED": False,
+    "MQTT_HOST": "",
+    "MQTT_PORT": 1883,
+    "MQTT_USER": "",
+    "MQTT_PASSWORD": "",
+    "MQTT_TLS": False,
+    "MQTT_TLS_CA_CERT": "",
+    "MQTT_TOPIC_PREFIX": "brunnen",
+    "MQTT_QOS": 1,
+    # InfluxDB explizit ein-/ausschalten
+    "INFLUX_ENABLED": True,
     # SMTP / Email-Alarmierung
     "SMTP_HOST": "",
     "SMTP_PORT": 587,
@@ -533,7 +545,8 @@ def update_config():
         string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS", "DEVICE_ID", "LOCATION",
                        "REED_1_NAME", "REED_2_NAME",
                        "NEXTCLOUD_URL", "NEXTCLOUD_USER", "NEXTCLOUD_PASSWORD", "NEXTCLOUD_PATH",
-                       "SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "SMTP_TO"]
+                       "SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "SMTP_TO",
+                       "MQTT_HOST", "MQTT_USER", "MQTT_PASSWORD", "MQTT_TLS_CA_CERT", "MQTT_TOPIC_PREFIX"]
         bool_keys = set(
             [k for k in cfg.keys() if k.endswith("_ENABLED") or k.endswith("_EN") or k.endswith("_TLS")]
         )
@@ -542,7 +555,7 @@ def update_config():
             if key in cfg:
                 if key in bool_keys:
                     cfg[key] = str(value).lower() in ("1", "true", "yes", "on")
-                elif key in ("BMP280_ADDRESS", "SMTP_PORT"):
+                elif key in ("BMP280_ADDRESS", "SMTP_PORT", "MQTT_PORT"):
                     try:
                         cfg[key] = int(str(value), 0)
                     except Exception:

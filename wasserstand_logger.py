@@ -11,6 +11,13 @@ import board
 import reed_contact
 import alarm as alarm_module
 import busio
+import ssl as _ssl
+
+try:
+    import paho.mqtt.client as _mqtt
+    _PAHO_AVAILABLE = True
+except ImportError:
+    _PAHO_AVAILABLE = False
 from datetime import datetime, UTC
 from adafruit_ads1x15.ads1115 import ADS1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
@@ -50,6 +57,16 @@ DEFAULT_CONFIG = {
     "INFLUX_TOKEN": "",
     "INFLUX_ORG": "",
     "INFLUX_BUCKET": "",
+    "INFLUX_ENABLED": True,
+    "MQTT_ENABLED": False,
+    "MQTT_HOST": "",
+    "MQTT_PORT": 1883,
+    "MQTT_USER": "",
+    "MQTT_PASSWORD": "",
+    "MQTT_TLS": False,
+    "MQTT_TLS_CA_CERT": "",
+    "MQTT_TOPIC_PREFIX": "brunnen",
+    "MQTT_QOS": 1,
     "LOG_LEVEL": "ERROR",
     "BMP280_ENABLED": True,
     "BMP280_ADDRESS": 0x76,
@@ -167,6 +184,11 @@ INFLUX_TOKEN     = config.get("INFLUX_TOKEN", "")
 INFLUX_ORG       = config.get("INFLUX_ORG", "")
 INFLUX_BUCKET    = config.get("INFLUX_BUCKET", "")
 
+# MQTT-Zustand (thread-safe via paho loop_start)
+_mqtt_client    = None
+_mqtt_connected = False
+_mqtt_cfg_key   = None   # Tuple zum Erkennen von Config-Änderungen
+
 # ============================================================
 # 🔁 KONFIG NEU LADEN BEI ÄNDERUNG
 # ============================================================
@@ -176,6 +198,7 @@ def reload_config_if_changed():
     global STARTABSTICH, INITIAL_WASSERTIEFE, SHUNT_OHMS
     global WERT_4mA, WERT_20mA, MESSWERT_NN, MESSINTERVAL
     global INFLUX_URL, INFLUX_TOKEN, INFLUX_ORG, INFLUX_BUCKET
+    global _mqtt_cfg_key
 
     try:
         current_mtime = os.path.getmtime(CONFIG_PATH)
@@ -198,8 +221,149 @@ def reload_config_if_changed():
             last_config_mtime  = current_mtime
             apply_logging_level(config.get("LOG_LEVEL", "ERROR"))
             setup_bmp280(config)
+
+            # MQTT-Client neu verbinden wenn sich MQTT-Config geändert hat
+            new_mqtt_key = _get_mqtt_cfg_key(config)
+            if new_mqtt_key != _mqtt_cfg_key:
+                if config.get("MQTT_ENABLED") and config.get("MQTT_HOST"):
+                    setup_mqtt_client(config)
+                else:
+                    _teardown_mqtt_client()
+                    _mqtt_cfg_key = new_mqtt_key
     except Exception as e:
         logging.error(f"Fehler beim Neuladen der Config: {e}")
+
+# ============================================================
+# 📡 MQTT FUNKTIONEN
+# ============================================================
+def _get_mqtt_cfg_key(cfg: dict) -> tuple:
+    """Gibt ein Tuple der relevanten MQTT-Config zurück – für Änderungs-Erkennung."""
+    return (
+        cfg.get("MQTT_HOST", ""),
+        int(cfg.get("MQTT_PORT", 1883)),
+        cfg.get("MQTT_USER", ""),
+        bool(cfg.get("MQTT_TLS", False)),
+        cfg.get("MQTT_TOPIC_PREFIX", "brunnen"),
+        bool(cfg.get("MQTT_ENABLED", False)),
+    )
+
+
+def _teardown_mqtt_client():
+    global _mqtt_client, _mqtt_connected
+    if _mqtt_client:
+        try:
+            _mqtt_client.loop_stop()
+            _mqtt_client.disconnect()
+        except Exception:
+            pass
+        _mqtt_client = None
+        _mqtt_connected = False
+
+
+def setup_mqtt_client(cfg: dict):
+    global _mqtt_client, _mqtt_connected, _mqtt_cfg_key
+    if not _PAHO_AVAILABLE:
+        logging.warning("⚠️  paho-mqtt nicht installiert – MQTT deaktiviert.")
+        return
+
+    _teardown_mqtt_client()
+
+    device_id = cfg.get("DEVICE_ID", socket.gethostname())
+    prefix    = cfg.get("MQTT_TOPIC_PREFIX", "brunnen").rstrip("/")
+    host      = cfg.get("MQTT_HOST", "").strip()
+    port      = int(cfg.get("MQTT_PORT", 1883))
+    status_topic = f"{prefix}/{device_id}/status"
+
+    if not host:
+        logging.warning("⚠️  MQTT_HOST nicht konfiguriert – MQTT deaktiviert.")
+        return
+
+    client = _mqtt.Client(client_id=device_id, clean_session=True)
+
+    # Last Will & Testament – Broker publisht "offline" wenn Verbindung abbricht
+    client.will_set(status_topic, payload="offline", qos=1, retain=True)
+
+    # TLS
+    if cfg.get("MQTT_TLS"):
+        ca_cert = cfg.get("MQTT_TLS_CA_CERT", "").strip() or None
+        client.tls_set(ca_certs=ca_cert, tls_version=_ssl.PROTOCOL_TLS)
+
+    # Authentifizierung
+    if cfg.get("MQTT_USER", "").strip():
+        client.username_pw_set(cfg["MQTT_USER"].strip(), cfg.get("MQTT_PASSWORD", ""))
+
+    def _on_connect(c, userdata, flags, rc):
+        global _mqtt_connected
+        if rc == 0:
+            _mqtt_connected = True
+            c.publish(status_topic, payload="online", qos=1, retain=True)
+            logging.info(f"✅ MQTT verbunden: {host}:{port}")
+        else:
+            _mqtt_connected = False
+            logging.warning(f"⚠️  MQTT Verbindungsfehler rc={rc}: {host}:{port}")
+
+    def _on_disconnect(c, userdata, rc):
+        global _mqtt_connected
+        _mqtt_connected = False
+        if rc != 0:
+            logging.warning(f"⚠️  MQTT Verbindung getrennt (rc={rc}) – reconnect läuft…")
+
+    client.on_connect    = _on_connect
+    client.on_disconnect = _on_disconnect
+    client.reconnect_delay_set(min_delay=5, max_delay=60)
+
+    try:
+        client.connect(host, port, keepalive=60)
+        client.loop_start()   # Hintergrund-Thread für MQTT-Keepalive + Reconnect
+        _mqtt_client  = client
+        _mqtt_cfg_key = _get_mqtt_cfg_key(cfg)
+    except Exception as e:
+        logging.error(f"❌ MQTT Verbindungsaufbau fehlgeschlagen: {e}")
+        _mqtt_client = None
+
+
+def publish_to_mqtt(cfg: dict, all_data: list):
+    """Publisht alle Messwerte eines Zyklus an den MQTT-Broker."""
+    global _mqtt_client, _mqtt_connected
+    if not _mqtt_client or not _mqtt_connected:
+        return
+
+    device_id = cfg.get("DEVICE_ID", socket.gethostname())
+    prefix    = cfg.get("MQTT_TOPIC_PREFIX", "brunnen").rstrip("/")
+    qos       = int(cfg.get("MQTT_QOS", 1))
+
+    for entry in all_data:
+        channel = entry.get("channel", "unknown")
+        topic   = f"{prefix}/{device_id}/sensor/{channel}"
+
+        payload = {
+            "device_id":  device_id,
+            "location":   cfg.get("LOCATION", ""),
+            "timestamp":  entry.get("timestamp"),
+            "channel":    channel,
+            "name":       entry.get("name", ""),
+            "type":       entry.get("type", ""),
+            "unit":       entry.get("unit", ""),
+            "value":      entry.get("value"),
+            "current_mA": entry.get("current_mA"),
+        }
+
+        # Typ-spezifische Zusatzfelder
+        sensor_type = entry.get("type", "")
+        if sensor_type == "LEVEL":
+            payload["level_m"]      = entry.get("level_m")
+            payload["messwert_NN"]  = entry.get("messwert_NN")
+            payload["pegel_diff"]   = entry.get("pegel_diff")
+        elif sensor_type == "PRESSURE":
+            payload["temperature_C"] = entry.get("temperature_C")
+        elif sensor_type == "COUNTER":
+            payload["impulse_total"] = entry.get("impulse_total")
+
+        try:
+            _mqtt_client.publish(topic, json.dumps(payload), qos=qos)
+        except Exception as e:
+            logging.warning(f"⚠️  MQTT Publish Fehler ({topic}): {e}")
+
 
 # ============================================================
 # 💾 SQLITE SETUP
@@ -471,6 +635,10 @@ def flush_queue_to_influx(max_total=5000, batch_size=500):
 # ============================================================
 logging.info("🌊 Starte Mehrkanal-Messung mit Offline-Puffer...")
 
+# MQTT initial verbinden falls konfiguriert
+if config.get("MQTT_ENABLED") and config.get("MQTT_HOST") and _PAHO_AVAILABLE:
+    setup_mqtt_client(config)
+
 _alarm_last_sent = {}    # Rate-Limiting: {alarm_key: timestamp}
 _alarm_fail_counts = {}  # Fehlerzähler pro Kanal
 
@@ -479,6 +647,8 @@ try:
         reload_config_if_changed()
         cfg = config.copy()
         all_data = []
+        influx_enabled = cfg.get("INFLUX_ENABLED", True)
+        mqtt_enabled   = cfg.get("MQTT_ENABLED", False)
 
         for ch_name, chan in channels.items():
             try:
@@ -543,8 +713,9 @@ try:
                     "value": level_m
                 }
 
-                # 💾 sofort in Offline-Queue (damit nichts verloren geht)
-                queue_insert(ch_data)
+                # 💾 sofort in Offline-Queue (nur wenn InfluxDB aktiv)
+                if influx_enabled:
+                    queue_insert(ch_data)
                 all_data.append(ch_data)
 
                 # Alarm-Schwellwerte prüfen
@@ -562,7 +733,8 @@ try:
         # BMP280 Barometer einlesen (optional)
         bmp_entry = read_bmp280(config)
         if bmp_entry:
-            queue_insert(bmp_entry)
+            if influx_enabled:
+                queue_insert(bmp_entry)
             all_data.append(bmp_entry)
 
         # Reedkontakt-Zähler einlesen
@@ -589,7 +761,8 @@ try:
                     "messwert_NN": 0.0,
                     "pegel_diff": 0.0,
                 }
-                queue_insert(reed_entry)
+                if influx_enabled:
+                    queue_insert(reed_entry)
                 all_data.append(reed_entry)
         except Exception as e:
             logging.error(f"❌ Fehler beim Lesen der Reedkontakte: {e}")
@@ -604,11 +777,16 @@ try:
         except Exception as e:
             logging.warning(f"Konnte latest_measurement.json nicht schreiben: {e}")
 
-        # 🔄 Queue flushen (inkl. der gerade erzeugten Messungen)
-        if flush_queue_to_influx(max_total=5000, batch_size=500):
-            logging.info("✅ Alle gepufferten Messpunkte erfolgreich an InfluxDB gesendet.")
-        else:
-            logging.info("📦 Offline: Werte bleiben in der Queue und werden später nachgesendet.")
+        # 🔄 Queue flushen → InfluxDB (nur wenn INFLUX_ENABLED)
+        if influx_enabled:
+            if flush_queue_to_influx(max_total=5000, batch_size=500):
+                logging.info("✅ Alle gepufferten Messpunkte erfolgreich an InfluxDB gesendet.")
+            else:
+                logging.info("📦 Offline: Werte bleiben in der Queue und werden später nachgesendet.")
+
+        # 📡 MQTT publishen (nur wenn MQTT_ENABLED und verbunden)
+        if mqtt_enabled and _PAHO_AVAILABLE and _mqtt_client:
+            publish_to_mqtt(cfg, all_data)
 
         time.sleep(float(cfg.get("MESSINTERVAL", MESSINTERVAL)))
 
@@ -617,5 +795,6 @@ except KeyboardInterrupt:
 except Exception as e:
     logging.error(f"❌ Unerwarteter Fehler: {e}")
 finally:
+    _teardown_mqtt_client()
     reed_contact.shutdown()
     conn.close()

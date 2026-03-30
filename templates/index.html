@@ -76,6 +76,106 @@
     {% endfor %}
   </div>
 
+  <!-- MQTT Broker -->
+  <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
+    <h2 class="text-base font-semibold text-amber-400 mb-4 flex items-center gap-2">
+      <span>📡</span> MQTT Broker
+    </h2>
+
+    <!-- Modus-Wahl -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1">MQTT Senden</label>
+        <select name="MQTT_ENABLED"
+          class="border rounded-lg px-3 py-2 w-full text-sm">
+          <option value="false" {% if not config.MQTT_ENABLED %}selected{% endif %}>Deaktiviert</option>
+          <option value="true"  {% if config.MQTT_ENABLED %}selected{% endif %}>Aktiviert</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1">InfluxDB Direktschreiben</label>
+        <select name="INFLUX_ENABLED"
+          class="border rounded-lg px-3 py-2 w-full text-sm">
+          <option value="true"  {% if config.INFLUX_ENABLED %}selected{% endif %}>Aktiviert</option>
+          <option value="false" {% if not config.INFLUX_ENABLED %}selected{% endif %}>Deaktiviert</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Modus-Hinweis -->
+    <div class="mb-5 p-3 rounded-lg bg-slate-700/50 border border-slate-600 text-xs text-slate-400 leading-relaxed">
+      <strong class="text-slate-300">Betriebsmodi:</strong><br>
+      🔵 <strong>Nur InfluxDB</strong> – Legacy/VPN-Betrieb, wie bisher.<br>
+      🟢 <strong>Nur MQTT</strong> – Kein VPN nötig. Telegraf auf dem Server schreibt in InfluxDB.<br>
+      🟡 <strong>Beide aktiv</strong> – Redundanz oder Übergangsphase.<br>
+      ⚪ <strong>Beide deaktiviert</strong> – Nur lokale SQLite-Speicherung, nichts wird gesendet.
+    </div>
+
+    <!-- Broker-Verbindung -->
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="col-span-2">
+        <label class="block text-sm font-medium text-slate-300 mb-1">Broker Host</label>
+        <input name="MQTT_HOST" type="text" value="{{ config.MQTT_HOST }}"
+          placeholder="mqtt.example.com"
+          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1">Port</label>
+        <input name="MQTT_PORT" type="number" value="{{ config.MQTT_PORT }}"
+          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1">Benutzername</label>
+        <input name="MQTT_USER" type="text" value="{{ config.MQTT_USER }}"
+          placeholder="brunnen_001"
+          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1">Passwort</label>
+        <input name="MQTT_PASSWORD" type="password" value="{{ config.MQTT_PASSWORD }}"
+          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1">TLS/SSL</label>
+        <select name="MQTT_TLS" class="border rounded-lg px-3 py-2 w-full text-sm">
+          <option value="false" {% if not config.MQTT_TLS %}selected{% endif %}>Deaktiviert (Port 1883)</option>
+          <option value="true"  {% if config.MQTT_TLS %}selected{% endif %}>Aktiviert (Port 8883)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1">QoS</label>
+        <select name="MQTT_QOS" class="border rounded-lg px-3 py-2 w-full text-sm">
+          <option value="0" {% if config.MQTT_QOS == 0 %}selected{% endif %}>0 – Höchstens einmal</option>
+          <option value="1" {% if config.MQTT_QOS == 1 or not config.MQTT_QOS %}selected{% endif %}>1 – Mindestens einmal (empfohlen)</option>
+          <option value="2" {% if config.MQTT_QOS == 2 %}selected{% endif %}>2 – Genau einmal</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-slate-300 mb-1">CA-Zertifikat Pfad (optional, für selbstsignierte Certs)</label>
+      <input name="MQTT_TLS_CA_CERT" type="text" value="{{ config.MQTT_TLS_CA_CERT }}"
+        placeholder="/etc/ssl/certs/mein-broker-ca.crt"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-slate-300 mb-1">Topic-Prefix</label>
+      <input name="MQTT_TOPIC_PREFIX" type="text" value="{{ config.MQTT_TOPIC_PREFIX }}"
+        placeholder="brunnen"
+        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
+      <p class="text-xs text-slate-500 mt-1">
+        Topics werden als <code class="text-sky-400">{prefix}/{device_id}/sensor/{kanal}</code> gebildet.
+      </p>
+    </div>
+  </div>
+
   <!-- BMP280 Barometer -->
   <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
     <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
