@@ -254,7 +254,7 @@ systemctl start NetworkManager
 # ------------------------------------------------------------
 section "9️⃣  Starte Dienste"
 
-systemctl start brunnen_web.service brunnen_logger.service
+systemctl restart brunnen_web.service brunnen_logger.service
 systemctl status brunnen_web.service brunnen_logger.service
 
 section "✅ Installation abgeschlossen!"

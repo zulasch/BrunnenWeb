@@ -546,7 +546,8 @@ def update_config():
                        "REED_1_NAME", "REED_2_NAME",
                        "NEXTCLOUD_URL", "NEXTCLOUD_USER", "NEXTCLOUD_PASSWORD", "NEXTCLOUD_PATH",
                        "SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "SMTP_TO",
-                       "MQTT_HOST", "MQTT_USER", "MQTT_PASSWORD", "MQTT_TLS_CA_CERT", "MQTT_TOPIC_PREFIX"]
+                       "MQTT_HOST", "MQTT_USER", "MQTT_PASSWORD", "MQTT_TLS_CA_CERT", "MQTT_TOPIC_PREFIX",
+                       "INFLUX_URL", "INFLUX_TOKEN", "INFLUX_ORG", "INFLUX_BUCKET"]
         bool_keys = set(
             [k for k in cfg.keys() if k.endswith("_ENABLED") or k.endswith("_EN") or k.endswith("_TLS")]
         )

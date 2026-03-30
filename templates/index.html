@@ -1,292 +1,473 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="flex items-center gap-3 mb-7">
+<div class="flex items-center gap-3 mb-5">
   <div class="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
-    <span class="text-lg">📊</span>
+    <span class="text-lg">⚙️</span>
   </div>
-  <h1 class="text-xl font-bold text-white">Messsystem-Konfiguration</h1>
+  <h1 class="text-xl font-bold text-white">Konfiguration</h1>
 </div>
 
 <div id="messageBox" class="hidden mb-5"></div>
 
+<!-- ── Tab-Navigation ── -->
+<div class="flex gap-1 mb-6 bg-slate-800 border border-slate-700 rounded-xl p-1 overflow-x-auto">
+  <button type="button" onclick="showTab('geraet')"   id="tab-geraet"   class="tab-btn active">🏷️ Gerät</button>
+  <button type="button" onclick="showTab('daten')"    id="tab-daten"    class="tab-btn">📡 Datenübertragung</button>
+  <button type="button" onclick="showTab('sensoren')" id="tab-sensoren" class="tab-btn">📊 Sensoren</button>
+  <button type="button" onclick="showTab('weitere')"  id="tab-weitere"  class="tab-btn">🌡️ Weitere</button>
+</div>
+
 <form id="configForm" onsubmit="saveConfig(event)" class="space-y-5">
 
-  <!-- Gerät / Standort -->
-  <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
-    <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
-      <span>🏷️</span> Gerät &amp; Standort
-    </h2>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-slate-300 mb-1">DEVICE_ID</label>
-      <input name="DEVICE_ID" value="{{ config.get('DEVICE_ID', '') }}"
-        class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
-      <p class="text-slate-500 text-xs mt-1">{{ descriptions.get("DEVICE_ID") }}</p>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-slate-300 mb-1">LOCATION</label>
-      <input name="LOCATION" value="{{ config.get('LOCATION', '') }}"
-        placeholder="z. B. Liegenschaft Musterstrasse 12"
-        class="border rounded-lg px-3 py-2 w-full" />
-      <p class="text-slate-500 text-xs mt-1">{{ descriptions.get("LOCATION") }}</p>
-    </div>
-  </div>
+  <!-- ══════════════════════════════════════════════
+       TAB 1 – GERÄT
+  ══════════════════════════════════════════════ -->
+  <div id="panel-geraet" class="tab-panel space-y-5">
 
-  <!-- Wasserzähler (Reedkontakte) -->
-  <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
-    <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
-      <span>💧</span> Wasserzähler (Reedkontakte)
-    </h2>
-    {% for i in [1, 2] %}
-    <div class="border rounded-lg p-4 mb-4 {% if i == 1 %}border-sky-700/40 bg-sky-900/10{% else %}border-emerald-700/40 bg-emerald-900/10{% endif %}">
-      <h3 class="text-sm font-semibold text-slate-300 mb-3">
-        Zähler {{ i }} (GPIO {% if i == 1 %}25{% else %}27{% endif %})
-      </h3>
-      <div class="mb-3">
-        <label class="block text-sm font-medium text-slate-300 mb-1">REED_{{ i }}_NAME</label>
-        <input name="REED_{{ i }}_NAME" value="{{ config.get('REED_' ~ i ~ '_NAME', 'Wasserzähler ' ~ i) }}"
-          class="border rounded-lg px-3 py-2 w-full" />
-        <p class="text-slate-500 text-xs mt-1">{{ descriptions.get("REED_" ~ i ~ "_NAME") }}</p>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">REED_{{ i }}_LITER_PRO_IMPULS</label>
-        <input name="REED_{{ i }}_LITER_PRO_IMPULS"
-          value="{{ config.get('REED_' ~ i ~ '_LITER_PRO_IMPULS', 1.0) }}"
-          type="number" step="0.001" min="0.001"
-          class="border rounded-lg px-3 py-2 w-full" />
-        <p class="text-slate-500 text-xs mt-1">{{ descriptions.get("REED_" ~ i ~ "_LITER_PRO_IMPULS") }}</p>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-
-  <!-- Allgemeine Einstellungen -->
-  <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
-    <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
-      <span>⚙️</span> Allgemeine Einstellungen
-    </h2>
-    {% for key, val in config.items() %}
-      {% if key in ["MESSINTERVAL", "ADMIN_PIN"] %}
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-slate-300 mb-1">{{ key }}</label>
-          <input name="{{ key }}" value="{{ val }}" class="border rounded-lg px-3 py-2 w-full" />
-          <p class="text-slate-500 text-xs mt-1">{{ descriptions.get(key) }}</p>
-        </div>
-      {% endif %}
-    {% endfor %}
-  </div>
-
-  <!-- MQTT Broker -->
-  <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
-    <h2 class="text-base font-semibold text-amber-400 mb-4 flex items-center gap-2">
-      <span>📡</span> MQTT Broker
-    </h2>
-
-    <!-- Modus-Wahl -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">MQTT Senden</label>
-        <select name="MQTT_ENABLED"
-          class="border rounded-lg px-3 py-2 w-full text-sm">
-          <option value="false" {% if not config.MQTT_ENABLED %}selected{% endif %}>Deaktiviert</option>
-          <option value="true"  {% if config.MQTT_ENABLED %}selected{% endif %}>Aktiviert</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">InfluxDB Direktschreiben</label>
-        <select name="INFLUX_ENABLED"
-          class="border rounded-lg px-3 py-2 w-full text-sm">
-          <option value="true"  {% if config.INFLUX_ENABLED %}selected{% endif %}>Aktiviert</option>
-          <option value="false" {% if not config.INFLUX_ENABLED %}selected{% endif %}>Deaktiviert</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Modus-Hinweis -->
-    <div class="mb-5 p-3 rounded-lg bg-slate-700/50 border border-slate-600 text-xs text-slate-400 leading-relaxed">
-      <strong class="text-slate-300">Betriebsmodi:</strong><br>
-      🔵 <strong>Nur InfluxDB</strong> – Legacy/VPN-Betrieb, wie bisher.<br>
-      🟢 <strong>Nur MQTT</strong> – Kein VPN nötig. Telegraf auf dem Server schreibt in InfluxDB.<br>
-      🟡 <strong>Beide aktiv</strong> – Redundanz oder Übergangsphase.<br>
-      ⚪ <strong>Beide deaktiviert</strong> – Nur lokale SQLite-Speicherung, nichts wird gesendet.
-    </div>
-
-    <!-- Broker-Verbindung -->
-    <div class="grid grid-cols-3 gap-3 mb-4">
-      <div class="col-span-2">
-        <label class="block text-sm font-medium text-slate-300 mb-1">Broker Host</label>
-        <input name="MQTT_HOST" type="text" value="{{ config.MQTT_HOST }}"
-          placeholder="mqtt.example.com"
-          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Port</label>
-        <input name="MQTT_PORT" type="number" value="{{ config.MQTT_PORT }}"
-          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Benutzername</label>
-        <input name="MQTT_USER" type="text" value="{{ config.MQTT_USER }}"
-          placeholder="brunnen_001"
-          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Passwort</label>
-        <input name="MQTT_PASSWORD" type="password" value="{{ config.MQTT_PASSWORD }}"
-          class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">TLS/SSL</label>
-        <select name="MQTT_TLS" class="border rounded-lg px-3 py-2 w-full text-sm">
-          <option value="false" {% if not config.MQTT_TLS %}selected{% endif %}>Deaktiviert (Port 1883)</option>
-          <option value="true"  {% if config.MQTT_TLS %}selected{% endif %}>Aktiviert (Port 8883)</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">QoS</label>
-        <select name="MQTT_QOS" class="border rounded-lg px-3 py-2 w-full text-sm">
-          <option value="0" {% if config.MQTT_QOS == 0 %}selected{% endif %}>0 – Höchstens einmal</option>
-          <option value="1" {% if config.MQTT_QOS == 1 or not config.MQTT_QOS %}selected{% endif %}>1 – Mindestens einmal (empfohlen)</option>
-          <option value="2" {% if config.MQTT_QOS == 2 %}selected{% endif %}>2 – Genau einmal</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-slate-300 mb-1">CA-Zertifikat Pfad (optional, für selbstsignierte Certs)</label>
-      <input name="MQTT_TLS_CA_CERT" type="text" value="{{ config.MQTT_TLS_CA_CERT }}"
-        placeholder="/etc/ssl/certs/mein-broker-ca.crt"
-        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
-    </div>
-
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-slate-300 mb-1">Topic-Prefix</label>
-      <input name="MQTT_TOPIC_PREFIX" type="text" value="{{ config.MQTT_TOPIC_PREFIX }}"
-        placeholder="brunnen"
-        class="border rounded-lg px-3 py-2 w-full text-sm font-mono" />
-      <p class="text-xs text-slate-500 mt-1">
-        Topics werden als <code class="text-sky-400">{prefix}/{device_id}/sensor/{kanal}</code> gebildet.
-      </p>
-    </div>
-  </div>
-
-  <!-- BMP280 Barometer -->
-  <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
-    <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
-      <span>🌡️</span> Barometer (BMP280)
-    </h2>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-slate-300 mb-1">BMP280_ENABLED</label>
-      <select name="BMP280_ENABLED" class="border rounded-lg px-3 py-2 w-full">
-        <option value="True" {% if config.get("BMP280_ENABLED") %}selected{% endif %}>Aktiviert</option>
-        <option value="False" {% if not config.get("BMP280_ENABLED") %}selected{% endif %}>Deaktiviert</option>
-      </select>
-      <p class="text-slate-500 text-xs mt-1">{{ descriptions.get("BMP280_ENABLED") }}</p>
-    </div>
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-slate-300 mb-1">BMP280_ADDRESS</label>
-      <input name="BMP280_ADDRESS" value="{{ config.get('BMP280_ADDRESS', '0x76') }}" class="border rounded-lg px-3 py-2 w-full font-mono" />
-      <p class="text-slate-500 text-xs mt-1">{{ descriptions.get("BMP280_ADDRESS") }}</p>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-slate-300 mb-1">NAME_BMP280</label>
-      <input name="NAME_BMP280" value="{{ config.get('NAME_BMP280', 'Barometer') }}" class="border rounded-lg px-3 py-2 w-full" />
-      <p class="text-slate-500 text-xs mt-1">{{ descriptions.get("NAME_BMP280") }}</p>
-    </div>
-  </div>
-
-  <!-- Analoge Kanäle -->
-  {% set channel_colors = [
-    "border-sky-700/40 bg-sky-900/10",
-    "border-emerald-700/40 bg-emerald-900/10",
-    "border-amber-700/40 bg-amber-900/10",
-    "border-purple-700/40 bg-purple-900/10"
-  ] %}
-  {% set channel_accents = ["text-sky-400", "text-emerald-400", "text-amber-400", "text-purple-400"] %}
-
-  {% for channel in ["A0", "A1", "A2", "A3"] %}
-    <div class="bg-slate-800 border {{ channel_colors[loop.index0] }} p-6 rounded-xl shadow-lg">
-      <h2 class="text-base font-semibold {{ channel_accents[loop.index0] }} mb-4 flex items-center gap-2">
-        <span>💧</span> Kanal {{ channel }} &ndash; {{ config.get("NAME_" + channel, "unbenannt") }}
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
+      <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
+        <span>🏷️</span> Gerät &amp; Standort
       </h2>
-
-      {% for key, val in config.items() %}
-        {% if key.endswith("_" + channel) and not key.startswith("SHUNT_OHMS") %}
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-300 mb-1">{{ key }}</label>
-
-            {% if "SENSOR_TYP" in key %}
-              <select name="{{ key }}" class="border rounded-lg px-3 py-2 w-full">
-                <option value="LEVEL" {% if val == "LEVEL" %}selected{% endif %}>Wasserlevel</option>
-                <option value="TEMP" {% if val == "TEMP" %}selected{% endif %}>Temperatur</option>
-                <option value="FLOW" {% if val == "FLOW" %}selected{% endif %}>Durchfluss</option>
-                <option value="ANALOG" {% if val == "ANALOG" %}selected{% endif %}>Analog</option>
-              </select>
-
-            {% elif "SENSOR_EINHEIT" in key %}
-              <select name="{{ key }}" class="border rounded-lg px-3 py-2 w-full">
-                <option value="m"     {% if val == "m"     %}selected{% endif %}>m</option>
-                <option value="cm"    {% if val == "cm"    %}selected{% endif %}>cm</option>
-                <option value="mm"    {% if val == "mm"    %}selected{% endif %}>mm</option>
-                <option value="°C"    {% if val == "°C"    %}selected{% endif %}>°C</option>
-                <option value="K"     {% if val == "K"     %}selected{% endif %}>K</option>
-                <option value="m3/h"  {% if val == "m3/h"  %}selected{% endif %}>m³/h</option>
-                <option value="l/min" {% if val == "l/min" %}selected{% endif %}>l/min</option>
-                <option value="l/s"   {% if val == "l/s"   %}selected{% endif %}>l/s</option>
-                <option value=""      {% if val == ""      %}selected{% endif %}>(keine)</option>
-              </select>
-
-            {% else %}
-              <input name="{{ key }}" value="{{ val }}" class="border rounded-lg px-3 py-2 w-full" />
-            {% endif %}
-
-            {% if descriptions.get(key) %}
-              <p class="text-slate-500 text-xs mt-1">{{ descriptions.get(key) }}</p>
-            {% endif %}
-          </div>
-        {% endif %}
-      {% endfor %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">Device ID</label>
+          <input name="DEVICE_ID" value="{{ config.get('DEVICE_ID', '') }}"
+            class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          <p class="text-slate-500 text-xs mt-1">Eindeutige Gerätekennung (erscheint in InfluxDB / MQTT)</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">Standort</label>
+          <input name="LOCATION" value="{{ config.get('LOCATION', '') }}"
+            placeholder="z. B. Liegenschaft Musterstrasse 12"
+            class="border rounded-lg px-3 py-2 w-full text-sm" />
+          <p class="text-slate-500 text-xs mt-1">Optionaler Standortname</p>
+        </div>
+      </div>
     </div>
-  {% endfor %}
 
-  <div class="flex justify-end pt-2">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
+      <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
+        <span>⚙️</span> Betrieb
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">Messintervall (Sekunden)</label>
+          <input name="MESSINTERVAL" type="number" min="1"
+            value="{{ config.get('MESSINTERVAL', 5) }}"
+            class="border rounded-lg px-3 py-2 w-full text-sm" />
+          <p class="text-slate-500 text-xs mt-1">Pause zwischen zwei Messzyklen</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">Admin-PIN</label>
+          <input name="ADMIN_PIN" type="text"
+            value="{{ config.get('ADMIN_PIN', '') }}"
+            class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          <p class="text-slate-500 text-xs mt-1">PIN für das Web-Interface</p>
+        </div>
+      </div>
+    </div>
+
+  </div>{# /panel-geraet #}
+
+  <!-- ══════════════════════════════════════════════
+       TAB 2 – DATENÜBERTRAGUNG
+  ══════════════════════════════════════════════ -->
+  <div id="panel-daten" class="tab-panel hidden space-y-5">
+
+    <!-- Betriebsmodus-Übersicht -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg">
+      <h2 class="text-base font-semibold text-amber-400 mb-3 flex items-center gap-2">
+        <span>🔀</span> Betriebsmodus
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">InfluxDB Direktverbindung</label>
+          <select name="INFLUX_ENABLED" class="border rounded-lg px-3 py-2 w-full text-sm">
+            <option value="true"  {% if config.get('INFLUX_ENABLED', True) %}selected{% endif %}>Aktiviert</option>
+            <option value="false" {% if not config.get('INFLUX_ENABLED', True) %}selected{% endif %}>Deaktiviert</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">MQTT Senden</label>
+          <select name="MQTT_ENABLED" class="border rounded-lg px-3 py-2 w-full text-sm">
+            <option value="false" {% if not config.get('MQTT_ENABLED') %}selected{% endif %}>Deaktiviert</option>
+            <option value="true"  {% if config.get('MQTT_ENABLED') %}selected{% endif %}>Aktiviert</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-slate-700/50 border border-slate-600 text-xs text-slate-400 leading-relaxed">
+        🔵 <strong>Nur InfluxDB</strong> – VPN-Betrieb, direkte Verbindung. &nbsp;
+        🟢 <strong>Nur MQTT</strong> – Kein VPN, Telegraf auf Server schreibt in InfluxDB. &nbsp;
+        🟡 <strong>Beide</strong> – Redundanz / Übergangsphase. &nbsp;
+        ⚪ <strong>Keine</strong> – Nur lokal in SQLite.
+      </div>
+    </div>
+
+    <!-- InfluxDB -->
+    <div class="bg-slate-800 border border-sky-700/30 p-6 rounded-xl shadow-lg">
+      <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
+        <span>🗄️</span> InfluxDB Verbindung
+      </h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">URL</label>
+          <input name="INFLUX_URL" type="text" value="{{ config.get('INFLUX_URL', '') }}"
+            placeholder="http://192.168.1.100:8086"
+            class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">Token</label>
+          <input name="INFLUX_TOKEN" type="password" value="{{ config.get('INFLUX_TOKEN', '') }}"
+            class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Organisation</label>
+            <input name="INFLUX_ORG" type="text" value="{{ config.get('INFLUX_ORG', '') }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Bucket</label>
+            <input name="INFLUX_BUCKET" type="text" value="{{ config.get('INFLUX_BUCKET', '') }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MQTT Broker -->
+    <div class="bg-slate-800 border border-amber-700/30 p-6 rounded-xl shadow-lg">
+      <h2 class="text-base font-semibold text-amber-400 mb-4 flex items-center gap-2">
+        <span>📡</span> MQTT Broker
+      </h2>
+      <div class="space-y-4">
+        <div class="grid grid-cols-3 gap-3">
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-slate-300 mb-1">Broker Host</label>
+            <input name="MQTT_HOST" type="text" value="{{ config.get('MQTT_HOST', '') }}"
+              placeholder="mqtt.example.com"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Port</label>
+            <input name="MQTT_PORT" type="number" value="{{ config.get('MQTT_PORT', 1883) }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Benutzername</label>
+            <input name="MQTT_USER" type="text" value="{{ config.get('MQTT_USER', '') }}"
+              placeholder="brunnen_001"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Passwort</label>
+            <input name="MQTT_PASSWORD" type="password" value="{{ config.get('MQTT_PASSWORD', '') }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">TLS/SSL</label>
+            <select name="MQTT_TLS" class="border rounded-lg px-3 py-2 w-full text-sm">
+              <option value="false" {% if not config.get('MQTT_TLS') %}selected{% endif %}>Deaktiviert (Port 1883)</option>
+              <option value="true"  {% if config.get('MQTT_TLS') %}selected{% endif %}>Aktiviert (Port 8883)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">QoS</label>
+            <select name="MQTT_QOS" class="border rounded-lg px-3 py-2 w-full text-sm">
+              <option value="0" {% if config.get('MQTT_QOS') == 0 %}selected{% endif %}>0 – Höchstens einmal</option>
+              <option value="1" {% if config.get('MQTT_QOS', 1) == 1 %}selected{% endif %}>1 – Mindestens einmal (empfohlen)</option>
+              <option value="2" {% if config.get('MQTT_QOS') == 2 %}selected{% endif %}>2 – Genau einmal</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">CA-Zertifikat Pfad <span class="text-slate-500 font-normal">(optional, für selbstsignierte Certs)</span></label>
+          <input name="MQTT_TLS_CA_CERT" type="text" value="{{ config.get('MQTT_TLS_CA_CERT', '') }}"
+            placeholder="/etc/ssl/certs/broker-ca.crt"
+            class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">Topic-Prefix</label>
+          <input name="MQTT_TOPIC_PREFIX" type="text" value="{{ config.get('MQTT_TOPIC_PREFIX', 'brunnen') }}"
+            placeholder="brunnen"
+            class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          <p class="text-xs text-slate-500 mt-1">
+            Topics: <code class="text-sky-400">{prefix}/{device_id}/sensor/{kanal}</code>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>{# /panel-daten #}
+
+  <!-- ══════════════════════════════════════════════
+       TAB 3 – ANALOGE SENSOREN
+  ══════════════════════════════════════════════ -->
+  <div id="panel-sensoren" class="tab-panel hidden space-y-3">
+
+    {% set channel_border  = ["border-sky-700/40",     "border-emerald-700/40", "border-amber-700/40",   "border-purple-700/40"]  %}
+    {% set channel_bg      = ["bg-sky-900/10",         "bg-emerald-900/10",     "bg-amber-900/10",       "bg-purple-900/10"]      %}
+    {% set channel_accent  = ["text-sky-400",          "text-emerald-400",      "text-amber-400",        "text-purple-400"]       %}
+    {% set channel_ring    = ["ring-sky-700/40",       "ring-emerald-700/40",   "ring-amber-700/40",     "ring-purple-700/40"]    %}
+
+    {% for channel in ["A0", "A1", "A2", "A3"] %}
+    {% set ci = loop.index0 %}
+    <div class="bg-slate-800 border {{ channel_border[ci] }} rounded-xl shadow-lg overflow-hidden">
+
+      <!-- Accordion-Header -->
+      <button type="button"
+        onclick="toggleAccordion('acc-{{ channel }}')"
+        class="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-700/30 transition">
+        <span class="font-semibold {{ channel_accent[ci] }} flex items-center gap-2 text-sm">
+          <span class="w-6 h-6 rounded-md {{ channel_bg[ci] }} border {{ channel_border[ci] }} flex items-center justify-center text-xs font-bold">{{ channel }}</span>
+          {{ config.get("NAME_" + channel, "Kanal " + channel) }}
+          <span class="text-slate-500 font-normal text-xs">– {{ config.get("SENSOR_TYP_" + channel, "?") }} · {{ config.get("SENSOR_EINHEIT_" + channel, "") }}</span>
+        </span>
+        <svg id="arrow-{{ channel }}" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      <!-- Accordion-Inhalt -->
+      <div id="acc-{{ channel }}" class="accordion-content hidden border-t {{ channel_border[ci] }}">
+        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <!-- Name -->
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-slate-300 mb-1">Bezeichnung</label>
+            <input name="NAME_{{ channel }}" value="{{ config.get('NAME_' + channel, '') }}"
+              class="border rounded-lg px-3 py-2 w-full text-sm" />
+          </div>
+
+          <!-- Typ + Einheit -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Sensortyp</label>
+            <select name="SENSOR_TYP_{{ channel }}" class="border rounded-lg px-3 py-2 w-full text-sm">
+              {% set typ = config.get("SENSOR_TYP_" + channel, "LEVEL") %}
+              <option value="LEVEL"  {% if typ == "LEVEL"  %}selected{% endif %}>Wasserlevel</option>
+              <option value="TEMP"   {% if typ == "TEMP"   %}selected{% endif %}>Temperatur</option>
+              <option value="FLOW"   {% if typ == "FLOW"   %}selected{% endif %}>Durchfluss</option>
+              <option value="ANALOG" {% if typ == "ANALOG" %}selected{% endif %}>Analog (generisch)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Einheit</label>
+            <select name="SENSOR_EINHEIT_{{ channel }}" class="border rounded-lg px-3 py-2 w-full text-sm">
+              {% set einheit = config.get("SENSOR_EINHEIT_" + channel, "m") %}
+              <option value="m"     {% if einheit == "m"     %}selected{% endif %}>m</option>
+              <option value="cm"    {% if einheit == "cm"    %}selected{% endif %}>cm</option>
+              <option value="mm"    {% if einheit == "mm"    %}selected{% endif %}>mm</option>
+              <option value="°C"    {% if einheit == "°C"    %}selected{% endif %}>°C</option>
+              <option value="K"     {% if einheit == "K"     %}selected{% endif %}>K</option>
+              <option value="m3/h"  {% if einheit == "m3/h"  %}selected{% endif %}>m³/h</option>
+              <option value="l/min" {% if einheit == "l/min" %}selected{% endif %}>l/min</option>
+              <option value="l/s"   {% if einheit == "l/s"   %}selected{% endif %}>l/s</option>
+              <option value=""      {% if einheit == ""      %}selected{% endif %}>(keine)</option>
+            </select>
+          </div>
+
+          <!-- 4–20 mA Skalierung -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Wert bei 4 mA</label>
+            <input name="WERT_4mA_{{ channel }}" type="number" step="any"
+              value="{{ config.get('WERT_4mA_' + channel, 0.0) }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Wert bei 20 mA</label>
+            <input name="WERT_20mA_{{ channel }}" type="number" step="any"
+              value="{{ config.get('WERT_20mA_' + channel, 3.0) }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+
+          <!-- Shunt -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Shunt-Widerstand (Ω)</label>
+            <input name="SHUNT_OHMS_{{ channel }}" type="number" step="any"
+              value="{{ config.get('SHUNT_OHMS_' + channel, 150.0) }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+
+          <!-- LEVEL-spezifische Felder -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Startabstich (m)</label>
+            <input name="STARTABSTICH_{{ channel }}" type="number" step="any"
+              value="{{ config.get('STARTABSTICH_' + channel, 0.0) }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Initiale Wassertiefe (m)</label>
+            <input name="INITIAL_WASSERTIEFE_{{ channel }}" type="number" step="any"
+              value="{{ config.get('INITIAL_WASSERTIEFE_' + channel, 0.0) }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Messwert ü. N.N. (m)</label>
+            <input name="MESSWERT_NN_{{ channel }}" type="number" step="any"
+              value="{{ config.get('MESSWERT_NN_' + channel, 0.0) }}"
+              class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>{# /panel-sensoren #}
+
+  <!-- ══════════════════════════════════════════════
+       TAB 4 – WEITERE SENSOREN
+  ══════════════════════════════════════════════ -->
+  <div id="panel-weitere" class="tab-panel hidden space-y-5">
+
+    <!-- BMP280 Barometer -->
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
+      <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
+        <span>🌡️</span> Barometer (BMP280)
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">Status</label>
+          <select name="BMP280_ENABLED" class="border rounded-lg px-3 py-2 w-full text-sm">
+            <option value="True"  {% if config.get("BMP280_ENABLED") %}selected{% endif %}>Aktiviert</option>
+            <option value="False" {% if not config.get("BMP280_ENABLED") %}selected{% endif %}>Deaktiviert</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">I²C-Adresse</label>
+          <input name="BMP280_ADDRESS" value="{{ config.get('BMP280_ADDRESS', '0x76') }}"
+            class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+          <p class="text-slate-500 text-xs mt-1">0x76 oder 0x77</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">Bezeichnung</label>
+          <input name="NAME_BMP280" value="{{ config.get('NAME_BMP280', 'Barometer') }}"
+            class="border rounded-lg px-3 py-2 w-full text-sm" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Wasserzähler / Reed-Kontakte -->
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
+      <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
+        <span>💧</span> Wasserzähler (Reed-Kontakte)
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {% for i in [1, 2] %}
+        <div class="border rounded-lg p-4 {% if i == 1 %}border-sky-700/40 bg-sky-900/10{% else %}border-emerald-700/40 bg-emerald-900/10{% endif %}">
+          <h3 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+            <span class="text-xs px-2 py-0.5 rounded {% if i == 1 %}bg-sky-900/40 text-sky-400{% else %}bg-emerald-900/40 text-emerald-400{% endif %}">
+              GPIO {% if i == 1 %}25{% else %}27{% endif %}
+            </span>
+            Zähler {{ i }}
+          </h3>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1">Bezeichnung</label>
+              <input name="REED_{{ i }}_NAME"
+                value="{{ config.get('REED_' ~ i ~ '_NAME', 'Wasserzähler ' ~ i) }}"
+                class="border rounded-lg px-3 py-2 w-full text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-1">Liter pro Impuls</label>
+              <input name="REED_{{ i }}_LITER_PRO_IMPULS"
+                value="{{ config.get('REED_' ~ i ~ '_LITER_PRO_IMPULS', 1.0) }}"
+                type="number" step="0.001" min="0.001"
+                class="border rounded-lg px-3 py-2 w-full font-mono text-sm" />
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>{# /panel-weitere #}
+
+  <!-- ── Globaler Speichern-Button ── -->
+  <div class="flex justify-end pt-2 pb-4">
     <button type="submit"
       class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-8 py-3 rounded-lg transition shadow-lg shadow-sky-900/30 text-sm">
-      💾 Änderungen speichern
+      💾 Speichern
     </button>
   </div>
 
 </form>
 
 <script>
+/* ── Tab-Logik ── */
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.remove('hidden');
+  document.getElementById('tab-' + id).classList.add('active');
+  sessionStorage.setItem('configTab', id);
+}
+
+/* ── Accordion-Logik ── */
+function toggleAccordion(id) {
+  const el    = document.getElementById(id);
+  const ch    = id.replace('acc-', '');
+  const arrow = document.getElementById('arrow-' + ch);
+  el.classList.toggle('hidden');
+  arrow.classList.toggle('rotate-180');
+}
+
+/* ── Aktiven Tab wiederherstellen ── */
+const savedTab = sessionStorage.getItem('configTab');
+if (savedTab) showTab(savedTab);
+
+/* ── Speichern ── */
 async function saveConfig(event) {
   event.preventDefault();
+  const btn = event.submitter;
+  const origText = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Speichere…'; }
+
   const form = document.getElementById('configForm');
-  const formData = new FormData(form);
-  const box = document.getElementById("messageBox");
+  const box  = document.getElementById('messageBox');
 
   try {
-    const response = await fetch('{{ url_for("update_config") }}', { method: 'POST', body: formData });
+    const response = await fetch('{{ url_for("update_config") }}',
+                                 { method: 'POST', body: new FormData(form) });
     const result = await response.json();
-
-    box.classList.remove("hidden");
+    box.classList.remove('hidden');
     box.textContent = result.message;
     box.className = result.success
-      ? "p-3 rounded-lg bg-emerald-900/40 border border-emerald-700 text-emerald-300 text-sm mb-5"
-      : "p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-5";
-    window.scrollTo({ top: 0, behavior: "smooth" });
+      ? 'p-3 rounded-lg bg-emerald-900/40 border border-emerald-700 text-emerald-300 text-sm mb-5'
+      : 'p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-5';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
-    box.classList.remove("hidden");
-    box.textContent = "❌ Netzwerkfehler oder Serverproblem: " + err;
-    box.className = "p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-5";
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    box.classList.remove('hidden');
+    box.textContent = '❌ Netzwerkfehler: ' + err;
+    box.className = 'p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-5';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = origText; }
   }
 }
 </script>
+
+<style>
+.tab-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #94a3b8;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tab-btn:hover { background: rgba(100,116,139,0.3); color: #e2e8f0; }
+.tab-btn.active { background: #0369a1; color: #fff; box-shadow: 0 1px 6px rgba(3,105,161,0.4); }
+.accordion-content { animation: slideDown 0.15s ease; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+</style>
+
 {% endblock %}
