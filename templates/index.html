@@ -13,7 +13,7 @@
 <!-- ── Tab-Navigation ── -->
 <div class="flex gap-1 mb-6 bg-slate-800 border border-slate-700 rounded-xl p-1 overflow-x-auto">
   <button type="button" onclick="showTab('geraet')"   id="tab-geraet"   class="tab-btn active">🏷️ Gerät</button>
-  <button type="button" onclick="showTab('daten')"    id="tab-daten"    class="tab-btn">📡 Datenübertragung</button>
+  <button type="button" onclick="showTab('daten')"    id="tab-daten"    class="tab-btn">📡 Übertragung</button>
   <button type="button" onclick="showTab('sensoren')" id="tab-sensoren" class="tab-btn">📊 Sensoren</button>
   <button type="button" onclick="showTab('weitere')"  id="tab-weitere"  class="tab-btn">🌡️ Weitere</button>
 </div>
@@ -97,9 +97,9 @@
         </div>
       </div>
       <div class="p-3 rounded-lg bg-slate-700/50 border border-slate-600 text-xs text-slate-400 leading-relaxed">
-        🔵 <strong>Nur InfluxDB</strong> – VPN-Betrieb, direkte Verbindung. &nbsp;
-        🟢 <strong>Nur MQTT</strong> – Kein VPN, Telegraf auf Server schreibt in InfluxDB. &nbsp;
-        🟡 <strong>Beide</strong> – Redundanz / Übergangsphase. &nbsp;
+        🔵 <strong>Nur InfluxDB</strong> – Direkte Verbindung notwendig. &nbsp;
+        🟢 <strong>Nur MQTT</strong> – Telegraf auf Server schreibt in InfluxDB. &nbsp;
+        🟡 <strong>Beide</strong> – Redundanz. &nbsp;
         ⚪ <strong>Keine</strong> – Nur lokal in SQLite.
       </div>
     </div>

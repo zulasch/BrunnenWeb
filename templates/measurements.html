@@ -1,92 +1,276 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="flex items-center gap-3 mb-6">
+<div class="flex items-center gap-3 mb-5">
   <div class="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
     <span class="text-lg">📈</span>
   </div>
-  <h2 class="text-xl font-bold text-white">Aktuelle Messwerte</h2>
-  <span class="ml-auto text-xs text-slate-500 bg-slate-800 border border-slate-700 px-3 py-1 rounded-full">
+  <h1 class="text-xl font-bold text-white">Messwerte</h1>
+  <span id="refreshBadge" class="ml-auto text-xs text-slate-500 bg-slate-800 border border-slate-700 px-3 py-1 rounded-full">
     Aktualisierung alle 5 s
   </span>
 </div>
 
-<!-- Statusbox -->
 <div id="messageBox" class="hidden mb-4"></div>
 
-<!-- Messwert-Tabelle -->
-<div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg overflow-hidden">
-  <div class="overflow-x-auto">
-    <table class="min-w-full text-sm">
-      <thead>
-        <tr class="bg-slate-700/60 text-slate-300 text-left border-b border-slate-700">
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Kanal</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Name</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Zeitstempel</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Strom [mA]</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Messwert</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Einheit</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Tiefe [m]</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Wasseroberfläche [m u. Gel.]</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Messwert NN [m ü. NN]</th>
-          <th class="px-4 py-3 font-medium whitespace-nowrap">Δ Pegel [m]</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr>
-          <td colspan="10" class="text-center px-4 py-8 text-slate-500">
-            <span class="inline-block animate-pulse">Lade aktuelle Messdaten...</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<!-- Tab-Navigation -->
+<div class="flex gap-1 mb-6 bg-slate-800 border border-slate-700 rounded-xl p-1">
+  <button type="button" onclick="showTab('sensoren')"    id="tab-sensoren"    class="tab-btn active">📊 Sensoren</button>
+  <button type="button" onclick="showTab('barometer')"   id="tab-barometer"   class="tab-btn">🌡️ Barometer</button>
+  <button type="button" onclick="showTab('zaehler')"     id="tab-zaehler"     class="tab-btn">💧 Wasserzähler</button>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 1 – ANALOGE SENSOREN
+══════════════════════════════════════════════ -->
+<div id="panel-sensoren" class="tab-panel">
+  <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="bg-slate-700/60 text-slate-300 text-left border-b border-slate-700">
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Kanal</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Name</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Zeitstempel</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Strom [mA]</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Messwert</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Einheit</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Tiefe [m]</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Wasseroberfläche [m u. Gel.]</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Messwert NN [m ü. NN]</th>
+            <th class="px-4 py-3 font-medium whitespace-nowrap">Δ Pegel [m]</th>
+          </tr>
+        </thead>
+        <tbody id="sensorBody">
+          <tr>
+            <td colspan="10" class="text-center px-4 py-8 text-slate-500">
+              <span class="inline-block animate-pulse">Lade Messdaten...</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 2 – BAROMETER
+══════════════════════════════════════════════ -->
+<div id="panel-barometer" class="tab-panel hidden">
+  <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-6 max-w-lg">
+
+    <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-700">
+      <div>
+        <p class="text-xs text-slate-500 mb-1">Sensor</p>
+        <p id="baroName" class="text-sm font-semibold text-slate-200">–</p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-slate-500 mb-1">Zeitstempel</p>
+        <p id="baroTimestamp" class="text-sm text-slate-300">–</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-5">
+      <div class="bg-slate-700/40 border border-slate-600/50 rounded-xl p-5">
+        <p class="text-xs text-slate-400 mb-2 flex items-center gap-1"><span>🌀</span> Luftdruck</p>
+        <p id="baroPressure" class="text-3xl font-bold text-sky-400 leading-none">–</p>
+      </div>
+      <div class="bg-slate-700/40 border border-slate-600/50 rounded-xl p-5">
+        <p class="text-xs text-slate-400 mb-2 flex items-center gap-1"><span>🌡️</span> Temperatur</p>
+        <p id="baroTemp" class="text-3xl font-bold text-amber-400 leading-none">–</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span id="baroStatusDot" class="w-2 h-2 rounded-full bg-slate-600 inline-block"></span>
+      <p id="baroStatus" class="text-xs text-slate-500">Warte auf Daten...</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 3 – WASSERZÄHLER
+══════════════════════════════════════════════ -->
+<div id="panel-zaehler" class="tab-panel hidden">
+  <div id="reedGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+    <div class="text-center text-slate-500 col-span-2 py-10 animate-pulse">Lade Zählerstände...</div>
+  </div>
+  <div class="bg-sky-900/20 border border-sky-700/40 rounded-xl p-4 text-sm text-sky-300 flex gap-3">
+    <span class="shrink-0 mt-0.5">ℹ️</span>
+    <span>
+      Der Zählerstand wird persistent gespeichert und überlebt einen Neustart.
+      Liter pro Impuls kann unter
+      <a href="/" class="underline font-semibold text-sky-400 hover:text-sky-300">Konfiguration → Weitere</a>
+      eingestellt werden.
+    </span>
   </div>
 </div>
 
 <script>
-async function loadMeasurements() {
-  try {
-    const res = await fetch('{{ url_for("measurements_api") }}');
-    const data = await res.json();
+/* ── Tab-Logik ── */
+const loaders = { sensoren: loadSensors, barometer: loadBarometer, zaehler: loadReed };
+let activeTab = sessionStorage.getItem('measureTab') || 'sensoren';
 
-    const body = document.getElementById("tableBody");
-    body.innerHTML = "";
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.remove('hidden');
+  document.getElementById('tab-' + id).classList.add('active');
+  activeTab = id;
+  sessionStorage.setItem('measureTab', id);
+  loaders[id]();   // sofort laden beim Tab-Wechsel
+}
+
+/* ── Auto-Refresh (nur aktiver Tab) ── */
+setInterval(() => loaders[activeTab](), 5000);
+
+/* ── Sensoren ── */
+async function loadSensors() {
+  try {
+    const res  = await fetch('{{ url_for("measurements_api") }}');
+    const data = await res.json();
+    const body = document.getElementById('sensorBody');
+    body.innerHTML = '';
 
     if (!Array.isArray(data)) {
-      body.innerHTML = `<tr><td colspan="10" class="text-center px-4 py-8 text-slate-500">Keine gültigen Messdaten gefunden.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="10" class="text-center px-4 py-8 text-slate-500">Keine Messdaten.</td></tr>`;
       return;
     }
 
-    data.forEach((row, idx) => {
-      const tr = document.createElement("tr");
-      tr.className = "border-b border-slate-700/50 hover:bg-slate-700/30 transition";
-
-      const type = (row.type || "LEVEL").toUpperCase();
-      const value = (row.value ?? row.level_m);
-      const unit = row.unit || (type === "LEVEL" ? "m" : "");
-
+    data.forEach(row => {
+      const tr   = document.createElement('tr');
+      tr.className = 'border-b border-slate-700/50 hover:bg-slate-700/30 transition';
+      const type = (row.type || 'LEVEL').toUpperCase();
+      const val  = row.value ?? row.level_m;
+      const unit = row.unit || (type === 'LEVEL' ? 'm' : '');
       tr.innerHTML = `
         <td class="px-4 py-3 font-mono text-sky-400 font-semibold">${row.channel}</td>
-        <td class="px-4 py-3 text-slate-200">${row.name ?? "–"}</td>
+        <td class="px-4 py-3 text-slate-200">${row.name ?? '–'}</td>
         <td class="px-4 py-3 text-slate-400 whitespace-nowrap">${new Date(row.timestamp).toLocaleString()}</td>
-        <td class="px-4 py-3 text-slate-300">${row.current_mA != null ? row.current_mA.toFixed(2) : "–"}</td>
-        <td class="px-4 py-3 font-semibold text-white">${value != null ? value.toFixed(2) : "–"}</td>
-        <td class="px-4 py-3 text-slate-400">${unit || "–"}</td>
-        <td class="px-4 py-3 text-slate-300">${type === "LEVEL" && row.level_m != null ? row.level_m.toFixed(2) : "–"}</td>
-        <td class="px-4 py-3 text-slate-300">${type === "LEVEL" && row.wasser_oberflaeche_m != null ? row.wasser_oberflaeche_m.toFixed(2) : "–"}</td>
-        <td class="px-4 py-3 text-slate-300">${type === "LEVEL" && row.messwert_NN != null ? row.messwert_NN.toFixed(2) : "–"}</td>
-        <td class="px-4 py-3 text-slate-300">${type === "LEVEL" && row.pegel_diff != null ? row.pegel_diff.toFixed(2) : "–"}</td>
+        <td class="px-4 py-3 text-slate-300">${row.current_mA != null ? row.current_mA.toFixed(2) : '–'}</td>
+        <td class="px-4 py-3 font-semibold text-white">${val != null ? val.toFixed(2) : '–'}</td>
+        <td class="px-4 py-3 text-slate-400">${unit || '–'}</td>
+        <td class="px-4 py-3 text-slate-300">${type === 'LEVEL' && row.level_m != null ? row.level_m.toFixed(2) : '–'}</td>
+        <td class="px-4 py-3 text-slate-300">${type === 'LEVEL' && row.wasser_oberflaeche_m != null ? row.wasser_oberflaeche_m.toFixed(2) : '–'}</td>
+        <td class="px-4 py-3 text-slate-300">${type === 'LEVEL' && row.messwert_NN != null ? row.messwert_NN.toFixed(2) : '–'}</td>
+        <td class="px-4 py-3 text-slate-300">${type === 'LEVEL' && row.pegel_diff != null ? row.pegel_diff.toFixed(2) : '–'}</td>
       `;
       body.appendChild(tr);
     });
-
   } catch (err) {
-    const body = document.getElementById("tableBody");
-    body.innerHTML = `<tr><td colspan="10" class="text-center px-4 py-8 text-rose-400">⚠️ Fehler beim Laden: ${err}</td></tr>`;
+    document.getElementById('sensorBody').innerHTML =
+      `<tr><td colspan="10" class="text-center px-4 py-8 text-rose-400">⚠️ Fehler: ${err}</td></tr>`;
   }
 }
 
-loadMeasurements();
-setInterval(loadMeasurements, 5000);
+/* ── Barometer ── */
+async function loadBarometer() {
+  try {
+    const res  = await fetch("{{ url_for('barometer_api') }}");
+    const data = await res.json();
+    const dot  = document.getElementById('baroStatusDot');
+    const st   = document.getElementById('baroStatus');
+
+    if (!res.ok || !data || data.error) {
+      st.textContent = data?.error || 'Keine Daten.';
+      dot.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
+      ['baroTimestamp','baroPressure','baroTemp','baroName'].forEach(id => document.getElementById(id).textContent = '–');
+      return;
+    }
+
+    document.getElementById('baroTimestamp').textContent = data.timestamp ? new Date(data.timestamp).toLocaleString() : '–';
+    document.getElementById('baroPressure').textContent  = data.value != null ? `${Number(data.value).toFixed(1)} hPa` : '–';
+    document.getElementById('baroTemp').textContent      = data.temperature_C != null ? `${Number(data.temperature_C).toFixed(1)} °C` : '–';
+    document.getElementById('baroName').textContent      = data.name || data.channel || 'BMP280';
+    st.textContent  = 'Letzte Aktualisierung erfolgreich.';
+    dot.className   = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
+  } catch (err) {
+    document.getElementById('baroStatus').textContent    = `Fehler: ${err}`;
+    document.getElementById('baroStatusDot').className   = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
+  }
+}
+
+/* ── Wasserzähler ── */
+async function loadReed() {
+  try {
+    const res  = await fetch('/api/reed');
+    const data = await res.json();
+    const grid = document.getElementById('reedGrid');
+    grid.innerHTML = '';
+
+    data.forEach(z => {
+      const card = document.createElement('div');
+      card.className = 'bg-slate-800 border border-sky-700/40 rounded-xl shadow-lg p-6';
+      card.innerHTML = `
+        <div class="flex items-start justify-between mb-5">
+          <div>
+            <h3 class="text-base font-bold text-white">${z.name}</h3>
+            <p class="text-xs text-slate-500 mt-1">GPIO ${z.gpio} &nbsp;·&nbsp; ${z.liter_pro_impuls} L/Impuls</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-sky-500/15 flex items-center justify-center text-xl shrink-0">🌊</div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-5">
+          <div class="bg-slate-700/40 border border-slate-600/50 rounded-xl p-4 text-center">
+            <p class="text-xs text-slate-400 mb-1">Gesamtvolumen</p>
+            <p class="text-2xl font-bold text-sky-400">${z.liter.toFixed(2)}</p>
+            <p class="text-xs text-slate-500 mt-1">Liter</p>
+          </div>
+          <div class="bg-slate-700/40 border border-slate-600/50 rounded-xl p-4 text-center">
+            <p class="text-xs text-slate-400 mb-1">Impulse gesamt</p>
+            <p class="text-2xl font-bold text-slate-200">${z.impulse}</p>
+            <p class="text-xs text-slate-500 mt-1">Impulse</p>
+          </div>
+        </div>
+        <button onclick="resetCounter(${z.gpio}, '${z.name}')"
+          class="w-full py-2 rounded-lg bg-rose-900/30 border border-rose-700/40 text-rose-400 hover:bg-rose-900/50 hover:text-rose-300 font-medium transition text-sm">
+          🔄 Zähler zurücksetzen
+        </button>
+      `;
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    document.getElementById('reedGrid').innerHTML =
+      `<div class="col-span-2 text-center text-rose-400 py-10">⚠️ Fehler: ${err}</div>`;
+  }
+}
+
+async function resetCounter(gpio, name) {
+  if (!confirm(`Zähler „${name}" wirklich auf 0 zurücksetzen?`)) return;
+  const box = document.getElementById('messageBox');
+  try {
+    const res  = await fetch(`/reed/reset/${gpio}`, { method: 'POST' });
+    const data = await res.json();
+    box.classList.remove('hidden');
+    box.textContent = data.message;
+    box.className = data.success
+      ? 'p-3 rounded-lg bg-emerald-900/40 border border-emerald-700 text-emerald-300 text-sm mb-4'
+      : 'p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-4';
+    setTimeout(() => box.classList.add('hidden'), 4000);
+    setTimeout(loadReed, 500);
+  } catch (err) {
+    box.classList.remove('hidden');
+    box.textContent = '❌ Fehler: ' + err;
+    box.className = 'p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-4';
+  }
+}
+
+/* ── Initialisierung ── */
+showTab(activeTab);
 </script>
+
+<style>
+.tab-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #94a3b8;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tab-btn:hover { background: rgba(100,116,139,0.3); color: #e2e8f0; }
+.tab-btn.active { background: #0369a1; color: #fff; box-shadow: 0 1px 6px rgba(3,105,161,0.4); }
+</style>
+
 {% endblock %}
