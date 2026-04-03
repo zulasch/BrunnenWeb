@@ -40,6 +40,12 @@ if [ -d "$BASE_DIR/venv" ]; then
   pip install -r "$BASE_DIR/requirements.txt" >>"$LOG" 2>&1
 fi
 
+# Nginx + SSL idempotent aktualisieren (neue Config, Zertifikat nur wenn fehlend)
+if [ -f "$BASE_DIR/scripts/setup_nginx.sh" ]; then
+  echo "🔒 Aktualisiere nginx-Konfiguration..." | tee -a "$LOG"
+  sudo bash "$BASE_DIR/scripts/setup_nginx.sh" >>"$LOG" 2>&1
+fi
+
 # ------------------------------------------------------------
 # 🧩 Systemd Units deployen (z.B. Display-Service)
 # ------------------------------------------------------------

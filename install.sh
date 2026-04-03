@@ -77,7 +77,10 @@ brunnen ALL=NOPASSWD: /usr/bin/systemctl restart brunnen_logger.service
 brunnen ALL=NOPASSWD: /bin/systemctl restart brunnen_web.service
 brunnen ALL=NOPASSWD: /bin/systemctl restart brunnen_logger.service
 brunnen ALL=NOPASSWD: /usr/bin/systemctl restart NetworkManager
+brunnen ALL=NOPASSWD: /usr/bin/systemctl reload nginx
+brunnen ALL=NOPASSWD: /bin/systemctl reload nginx
 brunnen ALL=NOPASSWD: $BASE_DIR/scripts/update_repo.sh
+brunnen ALL=NOPASSWD: $BASE_DIR/scripts/setup_nginx.sh
 EOF
 
 chmod 440 "$SUDOERS_FILE"
@@ -188,7 +191,7 @@ User=brunnen
 Group=brunnen
 SupplementaryGroups=gpio
 WorkingDirectory=$BASE_DIR
-ExecStart=$BASE_DIR/venv/bin/gunicorn -w 1 --threads 1 -t 180 -b 0.0.0.0:8080 webapp:app
+ExecStart=$BASE_DIR/venv/bin/gunicorn -w 1 --threads 1 -t 180 -b 127.0.0.1:8080 webapp:app
 Restart=always
 Environment="PATH=$BASE_DIR/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 Environment="WEBAPP_SECRET=$WEBAPP_SECRET"
@@ -252,6 +255,10 @@ systemctl start NetworkManager
 # ------------------------------------------------------------
 # 🎉 Abschluss
 # ------------------------------------------------------------
+section "8b  Nginx + SSL einrichten"
+bash "$BASE_DIR/scripts/setup_nginx.sh"
+ok "Nginx und SSL-Zertifikat konfiguriert"
+
 section "9️⃣  Starte Dienste"
 
 systemctl restart brunnen_web.service brunnen_logger.service

@@ -17,6 +17,9 @@ CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
 NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
+CERT_DIR = os.path.join(BASE_DIR, "certs")
+CERT_FILE = os.path.join(CERT_DIR, "brunnen.crt")
+KEY_FILE = os.path.join(CERT_DIR, "brunnen.key")
 
 # 🔧 Standard-Konfiguration – wird mit lokaler config.json gemerged
 DEFAULT_CONFIG = {
@@ -1194,6 +1197,133 @@ def alerts_test():
     if ok:
         return jsonify({"success": True, "message": "✅ Test-Email wurde gesendet."})
     return jsonify({"success": False, "message": f"❌ {msg}"}), 500
+
+
+# ─── Certificate Management ────────────────────────────────────────────────
+
+def _get_cert_info() -> dict:
+    """Read subject, issuer, and validity from the active certificate."""
+    if not os.path.exists(CERT_FILE):
+        return {}
+    try:
+        out = subprocess.check_output(
+            ["openssl", "x509", "-in", CERT_FILE, "-noout",
+             "-subject", "-issuer", "-dates"],
+            stderr=subprocess.DEVNULL, timeout=5
+        ).decode()
+        info = {}
+        for line in out.splitlines():
+            if "=" in line:
+                k, _, v = line.partition("=")
+                info[k.strip()] = v.strip()
+        return info
+    except Exception:
+        return {}
+
+
+def _reload_nginx() -> tuple[bool, str]:
+    """Reload nginx via sudo (sudoers entry required)."""
+    for cmd in ["/usr/bin/systemctl", "/bin/systemctl"]:
+        try:
+            subprocess.check_call(
+                ["sudo", cmd, "reload", "nginx"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10
+            )
+            return True, ""
+        except FileNotFoundError:
+            continue
+        except subprocess.CalledProcessError as e:
+            return False, str(e)
+    return False, "systemctl nicht gefunden"
+
+
+@app.route("/certificates")
+@login_required
+def certificates_page():
+    cert_info = _get_cert_info()
+    cert_exists = os.path.exists(CERT_FILE) and os.path.exists(KEY_FILE)
+    return render_template("certificates.html", cert_info=cert_info, cert_exists=cert_exists)
+
+
+@app.route("/certificates/generate", methods=["POST"])
+@login_required
+def certificates_generate():
+    try:
+        os.makedirs(CERT_DIR, exist_ok=True)
+        cn = request.form.get("cn", "").strip() or "brunnen"
+        subprocess.check_call(
+            ["openssl", "req", "-x509", "-nodes", "-days", "3650",
+             "-newkey", "rsa:2048",
+             "-keyout", KEY_FILE,
+             "-out", CERT_FILE,
+             "-subj", f"/C=DE/ST=Bayern/O=BrunnenWeb/CN={cn}"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30
+        )
+        os.chmod(KEY_FILE, 0o640)
+        os.chmod(CERT_FILE, 0o644)
+        _reload_nginx()
+        return jsonify({"success": True, "message": "Selbstsigniertes Zertifikat erfolgreich erstellt."})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/certificates/upload", methods=["POST"])
+@login_required
+def certificates_upload():
+    cert_file = request.files.get("cert")
+    key_file  = request.files.get("key")
+    if not cert_file or not key_file:
+        return jsonify({"success": False, "message": "Bitte Zertifikat (.crt) und Schlüssel (.key) hochladen."}), 400
+    try:
+        cert_data = cert_file.read()
+        key_data  = key_file.read()
+
+        # Validate: check that cert and key are PEM-format
+        if b"BEGIN CERTIFICATE" not in cert_data:
+            return jsonify({"success": False, "message": "Ungültiges Zertifikat (kein PEM-Format)."}), 400
+        if b"BEGIN" not in key_data or b"PRIVATE KEY" not in key_data:
+            return jsonify({"success": False, "message": "Ungültiger Schlüssel (kein PEM-Format)."}), 400
+
+        # Write to temp files and validate matching key/cert pair via openssl
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".crt") as tc:
+            tc.write(cert_data); tmp_cert = tc.name
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".key") as tk:
+            tk.write(key_data); tmp_key = tk.name
+
+        try:
+            cert_mod = subprocess.check_output(
+                ["openssl", "x509", "-noout", "-modulus", "-in", tmp_cert],
+                stderr=subprocess.DEVNULL, timeout=5
+            ).strip()
+            key_mod = subprocess.check_output(
+                ["openssl", "rsa", "-noout", "-modulus", "-in", tmp_key],
+                stderr=subprocess.DEVNULL, timeout=5
+            ).strip()
+        except subprocess.CalledProcessError:
+            os.unlink(tmp_cert); os.unlink(tmp_key)
+            return jsonify({"success": False, "message": "Zertifikat oder Schlüssel konnte nicht gelesen werden."}), 400
+        finally:
+            try: os.unlink(tmp_cert)
+            except: pass
+            try: os.unlink(tmp_key)
+            except: pass
+
+        if cert_mod != key_mod:
+            return jsonify({"success": False, "message": "Zertifikat und Schlüssel passen nicht zusammen."}), 400
+
+        os.makedirs(CERT_DIR, exist_ok=True)
+        with open(CERT_FILE, "wb") as f:
+            f.write(cert_data)
+        with open(KEY_FILE, "wb") as f:
+            f.write(key_data)
+        os.chmod(KEY_FILE, 0o640)
+        os.chmod(CERT_FILE, 0o644)
+
+        _reload_nginx()
+        return jsonify({"success": True, "message": "Zertifikat erfolgreich installiert und nginx neu geladen."})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 def scheduler_loop():

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="flex items-center gap-3 mb-5">
+  <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+    <span class="text-lg">🔒</span>
+  </div>
+  <h1 class="text-xl font-bold text-white">SSL-Zertifikat</h1>
+</div>
+
+<div id="messageBox" class="hidden mb-4"></div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+  <!-- ── Aktuelles Zertifikat ─────────────────────────────── -->
+  <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+    <h2 class="text-base font-semibold text-sky-400 mb-4 flex items-center gap-2">
+      <span>📜</span> Aktuelles Zertifikat
+    </h2>
+
+    {% if cert_exists %}
+    <dl class="space-y-3 text-sm">
+      {% set subject = cert_info.get('subject', '') %}
+      {% set issuer  = cert_info.get('issuer',  '') %}
+      {% set from_d  = cert_info.get('notBefore', '–') %}
+      {% set to_d    = cert_info.get('notAfter',  '–') %}
+
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-xs text-slate-500">Subject</dt>
+        <dd class="text-slate-200 font-mono text-xs break-all">{{ subject or '–' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-xs text-slate-500">Issuer</dt>
+        <dd class="text-slate-300 font-mono text-xs break-all">{{ issuer or '–' }}</dd>
+      </div>
+      <div class="grid grid-cols-2 gap-4 pt-1">
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-xs text-slate-500">Gültig ab</dt>
+          <dd class="text-emerald-400 text-xs">{{ from_d }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-xs text-slate-500">Gültig bis</dt>
+          <dd class="text-amber-400 text-xs">{{ to_d }}</dd>
+        </div>
+      </div>
+    </dl>
+    {% else %}
+    <div class="flex items-center gap-2 text-slate-400 text-sm">
+      <span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>
+      Kein Zertifikat vorhanden
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Selbstsigniertes Zertifikat generieren ───────────── -->
+  <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+    <h2 class="text-base font-semibold text-amber-400 mb-4 flex items-center gap-2">
+      <span>⚙️</span> Selbstsigniertes Zertifikat generieren
+    </h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Erzeugt ein neues 10-Jahres-Zertifikat mit RSA 2048. Ersetzt ein vorhandenes Zertifikat.
+      Browser zeigen eine Sicherheitswarnung — für interne Nutzung akzeptabel.
+    </p>
+    <div class="mb-4">
+      <label class="block text-xs text-slate-400 mb-1">Common Name (CN) – z.B. IP-Adresse oder Hostname</label>
+      <input id="genCN" type="text" placeholder="brunnen.local"
+             class="w-full rounded-lg border px-3 py-2 text-sm">
+    </div>
+    <button onclick="generateCert()"
+      class="w-full py-2 rounded-lg bg-amber-700/40 border border-amber-600/50 text-amber-300 hover:bg-amber-700/60 hover:text-amber-200 font-medium transition text-sm">
+      🔑 Neues Zertifikat generieren
+    </button>
+  </div>
+
+  <!-- ── Eigenes Zertifikat hochladen ─────────────────────── -->
+  <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg lg:col-span-2">
+    <h2 class="text-base font-semibold text-emerald-400 mb-4 flex items-center gap-2">
+      <span>📤</span> Eigenes Zertifikat hochladen
+    </h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Lade ein von einer CA signiertes Zertifikat hoch (z.B. Let's Encrypt).
+      Beide Dateien müssen im PEM-Format vorliegen und zusammenpassen.
+    </p>
+    <form id="uploadForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Zertifikat (.crt / .pem)</label>
+        <input id="certFile" type="file" accept=".crt,.pem,.cer"
+               class="w-full rounded-lg border px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-sky-800 file:text-sky-200 hover:file:bg-sky-700 cursor-pointer">
+      </div>
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Privater Schlüssel (.key)</label>
+        <input id="keyFile" type="file" accept=".key,.pem"
+               class="w-full rounded-lg border px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-sky-800 file:text-sky-200 hover:file:bg-sky-700 cursor-pointer">
+      </div>
+      <div class="sm:col-span-2">
+        <button type="button" onclick="uploadCert()"
+          class="w-full sm:w-auto px-6 py-2 rounded-lg bg-emerald-700/40 border border-emerald-600/50 text-emerald-300 hover:bg-emerald-700/60 hover:text-emerald-200 font-medium transition text-sm">
+          📤 Zertifikat installieren
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Info-Box ──────────────────────────────────────────── -->
+  <div class="bg-sky-900/20 border border-sky-700/40 rounded-xl p-4 text-sm text-sky-300 flex gap-3 lg:col-span-2">
+    <span class="shrink-0 mt-0.5">ℹ️</span>
+    <span>
+      Das Zertifikat wird unter <code class="font-mono text-xs bg-slate-700 px-1 rounded">/opt/brunnen_web/certs/</code> gespeichert.
+      Nach jeder Änderung wird nginx automatisch neu geladen.
+      HTTP (Port 80) leitet automatisch auf HTTPS (443) um.
+    </span>
+  </div>
+
+</div>
+
+<script>
+function showMsg(msg, ok) {
+  const box = document.getElementById('messageBox');
+  box.textContent = msg;
+  box.className = ok
+    ? 'p-3 rounded-lg bg-emerald-900/40 border border-emerald-700 text-emerald-300 text-sm mb-4'
+    : 'p-3 rounded-lg bg-rose-900/40 border border-rose-700 text-rose-300 text-sm mb-4';
+  box.classList.remove('hidden');
+  setTimeout(() => box.classList.add('hidden'), 6000);
+}
+
+async function generateCert() {
+  const cn = document.getElementById('genCN').value.trim();
+  const fd = new FormData();
+  if (cn) fd.append('cn', cn);
+  try {
+    const res  = await fetch('/certificates/generate', { method: 'POST', body: fd });
+    const data = await res.json();
+    showMsg(data.message, data.success);
+    if (data.success) setTimeout(() => location.reload(), 1500);
+  } catch (e) {
+    showMsg('Fehler: ' + e, false);
+  }
+}
+
+async function uploadCert() {
+  const certInput = document.getElementById('certFile');
+  const keyInput  = document.getElementById('keyFile');
+  if (!certInput.files[0] || !keyInput.files[0]) {
+    showMsg('Bitte beide Dateien auswählen.', false);
+    return;
+  }
+  const fd = new FormData();
+  fd.append('cert', certInput.files[0]);
+  fd.append('key',  keyInput.files[0]);
+  try {
+    const res  = await fetch('/certificates/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    showMsg(data.message, data.success);
+    if (data.success) setTimeout(() => location.reload(), 1500);
+  } catch (e) {
+    showMsg('Fehler: ' + e, false);
+  }
+}
+</script>
+
+{% endblock %}
