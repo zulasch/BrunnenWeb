@@ -1348,5 +1348,5 @@ Thread(target=scheduler_loop, daemon=True).start()
 
 # Start
 if __name__ == "__main__":
-    # läuft auf 0.0.0.0:8080
-    app.run(host="0.0.0.0", port=8080, debug=False)
+    # läuft auf 127.0.0.1:8080
+    app.run(host="127.0.0.1", port=8080, debug=False)
