@@ -4,8 +4,12 @@ influxdb-client
 adafruit-circuitpython-ads1x15
 adafruit-blinka
 adafruit-circuitpython-bmp280
+adafruit-circuitpython-ssd1306 
 RPi.GPIO
 gunicorn
 lgpio
 luma.oled
 requests
+paho-mqtt>=1.6
+pillow
+board 

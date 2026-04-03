@@ -65,7 +65,7 @@ def systemctl_is_active(unit: str) -> bool:
 
 def read_latest_measurements():
     """
-    Erwartet Liste von Dicts (so wie wasserstand_logger.py schreibt) :contentReference[oaicite:4]{index=4}
+    Erwartet Liste von Dicts (so wie wasserstand_logger.py schreibt)
     """
     if not os.path.exists(LATEST_JSON):
         return []
@@ -83,7 +83,7 @@ def get_channel_data(measurements, ch):
     return None
 
 def parse_ts(ts: str):
-    # Logger schreibt ISO (UTC) :contentReference[oaicite:5]{index=5}
+    # Logger schreibt ISO (UTC)
     try:
         # Python: "2025-.." +00:00 kompatibel
         dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))

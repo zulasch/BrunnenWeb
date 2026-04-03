@@ -17,6 +17,10 @@ CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
 NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
+TYPES_FILE = os.path.join(BASE_DIR, "config", "output_types.json")
+CERT_DIR = os.path.join(BASE_DIR, "certs")
+CERT_FILE = os.path.join(CERT_DIR, "brunnen.crt")
+KEY_FILE = os.path.join(CERT_DIR, "brunnen.key")
 
 # 🔧 Standard-Konfiguration – wird mit lokaler config.json gemerged
 DEFAULT_CONFIG = {
@@ -37,6 +41,18 @@ DEFAULT_CONFIG = {
     "NEXTCLOUD_USER": "",
     "NEXTCLOUD_PASSWORD": "",
     "NEXTCLOUD_PATH": "Brunnen/Backups",
+    # MQTT Broker
+    "MQTT_ENABLED": False,
+    "MQTT_HOST": "",
+    "MQTT_PORT": 1883,
+    "MQTT_USER": "",
+    "MQTT_PASSWORD": "",
+    "MQTT_TLS": False,
+    "MQTT_TLS_CA_CERT": "",
+    "MQTT_TOPIC_PREFIX": "brunnen",
+    "MQTT_QOS": 1,
+    # InfluxDB explizit ein-/ausschalten
+    "INFLUX_ENABLED": True,
     # SMTP / Email-Alarmierung
     "SMTP_HOST": "",
     "SMTP_PORT": 587,
@@ -64,45 +80,46 @@ DEFAULT_CONFIG = {
 # Kanal-spezifische Defaults generieren
 #for ch in ["A0", "A1", "A2", "A3"]:
 
-DEFAULT_CONFIG.setdefault(f"NAME_A0", "Nordbrunnen ABC")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A0", "m")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A0", "LEVEL")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A0", 0.0,)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A0", 3.0)
-DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A0", 100.0)
-DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A0", 25.0)
-DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A0", 100.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A0", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A0", "Nordbrunnen ABC")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A0", "m")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A0", "LEVEL")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A0", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A0", 3.0)
+DEFAULT_CONFIG.setdefault("STARTABSTICH_A0", 100.0)
+DEFAULT_CONFIG.setdefault("INITIAL_WASSERTIEFE_A0", 25.0)
+DEFAULT_CONFIG.setdefault("MESSWERT_NN_A0", 100.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A0", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A1", "Pumpentemperatur")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A1", "°C")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A1", "TEMP")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A1", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A1", 3.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A1", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A1", "Pumpentemperatur")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A1", "°C")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A1", "TEMP")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A1", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A1", 3.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A1", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A2", "Pumpendurchfluss")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A2", "m3/h")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A2", "FLOW")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A2", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A2", 3.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A2", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A2", "Pumpendurchfluss")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A2", "m3/h")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A2", "FLOW")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A2", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A2", 3.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A2", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A3", "reserve")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A3", "m")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A3", "LEVEL")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A3", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A3", 3.0)
-DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A3", 100.0)
-DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A3", 15.0)
-DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A3", 00.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A3", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A3", "reserve")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A3", "m")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A3", "LEVEL")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A3", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A3", 3.0)
+DEFAULT_CONFIG.setdefault("STARTABSTICH_A3", 100.0)
+DEFAULT_CONFIG.setdefault("INITIAL_WASSERTIEFE_A3", 15.0)
+DEFAULT_CONFIG.setdefault("MESSWERT_NN_A3", 0.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A3", 150.0)
 
 
 # ===== Flask =====
 app = Flask(__name__, template_folder="templates", static_folder="static")
-# Geheimschlüssel (für Sessions). In Produktion in ENV legen!
-app.config["SECRET_KEY"] = os.environ.get("WEBAPP_SECRET", "change-me-please")
+# Geheimschlüssel: aus ENV oder zufällig generiert (Sessions überleben Neustarts nur mit festem Key in ENV)
+import secrets as _secrets
+app.config["SECRET_KEY"] = os.environ.get("WEBAPP_SECRET", _secrets.token_hex(32))
 
 @app.context_processor
 def inject_globals():
@@ -110,29 +127,56 @@ def inject_globals():
     return {"device_id": cfg.get("DEVICE_ID", socket.gethostname())}
 
 # ===== Helpers =====
+def _write_json_atomic(path: str, data):
+    """Write JSON atomically via temp file to prevent corruption on crash."""
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(data, f, indent=2)
+    os.replace(tmp, path)
+
+
 def load_schedule():
     if os.path.exists(SCHEDULE_FILE):
-        with open(SCHEDULE_FILE) as f:
-            return json.load(f)
+        try:
+            with open(SCHEDULE_FILE) as f:
+                return json.load(f)
+        except Exception:
+            pass
     return []
 
 
 def save_schedule(data):
-    with open(SCHEDULE_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+    _write_json_atomic(SCHEDULE_FILE, data)
 
 
 def load_names():
     if os.path.exists(NAMES_FILE):
-        with open(NAMES_FILE) as f:
-            return json.load(f)
+        try:
+            with open(NAMES_FILE) as f:
+                return json.load(f)
+        except Exception:
+            pass
     return {str(i): f"Kanal {i+1}" for i in range(6)}
 
 
 def save_names(data):
-    with open(NAMES_FILE, "w") as f:
-        json.dump(data, f, indent=2)
-        
+    _write_json_atomic(NAMES_FILE, data)
+
+
+def load_types():
+    """Returns dict {"0": "NO", "1": "NC", ...} — default NO for all channels."""
+    if os.path.exists(TYPES_FILE):
+        try:
+            with open(TYPES_FILE) as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {str(i): "NO" for i in range(6)}
+
+
+def save_types(data):
+    _write_json_atomic(TYPES_FILE, data)
+
 
 def load_config():
     # Leere Basis
@@ -161,18 +205,16 @@ def load_config():
             cfg.pop(key)
             changed = True
 
-    # 4️⃣ Wenn sich was geändert hat -> wieder speichern
+    # 4️⃣ Wenn sich was geändert hat -> wieder speichern (atomar via Temp-Datei)
     if changed:
         os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-        with open(CONFIG_PATH, "w") as f:
-            json.dump(cfg, f, indent=2)
+        _write_json_atomic(CONFIG_PATH, cfg)
 
     return cfg
 
 
 def save_config(cfg: dict):
-    with open(CONFIG_PATH, "w") as f:
-        json.dump(cfg, f, indent=2)
+    _write_json_atomic(CONFIG_PATH, cfg)
 
 # ===== Nextcloud / WebDAV Backup =====
 _BACKUP_FILES = ["config.json", "output_schedule.json", "output_names.json"]
@@ -533,7 +575,9 @@ def update_config():
         string_keys = ["ADMIN_PIN", "WEB_USER", "WEB_PASS", "DEVICE_ID", "LOCATION",
                        "REED_1_NAME", "REED_2_NAME",
                        "NEXTCLOUD_URL", "NEXTCLOUD_USER", "NEXTCLOUD_PASSWORD", "NEXTCLOUD_PATH",
-                       "SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "SMTP_TO"]
+                       "SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "SMTP_TO",
+                       "MQTT_HOST", "MQTT_USER", "MQTT_PASSWORD", "MQTT_TLS_CA_CERT", "MQTT_TOPIC_PREFIX",
+                       "INFLUX_URL", "INFLUX_TOKEN", "INFLUX_ORG", "INFLUX_BUCKET"]
         bool_keys = set(
             [k for k in cfg.keys() if k.endswith("_ENABLED") or k.endswith("_EN") or k.endswith("_TLS")]
         )
@@ -542,7 +586,7 @@ def update_config():
             if key in cfg:
                 if key in bool_keys:
                     cfg[key] = str(value).lower() in ("1", "true", "yes", "on")
-                elif key in ("BMP280_ADDRESS", "SMTP_PORT"):
+                elif key in ("BMP280_ADDRESS", "SMTP_PORT", "MQTT_PORT"):
                     try:
                         cfg[key] = int(str(value), 0)
                     except Exception:
@@ -584,6 +628,19 @@ def outputs_names():
         save_names(data)
         return jsonify({"success": True, "message": "✅ Namen gespeichert"})
     return jsonify(load_names())
+
+
+@app.route("/outputs/types", methods=["GET", "POST"])
+@login_required
+def outputs_types():
+    if request.method == "POST":
+        data = request.form.to_dict()
+        # Ensure only valid values
+        clean = {k: ("NC" if v == "NC" else "NO") for k, v in data.items()}
+        save_types(clean)
+        return jsonify({"success": True, "message": "✅ Relaistypen gespeichert"})
+    return jsonify(load_types())
+
 
 @app.route("/outputs/set/<int:channel>/<int:state>", methods=["POST"])
 @login_required
@@ -658,7 +715,7 @@ def service_action():
             return jsonify({"status": "ok", "message": st})
 
         # Wenn die WebApp sich selbst neu startet → gleich Erfolg melden
-        if service in ("brunnen_web.service", "web"):
+        if service == "web":
             subprocess.Popen(
                 ["sudo", "systemctl", "restart", "brunnen_web.service"],
                 stdout=subprocess.DEVNULL,
@@ -1182,27 +1239,159 @@ def alerts_test():
     return jsonify({"success": False, "message": f"❌ {msg}"}), 500
 
 
+# ─── Certificate Management ────────────────────────────────────────────────
+
+def _get_cert_info() -> dict:
+    """Read subject, issuer, and validity from the active certificate."""
+    if not os.path.exists(CERT_FILE):
+        return {}
+    try:
+        out = subprocess.check_output(
+            ["openssl", "x509", "-in", CERT_FILE, "-noout",
+             "-subject", "-issuer", "-dates"],
+            stderr=subprocess.DEVNULL, timeout=5
+        ).decode()
+        info = {}
+        for line in out.splitlines():
+            if "=" in line:
+                k, _, v = line.partition("=")
+                info[k.strip()] = v.strip()
+        return info
+    except Exception:
+        return {}
+
+
+def _reload_nginx() -> tuple[bool, str]:
+    """Reload nginx via sudo (sudoers entry required)."""
+    for cmd in ["/usr/bin/systemctl", "/bin/systemctl"]:
+        try:
+            subprocess.check_call(
+                ["sudo", cmd, "reload", "nginx"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10
+            )
+            return True, ""
+        except FileNotFoundError:
+            continue
+        except subprocess.CalledProcessError as e:
+            return False, str(e)
+    return False, "systemctl nicht gefunden"
+
+
+@app.route("/certificates")
+@login_required
+def certificates_page():
+    cert_info = _get_cert_info()
+    cert_exists = os.path.exists(CERT_FILE) and os.path.exists(KEY_FILE)
+    return render_template("certificates.html", cert_info=cert_info, cert_exists=cert_exists)
+
+
+@app.route("/certificates/generate", methods=["POST"])
+@login_required
+def certificates_generate():
+    try:
+        os.makedirs(CERT_DIR, exist_ok=True)
+        cn = request.form.get("cn", "").strip() or "brunnen"
+        subprocess.check_call(
+            ["openssl", "req", "-x509", "-nodes", "-days", "3650",
+             "-newkey", "rsa:2048",
+             "-keyout", KEY_FILE,
+             "-out", CERT_FILE,
+             "-subj", f"/C=DE/ST=Bayern/O=BrunnenWeb/CN={cn}"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30
+        )
+        os.chmod(KEY_FILE, 0o640)
+        os.chmod(CERT_FILE, 0o644)
+        _reload_nginx()
+        return jsonify({"success": True, "message": "Selbstsigniertes Zertifikat erfolgreich erstellt."})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/certificates/upload", methods=["POST"])
+@login_required
+def certificates_upload():
+    cert_file = request.files.get("cert")
+    key_file  = request.files.get("key")
+    if not cert_file or not key_file:
+        return jsonify({"success": False, "message": "Bitte Zertifikat (.crt) und Schlüssel (.key) hochladen."}), 400
+    try:
+        cert_data = cert_file.read()
+        key_data  = key_file.read()
+
+        # Validate: check that cert and key are PEM-format
+        if b"BEGIN CERTIFICATE" not in cert_data:
+            return jsonify({"success": False, "message": "Ungültiges Zertifikat (kein PEM-Format)."}), 400
+        if b"BEGIN" not in key_data or b"PRIVATE KEY" not in key_data:
+            return jsonify({"success": False, "message": "Ungültiger Schlüssel (kein PEM-Format)."}), 400
+
+        # Write to temp files and validate matching key/cert pair via openssl
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".crt") as tc:
+            tc.write(cert_data); tmp_cert = tc.name
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".key") as tk:
+            tk.write(key_data); tmp_key = tk.name
+
+        try:
+            cert_mod = subprocess.check_output(
+                ["openssl", "x509", "-noout", "-modulus", "-in", tmp_cert],
+                stderr=subprocess.DEVNULL, timeout=5
+            ).strip()
+            key_mod = subprocess.check_output(
+                ["openssl", "rsa", "-noout", "-modulus", "-in", tmp_key],
+                stderr=subprocess.DEVNULL, timeout=5
+            ).strip()
+        except subprocess.CalledProcessError:
+            os.unlink(tmp_cert); os.unlink(tmp_key)
+            return jsonify({"success": False, "message": "Zertifikat oder Schlüssel konnte nicht gelesen werden."}), 400
+        finally:
+            try: os.unlink(tmp_cert)
+            except: pass
+            try: os.unlink(tmp_key)
+            except: pass
+
+        if cert_mod != key_mod:
+            return jsonify({"success": False, "message": "Zertifikat und Schlüssel passen nicht zusammen."}), 400
+
+        os.makedirs(CERT_DIR, exist_ok=True)
+        with open(CERT_FILE, "wb") as f:
+            f.write(cert_data)
+        with open(KEY_FILE, "wb") as f:
+            f.write(key_data)
+        os.chmod(KEY_FILE, 0o640)
+        os.chmod(CERT_FILE, 0o644)
+
+        _reload_nginx()
+        return jsonify({"success": True, "message": "Zertifikat erfolgreich installiert und nginx neu geladen."})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
 def scheduler_loop():
+    last_fired = set()  # {"HH:MM:ch:state"} — prevents double-firing within same minute
     while True:
         try:
             now = datetime.now().strftime("%H:%M")
             schedule = load_schedule()
+            fired_this_minute = set()
             for job in schedule:
-                if job["time"] == now:
+                key = f"{job['time']}:{job['channel']}:{job['state']}"
+                if job["time"] == now and key not in last_fired:
+                    fired_this_minute.add(key)
                     try:
                         mosfet_control.set_output(job["channel"], job["state"])
                         Thread(target=_log_output_to_influx,
                                args=(job["channel"], bool(job["state"])), daemon=True).start()
                     except Exception as e:
                         app.logger.error(f"Scheduler: Fehler bei Kanal {job.get('channel')}: {e}")
+            last_fired = fired_this_minute
         except Exception as e:
             app.logger.error(f"Scheduler-Loop Fehler: {e}")
-        time.sleep(60)
+        time.sleep(30)
 
 Thread(target=scheduler_loop, daemon=True).start()
 
 
 # Start
 if __name__ == "__main__":
-    # läuft auf 0.0.0.0:8080
-    app.run(host="0.0.0.0", port=8080, debug=False)
+    # läuft auf 127.0.0.1:8080
+    app.run(host="127.0.0.1", port=8080, debug=False)
