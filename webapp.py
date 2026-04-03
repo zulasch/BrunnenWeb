@@ -17,6 +17,7 @@ CONFIG_PATH = os.path.join(BASE_DIR, "config", "config.json")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 SCHEDULE_FILE = os.path.join(BASE_DIR, "config", "output_schedule.json")
 NAMES_FILE = os.path.join(BASE_DIR, "config", "output_names.json")
+TYPES_FILE = os.path.join(BASE_DIR, "config", "output_types.json")
 CERT_DIR = os.path.join(BASE_DIR, "certs")
 CERT_FILE = os.path.join(CERT_DIR, "brunnen.crt")
 KEY_FILE = os.path.join(CERT_DIR, "brunnen.key")
@@ -147,7 +148,20 @@ def load_names():
 def save_names(data):
     with open(NAMES_FILE, "w") as f:
         json.dump(data, f, indent=2)
-        
+
+
+def load_types():
+    """Returns dict {0: "NO", 1: "NC", ...} — default NO for all channels."""
+    if os.path.exists(TYPES_FILE):
+        with open(TYPES_FILE) as f:
+            return json.load(f)
+    return {str(i): "NO" for i in range(6)}
+
+
+def save_types(data):
+    with open(TYPES_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
 
 def load_config():
     # Leere Basis
@@ -601,6 +615,19 @@ def outputs_names():
         save_names(data)
         return jsonify({"success": True, "message": "✅ Namen gespeichert"})
     return jsonify(load_names())
+
+
+@app.route("/outputs/types", methods=["GET", "POST"])
+@login_required
+def outputs_types():
+    if request.method == "POST":
+        data = request.form.to_dict()
+        # Ensure only valid values
+        clean = {k: ("NC" if v == "NC" else "NO") for k, v in data.items()}
+        save_types(clean)
+        return jsonify({"success": True, "message": "✅ Relaistypen gespeichert"})
+    return jsonify(load_types())
+
 
 @app.route("/outputs/set/<int:channel>/<int:state>", methods=["POST"])
 @login_required

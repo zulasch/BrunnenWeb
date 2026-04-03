@@ -16,15 +16,15 @@
      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
 </div>
 
-<!-- Kanalnamen bearbeiten -->
+<!-- Konfiguration: Namen + Relaistyp -->
 <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg max-w-3xl mx-auto mb-8">
   <h3 class="text-base font-semibold text-sky-400 mb-5 flex items-center gap-2">
-    <span>🏷️</span> Kanalnamen bearbeiten
+    <span>🏷️</span> Kanäle konfigurieren
   </h3>
   <form id="namesForm" class="grid md:grid-cols-2 gap-4"></form>
   <button type="submit" form="namesForm"
           class="mt-5 w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2.5 rounded-lg transition text-sm shadow-lg shadow-sky-900/20">
-    💾 Namen speichern
+    💾 Speichern
   </button>
   <p id="namesMsg" class="text-center mt-3 text-sm hidden"></p>
 </div>
@@ -71,42 +71,75 @@
 
 <script>
 let channelNames = {};
+let channelTypes = {};  // "NO" or "NC" per channel index
+
+/*
+ * NO (Normally Open):  Relais stromlos = Kontakt OFFEN.  GPIO HIGH → Kontakt GESCHLOSSEN.
+ * NC (Normally Closed): Relais stromlos = Kontakt GESCHLOSSEN. GPIO HIGH → Kontakt OFFEN.
+ *
+ * circuitClosed(gpioOn, type) → true wenn der Stromkreis geschlossen ist.
+ */
+function circuitClosed(gpioOn, type) {
+  return type === "NC" ? !gpioOn : gpioOn;
+}
 
 async function loadStates() {
   try {
-    const [stateRes, nameRes] = await Promise.all([
+    const [stateRes, nameRes, typeRes] = await Promise.all([
       fetch("/outputs/state"),
-      fetch("/outputs/names")
+      fetch("/outputs/names"),
+      fetch("/outputs/types")
     ]);
-    const states = await stateRes.json();
-    channelNames = await nameRes.json();
+    const gpioStates = await stateRes.json();   // [true/false, ...]
+    channelNames     = await nameRes.json();
+    channelTypes     = await typeRes.json();    // {"0":"NO","1":"NC",...}
 
     const grid = document.getElementById("outputsGrid");
     grid.innerHTML = "";
 
-    states.forEach((on, i) => {
-      const label = channelNames[i] || `Kanal ${i + 1}`;
+    gpioStates.forEach((gpioOn, i) => {
+      const label  = channelNames[i] || `Kanal ${i + 1}`;
+      const type   = channelTypes[String(i)] || "NO";
+      const closed = circuitClosed(gpioOn, type);
 
+      // Card border: green when circuit is CLOSED (current flows)
       const card = document.createElement("div");
-      card.className = on
-        ? "bg-slate-800 border border-emerald-600/50 rounded-xl shadow-lg p-5 relative text-center transition hover:shadow-emerald-900/20"
+      card.className = closed
+        ? "bg-slate-800 border border-emerald-600/50 rounded-xl shadow-lg p-5 relative text-center transition"
         : "bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-5 relative text-center transition";
+
+      // Badge colors
+      const typeBadgeClass = type === "NC"
+        ? "text-xs px-2 py-0.5 rounded font-mono bg-amber-900/40 border border-amber-700/50 text-amber-400"
+        : "text-xs px-2 py-0.5 rounded font-mono bg-sky-900/40 border border-sky-700/50 text-sky-400";
+
+      const dotClass   = closed ? "bg-emerald-400 shadow-lg shadow-emerald-400/50" : "bg-slate-600";
+      const statusText = closed ? "Geschlossen" : "Offen";
+      const statusColor = closed ? "text-emerald-400" : "text-slate-500";
+
+      // Button always toggles the GPIO state
+      const btnClass = gpioOn
+        ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30"
+        : "bg-slate-700 hover:bg-slate-600 text-slate-300";
+      const btnLabel = gpioOn ? "⏹ Ausschalten" : "▶ Einschalten";
 
       card.innerHTML = `
         <div class="flex items-center justify-between mb-4">
           <h4 class="font-semibold text-sm text-slate-200 text-left">${label}</h4>
-          <span class="w-2.5 h-2.5 rounded-full ${on ? 'bg-emerald-400 shadow-lg shadow-emerald-400/50' : 'bg-slate-600'}"></span>
+          <div class="flex items-center gap-2">
+            <span class="${typeBadgeClass}">${type}</span>
+            <span class="w-2.5 h-2.5 rounded-full ${dotClass}"></span>
+          </div>
         </div>
-        <button onclick="toggle(${i}, ${on ? 0 : 1})"
-                class="w-full py-2.5 rounded-lg text-sm font-semibold transition
-                       ${on
-                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30'
-                          : 'bg-slate-700 hover:bg-slate-600 text-slate-300'}">
-          ${on ? '⏹ Ausschalten' : '▶ Einschalten'}
+        <button onclick="toggle(${i}, ${gpioOn ? 0 : 1})"
+                class="w-full py-2.5 rounded-lg text-sm font-semibold transition ${btnClass}">
+          ${btnLabel}
         </button>
-        <p class="mt-2.5 text-xs ${on ? 'text-emerald-400' : 'text-slate-500'} font-medium">
-          ${on ? 'Aktiv' : 'Inaktiv'}
-        </p>
+        <div class="mt-2.5 flex items-center justify-center gap-2">
+          <span class="text-xs ${statusColor} font-medium">Kontakt: ${statusText}</span>
+          <span class="text-xs text-slate-600">·</span>
+          <span class="text-xs text-slate-600">GPIO: ${gpioOn ? 'HIGH' : 'LOW'}</span>
+        </div>
       `;
       grid.appendChild(card);
     });
@@ -122,17 +155,31 @@ async function toggle(channel, state) {
   loadStates();
 }
 
-/* Namen bearbeiten */
+/* Namen + Relaistypen bearbeiten */
 async function loadNamesForm() {
-  const res = await fetch("/outputs/names");
-  const data = await res.json();
-  const form = document.getElementById("namesForm");
+  const [nameRes, typeRes] = await Promise.all([
+    fetch("/outputs/names"),
+    fetch("/outputs/types")
+  ]);
+  const names = await nameRes.json();
+  const types = await typeRes.json();
+  const form  = document.getElementById("namesForm");
   form.innerHTML = "";
-  Object.keys(data).forEach(k => {
+
+  Object.keys(names).forEach(k => {
+    const t = types[String(k)] || "NO";
     form.innerHTML += `
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Kanal ${parseInt(k)+1}</label>
-        <input name="${k}" value="${data[k]}" class="border rounded-lg px-3 py-2 w-full text-sm">
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-slate-300">Kanal ${parseInt(k)+1}</label>
+        <input name="name_${k}" value="${names[k]}"
+               class="border rounded-lg px-3 py-2 w-full text-sm" placeholder="Kanalname">
+        <div class="flex gap-2 items-center">
+          <span class="text-xs text-slate-500 shrink-0">Relaistyp:</span>
+          <select name="type_${k}" class="border rounded-lg px-3 py-1.5 text-sm flex-1">
+            <option value="NO" ${t === 'NO' ? 'selected' : ''}>NO – Normal Offen</option>
+            <option value="NC" ${t === 'NC' ? 'selected' : ''}>NC – Normal Geschlossen</option>
+          </select>
+        </div>
       </div>`;
   });
 }
@@ -140,11 +187,26 @@ async function loadNamesForm() {
 document.getElementById("namesForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
-  const res = await fetch("/outputs/names", { method: "POST", body: formData });
+
+  // Split names and types into separate POSTs
+  const namesData = new FormData();
+  const typesData = new FormData();
+
+  for (const [k, v] of formData.entries()) {
+    if (k.startsWith("name_"))  namesData.append(k.replace("name_", ""), v);
+    if (k.startsWith("type_"))  typesData.append(k.replace("type_", ""), v);
+  }
+
+  const [r1, r2] = await Promise.all([
+    fetch("/outputs/names", { method: "POST", body: namesData }),
+    fetch("/outputs/types", { method: "POST", body: typesData })
+  ]);
+
   const msg = document.getElementById("namesMsg");
   msg.classList.remove("hidden");
-  msg.textContent = res.ok ? "✅ Gespeichert" : "❌ Fehler";
-  msg.className = res.ok
+  const ok = r1.ok && r2.ok;
+  msg.textContent = ok ? "✅ Gespeichert" : "❌ Fehler";
+  msg.className = ok
     ? "block text-emerald-400 text-sm mt-3"
     : "block text-rose-400 text-sm mt-3";
   setTimeout(() => msg.classList.add("hidden"), 2500);
