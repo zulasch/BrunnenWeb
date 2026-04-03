@@ -80,45 +80,46 @@ DEFAULT_CONFIG = {
 # Kanal-spezifische Defaults generieren
 #for ch in ["A0", "A1", "A2", "A3"]:
 
-DEFAULT_CONFIG.setdefault(f"NAME_A0", "Nordbrunnen ABC")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A0", "m")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A0", "LEVEL")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A0", 0.0,)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A0", 3.0)
-DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A0", 100.0)
-DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A0", 25.0)
-DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A0", 100.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A0", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A0", "Nordbrunnen ABC")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A0", "m")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A0", "LEVEL")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A0", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A0", 3.0)
+DEFAULT_CONFIG.setdefault("STARTABSTICH_A0", 100.0)
+DEFAULT_CONFIG.setdefault("INITIAL_WASSERTIEFE_A0", 25.0)
+DEFAULT_CONFIG.setdefault("MESSWERT_NN_A0", 100.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A0", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A1", "Pumpentemperatur")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A1", "°C")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A1", "TEMP")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A1", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A1", 3.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A1", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A1", "Pumpentemperatur")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A1", "°C")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A1", "TEMP")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A1", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A1", 3.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A1", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A2", "Pumpendurchfluss")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A2", "m3/h")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A2", "FLOW")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A2", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A2", 3.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A2", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A2", "Pumpendurchfluss")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A2", "m3/h")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A2", "FLOW")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A2", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A2", 3.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A2", 150.0)
 
-DEFAULT_CONFIG.setdefault(f"NAME_A3", "reserve")
-DEFAULT_CONFIG.setdefault(f"SENSOR_EINHEIT_A3", "m")
-DEFAULT_CONFIG.setdefault(f"SENSOR_TYP_A3", "LEVEL")
-DEFAULT_CONFIG.setdefault(f"WERT_4mA_A3", 0.0)
-DEFAULT_CONFIG.setdefault(f"WERT_20mA_A3", 3.0)
-DEFAULT_CONFIG.setdefault(f"STARTABSTICH_A3", 100.0)
-DEFAULT_CONFIG.setdefault(f"INITIAL_WASSERTIEFE_A3", 15.0)
-DEFAULT_CONFIG.setdefault(f"MESSWERT_NN_A3", 00.0)
-DEFAULT_CONFIG.setdefault(f"SHUNT_OHMS_A3", 150.0)
+DEFAULT_CONFIG.setdefault("NAME_A3", "reserve")
+DEFAULT_CONFIG.setdefault("SENSOR_EINHEIT_A3", "m")
+DEFAULT_CONFIG.setdefault("SENSOR_TYP_A3", "LEVEL")
+DEFAULT_CONFIG.setdefault("WERT_4mA_A3", 0.0)
+DEFAULT_CONFIG.setdefault("WERT_20mA_A3", 3.0)
+DEFAULT_CONFIG.setdefault("STARTABSTICH_A3", 100.0)
+DEFAULT_CONFIG.setdefault("INITIAL_WASSERTIEFE_A3", 15.0)
+DEFAULT_CONFIG.setdefault("MESSWERT_NN_A3", 0.0)
+DEFAULT_CONFIG.setdefault("SHUNT_OHMS_A3", 150.0)
 
 
 # ===== Flask =====
 app = Flask(__name__, template_folder="templates", static_folder="static")
-# Geheimschlüssel (für Sessions). In Produktion in ENV legen!
-app.config["SECRET_KEY"] = os.environ.get("WEBAPP_SECRET", "change-me-please")
+# Geheimschlüssel: aus ENV oder zufällig generiert (Sessions überleben Neustarts nur mit festem Key in ENV)
+import secrets as _secrets
+app.config["SECRET_KEY"] = os.environ.get("WEBAPP_SECRET", _secrets.token_hex(32))
 
 @app.context_processor
 def inject_globals():
@@ -126,41 +127,55 @@ def inject_globals():
     return {"device_id": cfg.get("DEVICE_ID", socket.gethostname())}
 
 # ===== Helpers =====
+def _write_json_atomic(path: str, data):
+    """Write JSON atomically via temp file to prevent corruption on crash."""
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(data, f, indent=2)
+    os.replace(tmp, path)
+
+
 def load_schedule():
     if os.path.exists(SCHEDULE_FILE):
-        with open(SCHEDULE_FILE) as f:
-            return json.load(f)
+        try:
+            with open(SCHEDULE_FILE) as f:
+                return json.load(f)
+        except Exception:
+            pass
     return []
 
 
 def save_schedule(data):
-    with open(SCHEDULE_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+    _write_json_atomic(SCHEDULE_FILE, data)
 
 
 def load_names():
     if os.path.exists(NAMES_FILE):
-        with open(NAMES_FILE) as f:
-            return json.load(f)
+        try:
+            with open(NAMES_FILE) as f:
+                return json.load(f)
+        except Exception:
+            pass
     return {str(i): f"Kanal {i+1}" for i in range(6)}
 
 
 def save_names(data):
-    with open(NAMES_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+    _write_json_atomic(NAMES_FILE, data)
 
 
 def load_types():
-    """Returns dict {0: "NO", 1: "NC", ...} — default NO for all channels."""
+    """Returns dict {"0": "NO", "1": "NC", ...} — default NO for all channels."""
     if os.path.exists(TYPES_FILE):
-        with open(TYPES_FILE) as f:
-            return json.load(f)
+        try:
+            with open(TYPES_FILE) as f:
+                return json.load(f)
+        except Exception:
+            pass
     return {str(i): "NO" for i in range(6)}
 
 
 def save_types(data):
-    with open(TYPES_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+    _write_json_atomic(TYPES_FILE, data)
 
 
 def load_config():
@@ -190,18 +205,16 @@ def load_config():
             cfg.pop(key)
             changed = True
 
-    # 4️⃣ Wenn sich was geändert hat -> wieder speichern
+    # 4️⃣ Wenn sich was geändert hat -> wieder speichern (atomar via Temp-Datei)
     if changed:
         os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-        with open(CONFIG_PATH, "w") as f:
-            json.dump(cfg, f, indent=2)
+        _write_json_atomic(CONFIG_PATH, cfg)
 
     return cfg
 
 
 def save_config(cfg: dict):
-    with open(CONFIG_PATH, "w") as f:
-        json.dump(cfg, f, indent=2)
+    _write_json_atomic(CONFIG_PATH, cfg)
 
 # ===== Nextcloud / WebDAV Backup =====
 _BACKUP_FILES = ["config.json", "output_schedule.json", "output_names.json"]
@@ -702,7 +715,7 @@ def service_action():
             return jsonify({"status": "ok", "message": st})
 
         # Wenn die WebApp sich selbst neu startet → gleich Erfolg melden
-        if service in ("brunnen_web.service", "web"):
+        if service == "web":
             subprocess.Popen(
                 ["sudo", "systemctl", "restart", "brunnen_web.service"],
                 stdout=subprocess.DEVNULL,
@@ -1354,21 +1367,26 @@ def certificates_upload():
 
 
 def scheduler_loop():
+    last_fired = set()  # {"HH:MM:ch:state"} — prevents double-firing within same minute
     while True:
         try:
             now = datetime.now().strftime("%H:%M")
             schedule = load_schedule()
+            fired_this_minute = set()
             for job in schedule:
-                if job["time"] == now:
+                key = f"{job['time']}:{job['channel']}:{job['state']}"
+                if job["time"] == now and key not in last_fired:
+                    fired_this_minute.add(key)
                     try:
                         mosfet_control.set_output(job["channel"], job["state"])
                         Thread(target=_log_output_to_influx,
                                args=(job["channel"], bool(job["state"])), daemon=True).start()
                     except Exception as e:
                         app.logger.error(f"Scheduler: Fehler bei Kanal {job.get('channel')}: {e}")
+            last_fired = fired_this_minute
         except Exception as e:
             app.logger.error(f"Scheduler-Loop Fehler: {e}")
-        time.sleep(60)
+        time.sleep(30)
 
 Thread(target=scheduler_loop, daemon=True).start()
 
