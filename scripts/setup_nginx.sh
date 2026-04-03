@@ -86,7 +86,17 @@ echo "nginx-Konfiguration geschrieben." | tee -a "$LOG"
 ln -sf "$NGINX_CONF" "$NGINX_ENABLED"
 rm -f /etc/nginx/sites-enabled/default
 
-# ── 6. nginx aktivieren + neu laden ───────────────────────
+# ── 6. Gunicorn auf 127.0.0.1 beschränken (falls noch 0.0.0.0) ────────────
+SERVICE_FILE="/etc/systemd/system/brunnen_web.service"
+if [ -f "$SERVICE_FILE" ] && grep -q "0.0.0.0:8080" "$SERVICE_FILE"; then
+  echo "Beschränke gunicorn auf 127.0.0.1:8080..." | tee -a "$LOG"
+  sed -i 's/0\.0\.0\.0:8080/127.0.0.1:8080/g' "$SERVICE_FILE"
+  systemctl daemon-reload >>"$LOG" 2>&1
+  systemctl restart brunnen_web.service >>"$LOG" 2>&1
+  echo "gunicorn-Bind aktualisiert und Service neu gestartet." | tee -a "$LOG"
+fi
+
+# ── 7. nginx aktivieren + neu laden ───────────────────────
 systemctl enable nginx >>"$LOG" 2>&1
 
 if nginx -t >>"$LOG" 2>&1; then
