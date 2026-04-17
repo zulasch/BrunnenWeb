@@ -50,10 +50,10 @@
       <div class="w-9 h-9 rounded-lg bg-purple-500/15 flex items-center justify-center shrink-0">
         <span class="text-lg">🌀</span>
       </div>
-      <div>
-        <h2 class="font-semibold text-slate-100 text-sm">GitHub-Update</h2>
+      <div class="flex-1">
+        <h2 class="font-semibold text-slate-100 text-sm">System-Update</h2>
         <p class="text-xs text-slate-500 mt-1">
-          Lädt automatisch die neuesten Änderungen aus GitHub und aktualisiert die Umgebung.
+          Aktualisiert das Betriebssystem (apt), lädt Änderungen aus GitHub und startet die Dienste neu.
         </p>
       </div>
     </div>
@@ -61,12 +61,23 @@
       class="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-4 py-2.5 rounded-lg transition w-full text-sm">
       ⬆️ Update starten
     </button>
+
+    <!-- Terminal-Ausgabe -->
+    <div id="updateTerminal" class="hidden mt-4">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs text-slate-500 font-mono">update.log</span>
+        <span id="updateStatusBadge" class="text-xs px-2 py-0.5 rounded font-medium bg-amber-900/40 border border-amber-700 text-amber-300">
+          läuft…
+        </span>
+      </div>
+      <pre id="updateOutput"
+           class="bg-slate-950 border border-slate-700 rounded-lg p-4 text-xs font-mono text-slate-300 overflow-y-auto max-h-80 whitespace-pre-wrap leading-relaxed"></pre>
+    </div>
   </div>
 
 </div>
 
 <div id="service-result" class="mt-4"></div>
-<div id="updateStatus" class="mt-3 p-4 rounded-xl text-sm hidden"></div>
 
 <script>
 async function restartService(service) {
@@ -122,36 +133,64 @@ async function restartService(service) {
 document.getElementById("restart-logger").addEventListener("click", () => restartService("logger"));
 document.getElementById("restart-web").addEventListener("click", () => restartService("web"));
 
-document.getElementById("updateBtn").addEventListener("click", async () => {
-  const statusBox = document.getElementById("updateStatus");
-  const btn = document.getElementById("updateBtn");
+document.getElementById("updateBtn").addEventListener("click", () => {
+  if (!confirm("⚙️ Möchtest du wirklich ein System-Update ausführen?\n\nDas kann mehrere Minuten dauern.")) return;
 
-  if (!confirm("⚙️ Möchtest du wirklich ein GitHub-Update ausführen?")) return;
+  const btn      = document.getElementById("updateBtn");
+  const terminal = document.getElementById("updateTerminal");
+  const output   = document.getElementById("updateOutput");
+  const badge    = document.getElementById("updateStatusBadge");
 
-  btn.disabled = true;
-  btn.innerText = "⏳ Aktualisiere...";
-  statusBox.className = "mt-3 p-4 rounded-xl text-sm bg-amber-900/40 border border-amber-700 text-amber-300";
-  statusBox.innerText = "Update läuft... bitte warten.";
-  statusBox.classList.remove("hidden");
+  btn.disabled   = true;
+  btn.textContent = "⏳ Update läuft…";
+  output.textContent = "";
+  terminal.classList.remove("hidden");
+  badge.textContent  = "läuft…";
+  badge.className    = "text-xs px-2 py-0.5 rounded font-medium bg-amber-900/40 border border-amber-700 text-amber-300";
 
-  try {
-    const response = await fetch("/update-system", { method: "POST" });
-    const data = await response.json();
+  const es = new EventSource("/update-system/stream");
 
-    if (data.success) {
-      statusBox.className = "mt-3 p-4 rounded-xl text-sm bg-emerald-900/40 border border-emerald-700 text-emerald-300 whitespace-pre-wrap";
-      statusBox.innerText = "✅ Update erfolgreich abgeschlossen:\n\n" + data.message;
-    } else {
-      statusBox.className = "mt-3 p-4 rounded-xl text-sm bg-rose-900/40 border border-rose-700 text-rose-300 whitespace-pre-wrap";
-      statusBox.innerText = "❌ Fehler beim Update:\n\n" + (data.message || "Unbekannter Fehler");
+  es.onmessage = (e) => {
+    const line = e.data;
+
+    if (line === "[DONE]") {
+      es.close();
+      badge.textContent = "✅ erfolgreich";
+      badge.className   = "text-xs px-2 py-0.5 rounded font-medium bg-emerald-900/40 border border-emerald-700 text-emerald-300";
+      btn.disabled      = false;
+      btn.textContent   = "⬆️ Update starten";
+      return;
     }
-  } catch (err) {
-    statusBox.className = "mt-3 p-4 rounded-xl text-sm bg-rose-900/40 border border-rose-700 text-rose-300";
-    statusBox.innerText = "⚠️ Netzwerkfehler oder Serverproblem: " + err;
-  }
+    if (line.startsWith("[ERROR")) {
+      es.close();
+      badge.textContent = "❌ Fehler";
+      badge.className   = "text-xs px-2 py-0.5 rounded font-medium bg-rose-900/40 border border-rose-700 text-rose-300";
+      btn.disabled      = false;
+      btn.textContent   = "⬆️ Update starten";
+      return;
+    }
 
-  btn.disabled = false;
-  btn.innerText = "⬆️ Update starten";
+    output.textContent += line + "\n";
+    // Auto-scroll ans Ende
+    output.scrollTop = output.scrollHeight;
+  };
+
+  es.onerror = () => {
+    es.close();
+    // Wenn der Server sich selbst neu startet, verlieren wir die Verbindung – das ist normal
+    if (output.textContent.includes("wird automatisch neu gestartet")) {
+      badge.textContent = "✅ Neustart läuft…";
+      badge.className   = "text-xs px-2 py-0.5 rounded font-medium bg-emerald-900/40 border border-emerald-700 text-emerald-300";
+      output.textContent += "\n🔄 Seite wird in 8 Sekunden neu geladen…";
+      output.scrollTop = output.scrollHeight;
+      setTimeout(() => location.reload(), 8000);
+    } else {
+      badge.textContent = "⚠️ Verbindung unterbrochen";
+      badge.className   = "text-xs px-2 py-0.5 rounded font-medium bg-amber-900/40 border border-amber-700 text-amber-400";
+    }
+    btn.disabled    = false;
+    btn.textContent = "⬆️ Update starten";
+  };
 });
 </script>
 {% endblock %}

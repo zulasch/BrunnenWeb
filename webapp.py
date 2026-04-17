@@ -5,7 +5,7 @@ import os, json, socket, subprocess, functools, time, zipfile, io, re
 from pathlib import Path
 from threading import Thread
 from urllib.parse import urlparse, urljoin
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort, flash, Response, stream_with_context
 import requests
 from xml.etree import ElementTree as ET
 import mosfet_control
@@ -751,26 +751,41 @@ def service_action():
     except Exception as e:
         return jsonify({"status": "error", "message": f"❌ Unerwarteter Fehler: {e}"}), 500
 
-@app.route("/update-system", methods=["POST"])
+@app.route("/update-system/stream")
 @login_required
-def update_system():
-    """Startet das GitHub-Update-Skript."""
-    script_path = "/opt/brunnen_web/scripts/update_repo.sh"
-    if not os.path.exists(script_path):
-        return jsonify({"success": False, "message": f"Skript nicht gefunden: {script_path}"}), 404
+def update_system_stream():
+    """Startet das GitHub-Update-Skript und streamt die Ausgabe via SSE."""
+    script_path = os.path.join(BASE_DIR, "scripts/update_repo.sh")
 
-    try:
-        result = subprocess.check_output(
-            ["sudo", script_path],
-            stderr=subprocess.STDOUT,
-            text=True,
-            timeout=180
-        )
-        return jsonify({"success": True, "message": result})
-    except subprocess.CalledProcessError as e:
-        return jsonify({"success": False, "message": e.output}), 500
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
+    def generate():
+        if not os.path.exists(script_path):
+            yield f"data: ❌ Skript nicht gefunden: {script_path}\n\n"
+            yield "data: [ERROR]\n\n"
+            return
+        try:
+            proc = subprocess.Popen(
+                ["sudo", script_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1
+            )
+            for line in proc.stdout:
+                yield f"data: {line.rstrip()}\n\n"
+            proc.wait()
+            if proc.returncode == 0:
+                yield "data: [DONE]\n\n"
+            else:
+                yield f"data: [ERROR:returncode={proc.returncode}]\n\n"
+        except Exception as e:
+            yield f"data: ❌ Fehler: {e}\n\n"
+            yield "data: [ERROR]\n\n"
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+    )
 
 
 @app.route("/logs")
