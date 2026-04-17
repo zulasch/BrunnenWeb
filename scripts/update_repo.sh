@@ -32,6 +32,9 @@ if [ ! -d ".git" ]; then
   exit 1
 fi
 
+# Eigentümerschaft sicherstellen (verhindert git-Permissions-Fehler)
+chown -R "$USER":"$USER" "$BASE_DIR" >>"$LOG" 2>&1
+
 # Als Brunnen-User ausführen (sicherer)
 sudo -u "$USER" git reset --hard HEAD >>"$LOG" 2>&1
 sudo -u "$USER" git pull >>"$LOG" 2>&1
