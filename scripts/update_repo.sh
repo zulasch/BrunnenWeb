@@ -14,6 +14,16 @@ LOG="$BASE_DIR/logs/update.log"
 
 echo "🌀 Starte GitHub Update am $(date)" | tee -a "$LOG"
 
+# ── Betriebssystem-Updates ─────────────────────────────────
+echo "🖥️  Aktualisiere Betriebssystem (apt)..." | tee -a "$LOG"
+DEBIAN_FRONTEND=noninteractive apt-get update -qq >>"$LOG" 2>&1
+DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -qq >>"$LOG" 2>&1
+if [ $? -eq 0 ]; then
+  echo "✅ Betriebssystem erfolgreich aktualisiert." | tee -a "$LOG"
+else
+  echo "⚠️  apt upgrade fehlgeschlagen – Update wird trotzdem fortgesetzt." | tee -a "$LOG"
+fi
+
 cd "$BASE_DIR" || exit 1
 
 # Prüfe Repository-Zustand
