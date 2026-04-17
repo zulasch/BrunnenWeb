@@ -3,7 +3,7 @@
 # 💧 Brunnen – Automatisches GitHub Update
 # ============================================================
 # Dieses Skript aktualisiert den Brunnen-Code aus GitHub
-# und startet anschließend den Systemd-Service neu. 
+# und startet anschließend den Systemd-Service neu.
 #
 # ============================================================
 
@@ -12,51 +12,59 @@ SERVICE="brunnen_web.service brunnen_logger.service brunnen_display.service"
 USER="brunnen"
 LOG="$BASE_DIR/logs/update.log"
 
-echo "🌀 Starte GitHub Update am $(date)" | tee -a "$LOG"
+# Hilfsfunktion: Ausgabe geht gleichzeitig auf stdout (→ WebGUI) und ins Logfile
+log() { echo "$@" | tee -a "$LOG"; }
+run() { "$@" 2>&1 | tee -a "$LOG"; return "${PIPESTATUS[0]}"; }
+
+log "🌀 Starte GitHub Update am $(date)"
 
 # ── Betriebssystem-Updates ─────────────────────────────────
-echo "🖥️  Aktualisiere Betriebssystem (apt)..." | tee -a "$LOG"
-DEBIAN_FRONTEND=noninteractive apt-get update -qq >>"$LOG" 2>&1
-DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -qq >>"$LOG" 2>&1
-if [ $? -eq 0 ]; then
-  echo "✅ Betriebssystem erfolgreich aktualisiert." | tee -a "$LOG"
+log "🖥️  Aktualisiere Betriebssystem (apt)..."
+run DEBIAN_FRONTEND=noninteractive apt-get update
+run DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+if [ ${PIPESTATUS[0]} -eq 0 ]; then
+  log "✅ Betriebssystem erfolgreich aktualisiert."
 else
-  echo "⚠️  apt upgrade fehlgeschlagen – Update wird trotzdem fortgesetzt." | tee -a "$LOG"
+  log "⚠️  apt upgrade fehlgeschlagen – Update wird trotzdem fortgesetzt."
 fi
 
 cd "$BASE_DIR" || exit 1
 
 # Prüfe Repository-Zustand
 if [ ! -d ".git" ]; then
-  echo "❌ Kein Git-Repository gefunden unter $BASE_DIR" | tee -a "$LOG"
+  log "❌ Kein Git-Repository gefunden unter $BASE_DIR"
   exit 1
 fi
 
 # Eigentümerschaft sicherstellen (verhindert git-Permissions-Fehler)
-chown -R "$USER":"$USER" "$BASE_DIR" >>"$LOG" 2>&1
+log "🔑 Prüfe Dateiberechtigungen..."
+chown -R "$USER":"$USER" "$BASE_DIR" 2>&1 | tee -a "$LOG"
 
 # Als Brunnen-User ausführen (sicherer)
-sudo -u "$USER" git reset --hard HEAD >>"$LOG" 2>&1
-sudo -u "$USER" git pull >>"$LOG" 2>&1
+log "📥 git reset --hard HEAD..."
+run sudo -u "$USER" git reset --hard HEAD
 
-if [ $? -ne 0 ]; then
-  echo "❌ Fehler beim Aktualisieren der Repository" | tee -a "$LOG"
+log "📥 git pull..."
+run sudo -u "$USER" git pull
+
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
+  log "❌ Fehler beim Aktualisieren der Repository"
   exit 1
 fi
 
-echo "✅ Repository erfolgreich aktualisiert." | tee -a "$LOG"
+log "✅ Repository erfolgreich aktualisiert."
 
 # Virtuelle Umgebung prüfen
 if [ -d "$BASE_DIR/venv" ]; then
-  echo "📦 Aktualisiere Python-Abhängigkeiten..." | tee -a "$LOG"
+  log "📦 Aktualisiere Python-Abhängigkeiten..."
   source "$BASE_DIR/venv/bin/activate"
-  pip install -r "$BASE_DIR/requirements.txt" >>"$LOG" 2>&1
+  run pip install -r "$BASE_DIR/requirements.txt"
 fi
 
 # Nginx + SSL idempotent aktualisieren (neue Config, Zertifikat nur wenn fehlend)
 if [ -f "$BASE_DIR/scripts/setup_nginx.sh" ]; then
-  echo "🔒 Aktualisiere nginx-Konfiguration..." | tee -a "$LOG"
-  sudo bash "$BASE_DIR/scripts/setup_nginx.sh" >>"$LOG" 2>&1
+  log "🔒 Aktualisiere nginx-Konfiguration..."
+  run sudo bash "$BASE_DIR/scripts/setup_nginx.sh"
 fi
 
 # ------------------------------------------------------------
@@ -72,33 +80,24 @@ for unit in "${UNITS[@]}"; do
   DST="$SYSTEMD_DIR/$unit"
 
   if [ -f "$SRC" ]; then
-    echo "🔧 Deploy systemd unit: $unit" | tee -a "$LOG"
-    sudo cp "$SRC" "$DST"
+    log "🔧 Deploy systemd unit: $unit"
+    run sudo cp "$SRC" "$DST"
     sudo chmod 644 "$DST"
   else
-    echo "⚠️ Unit nicht gefunden im Repo: $SRC" | tee -a "$LOG"
+    log "⚠️ Unit nicht gefunden im Repo: $SRC"
   fi
 done
 
-sudo systemctl daemon-reload
+run sudo systemctl daemon-reload
 
 # Unit beim Boot aktivieren (idempotent)
-sudo systemctl enable brunnen_display.service >>"$LOG" 2>&1
+run sudo systemctl enable brunnen_display.service
 
-# Optional: direkt neu starten, wenn sie existiert
-sudo systemctl restart brunnen_display.service >>"$LOG" 2>&1
+# Display-Service neu starten
+run sudo systemctl restart brunnen_display.service
 
-
-# Service neu starten
 # Service-Neustart verzögern (3 Sekunden nach Abschluss)
-echo "🕒 Plane Neustart in 3 Sekunden..." | tee -a "$LOG"
+log "🕒 Plane Neustart in 3 Sekunden..."
 (sleep 3 && sudo systemctl restart $SERVICE) >/dev/null 2>&1 &
-echo "✅ Update abgeschlossen – Server wird automatisch neu gestartet." | tee -a "$LOG"
-
-if [ $? -eq 0 ]; then
-  echo "✅ Dienst erfolgreich neu gestartet." | tee -a "$LOG"
-else
-  echo "⚠️ Fehler beim Neustart des Dienstes." | tee -a "$LOG"
-fi
-
-echo "🟢 Update abgeschlossen am $(date)" | tee -a "$LOG"
+log "✅ Update abgeschlossen – Server wird automatisch neu gestartet."
+log "🟢 Update abgeschlossen am $(date)"
