@@ -571,10 +571,10 @@ def send_to_influx(data_list):
                     if sensor_type == "LEVEL":
                         p = (
                             p
-                            .field("Wassertiefe",     float(entry["level_m"]))
-                            .field("Startabstich",    float(entry["wasser_oberflaeche_m"]))
-                            .field("Messwert_NN",     float(entry["messwert_NN"]))
-                            .field("Pegel_Differenz", float(entry["pegel_diff"]))
+                            .field("Wassertiefe",             float(entry["level_m"]))
+                            .field("Wasserstand_m_u_Gel",     float(entry["wasser_oberflaeche_m"]))
+                            .field("Messwert_NN",             float(entry["messwert_NN"]))
+                            .field("Pegel_Differenz",         float(entry["pegel_diff"]))
                         )
                     elif sensor_type == "TEMP":
                         p = p.field("Temperatur", value)
